@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="WorkHub.Business/WorkHub.Business.csproj" />
+  <Project Path="WorkHub.DataAccess/WorkHub.DataAccess.csproj" />
+  <Project Path="WorkHub.Models/WorkHub.Models.csproj" />
+  <Project Path="WorkHub.Utility/WorkHub.Utility.csproj" />
+  <Project Path="WorkHub/WorkHub.csproj" />
+</Solution>
