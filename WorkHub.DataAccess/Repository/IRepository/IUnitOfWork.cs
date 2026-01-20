@@ -10,7 +10,7 @@ namespace WorkHub.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
-        //IProductRepository Product { get; }
+        public IRecruitmentInfoRepo RecruitmentInfoRepo { get; }
         Task SaveAsync();
     }
 }

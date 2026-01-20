@@ -76,6 +76,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// AutoMapper ? PLACE IT HERE
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // CORS
 builder.Services.AddCors(options =>

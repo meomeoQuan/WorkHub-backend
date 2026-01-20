@@ -15,8 +15,10 @@ namespace WorkHub.DataAccess.Repository
         public UnitOfWork(WorkHubDbContext db)
         {
             _db = db;
-            //Product = new ProductRepository(_db);
+            RecruitmentInfoRepo = new RecruitmentInfoRepo(_db);
         }
+
+        public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
 
         //public IProductRepository Product { get; private set; }
 
