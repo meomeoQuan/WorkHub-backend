@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WorkHub.Business\WorkHub.Business.csproj" />
     <ProjectReference Include="..\WorkHub.DataAccess\WorkHub.DataAccess.csproj" />
   </ItemGroup>
 

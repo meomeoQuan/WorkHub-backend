@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -7,7 +7,7 @@ using System.Text;
 using WorkHub.DataAccess.Data;
 using WorkHub.DataAccess.Repository;
 using WorkHub.DataAccess.Repository.IRepository;
-
+using WorkHub.Business.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,8 +76,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// AutoMapper ? PLACE IT HERE
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// AutoMapper ✅ PLACE IT HERE
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // CORS
 builder.Services.AddCors(options =>
@@ -120,7 +120,7 @@ app.UseHttpsRedirection();
 // CORS must be BEFORE MapControllers
 app.UseCors("AllowAll");
 
-app.UseAuthentication(); // ?? MUST be before authorization
+app.UseAuthentication(); // 👈 MUST be before authorization
 app.UseAuthorization();
 
 // Health endpoint (ALB)

@@ -25,4 +25,8 @@
     <Folder Include="Service\IService\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WorkHub.Models\WorkHub.Models.csproj" />
+  </ItemGroup>
+
 </Project>
