@@ -22,11 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Service\IService\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\WorkHub.DataAccess\WorkHub.DataAccess.csproj" />
     <ProjectReference Include="..\WorkHub.Models\WorkHub.Models.csproj" />
+    <ProjectReference Include="..\WorkHub.Utility\WorkHub.Utility.csproj" />
   </ItemGroup>
 
 </Project>
