@@ -20,7 +20,7 @@ namespace WorkHub.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

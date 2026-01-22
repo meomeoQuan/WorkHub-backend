@@ -34,6 +34,7 @@ namespace WorkHub.Business.Service
             var user = new User
             {
                 Email = request.Email,
+                FullName = request.Email,
                 Password = hash,
                 Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker)
             };
