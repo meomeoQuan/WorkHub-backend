@@ -16,11 +16,14 @@ namespace WorkHub.DataAccess.Repository
         {
             _db = db;
             RecruitmentInfoRepo = new RecruitmentInfoRepo(_db);
+            UserRepository = new UserRepository(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
 
-        //public IProductRepository Product { get; private set; }
+        public IUserRepository UserRepository { get; private set; }
+
+
 
         public async Task SaveAsync()
         {

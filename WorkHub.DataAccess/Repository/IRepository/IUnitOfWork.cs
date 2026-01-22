@@ -11,6 +11,7 @@ namespace WorkHub.DataAccess.Repository.IRepository
     public interface IUnitOfWork
     {
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; }
+        public IUserRepository UserRepository { get; }
         Task SaveAsync();
     }
 }

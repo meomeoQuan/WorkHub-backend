@@ -8,6 +8,8 @@ using WorkHub.DataAccess.Data;
 using WorkHub.DataAccess.Repository;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Business.Mapping;
+using WorkHub.Business.Service;
+using WorkHub.Business.Service.IService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +104,8 @@ builder.Services.AddHealthChecks()
 // ================= Add service =================
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IAuthService,AuthService>();
 
 // ================= Add service =================
 
