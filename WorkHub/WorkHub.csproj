@@ -32,4 +32,10 @@
     <ProjectReference Include="..\WorkHub.DataAccess\WorkHub.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Admin\" />
+    <Folder Include="Controllers\JobSeeker\" />
+    <Folder Include="Controllers\Employer\" />
+  </ItemGroup>
+
 </Project>
