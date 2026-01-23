@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkHub.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddInitial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -111,6 +111,7 @@ namespace WorkHub.DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployerId = table.Column<int>(type: "int", nullable: false),
                     CompanyId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     JobName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     JobType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Location = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
