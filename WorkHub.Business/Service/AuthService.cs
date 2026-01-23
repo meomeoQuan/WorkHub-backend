@@ -47,10 +47,11 @@ namespace WorkHub.Business.Service
         {
             var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email == request.Email);
             if (user == null)
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Invalid email or password");
+
 
             if (!BCryptHelper.Decode(request.Password, user.Password))
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("Invalid email or password");
 
             return _jwtService.GenerateToken(user);
         }

@@ -106,6 +106,7 @@ builder.Services.AddHealthChecks()
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IAuthService,AuthService>();
+//builder.Services.AddScoped<IEmailService, EmailService>();
 
 // ================= Add service =================
 
