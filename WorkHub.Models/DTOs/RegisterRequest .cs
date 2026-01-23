@@ -13,10 +13,10 @@ namespace WorkHub.Models.DTOs
         [EmailAddress]
         public string Email { get; set; }
         [Required]
+        [DataType(DataType.Password)]
         [RegularExpression(
-    @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$",
-    ErrorMessage = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
-)]
+     @"^(?=\S{8,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).*$"
+ )]
 
         public string Password { get; set; }
         [Required]

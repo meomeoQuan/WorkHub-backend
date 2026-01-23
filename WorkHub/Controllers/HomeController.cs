@@ -20,13 +20,16 @@ namespace WorkHub.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        [Authorize]
+      
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(5,descending: true);
             var result = _mapper.Map<List<RecruitmentOverviewInfoDto>>(entities);
-            return Ok(result);
+
+            var response = ApiResponse<List<RecruitmentOverviewInfoDto>>.Ok(result, "Top 5 recruitment info retrieved successfully");
+
+            return Ok(response);
         }
     }
 }
