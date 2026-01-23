@@ -181,6 +181,33 @@ namespace WorkHub.DataAccess.Repository
             return await dbSet.AnyAsync(predicate);
         }
 
-      
+        public async Task<IEnumerable<T>> GetTopAsync(
+            int count, 
+            Expression<Func<T, bool>>? filter = null, 
+            Expression<Func<T, object>>? orderBy = null,
+            bool descending = false,
+            string? includeProperties = null)
+        {
+            IQueryable<T> query = dbSet;
+
+           if(filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+           if (orderBy != null)
+            {
+                query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+            }
+
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+              foreach(var includeProp in includeProperties.Split(',',StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return await query.Take(count).ToListAsync();
+        }
     }
 }
