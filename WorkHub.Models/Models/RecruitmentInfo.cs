@@ -16,6 +16,8 @@ public partial class RecruitmentInfo
 
     public int CompanyId { get; set; }
 
+    public string? Description { get; set; } = null!;
+
     [StringLength(100)]
     public string JobName { get; set; } = null!;
 
