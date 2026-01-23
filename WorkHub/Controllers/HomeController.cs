@@ -24,7 +24,7 @@ namespace WorkHub.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var entities = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync();
+            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(5,descending: true);
             var result = _mapper.Map<List<RecruitmentOverviewInfoDto>>(entities);
             return Ok(result);
         }

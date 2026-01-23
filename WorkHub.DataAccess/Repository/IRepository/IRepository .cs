@@ -15,10 +15,13 @@ namespace WorkHub.DataAccess.Repository.IRepository
 
         Task<IEnumerable<T>> GetAllPagedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
 
+        Task<IEnumerable<T>> GetTopAsync(int count ,Expression<Func<T,bool>> ? filter = null , Expression<Func<T,object>> ? orderBy = null , bool descending = false , string ? includeProperties = null);
+
         //Func<object, object> value
         Task<int> CountAsync(Expression<Func<T, bool>>? filter = null);
 
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+
 
         //=========================================================================================================
         T Get(Expression<Func<T, bool>> filter, string? includeProperties = null);

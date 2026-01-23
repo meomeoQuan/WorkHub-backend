@@ -36,7 +36,7 @@ namespace WorkHub.Business.Service
                 Email = request.Email,
                 FullName = request.Email,
                 Password = hash,
-                Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker)
+                Role = request.role,
             };
 
              _unitOfWork.UserRepository.Add(user);
