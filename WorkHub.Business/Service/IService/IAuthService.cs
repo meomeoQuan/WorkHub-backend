@@ -9,8 +9,8 @@ namespace WorkHub.Business.Service.IService
 {
     public interface IAuthService
     {
-        Task RegisterAsync(RegisterRequestDTO RegisterRequest);
-        Task<string> LoginAsync(LoginRequestDTO loginRequest);
+        Task<UserDTO?> RegisterAsync(RegisterRequestDTO RegisterRequest);
+        Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO loginRequest);
 
         Task<string> GoogleLoginAsync(string idToken);
     }

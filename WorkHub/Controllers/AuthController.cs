@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,37 +28,56 @@ namespace WorkHub.Controllers
             try
             {
 
-                await _authService.RegisterAsync(registerRequest);
+                if (registerRequest == null)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Registeration data is required"));
+                }
 
-                var response = ApiResponse<object>.CreatedAt(null, "User registered successfully");
+                var user = await _authService.RegisterAsync(registerRequest);
 
-                return StatusCode(response.StatusCode, response);
+                if (user == null)
+                {
+                   return BadRequest(ApiResponse<object>.BadRequest("Registration failed !"));
+                }
+
+                var response = ApiResponse<object>.CreatedAt(user, "User registered successfully");
+
+                return CreatedAtAction(nameof(Register), response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponse<object>.NoContent(ex.Message);
-
-                return StatusCode(response.StatusCode, response);
+                var errorResponse = ApiResponse<object>.Error(500, "An error occurred during registration", ex.Message);
+                return StatusCode(500, errorResponse);
 
             }
 
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             try
             {
-                var token = await _authService.LoginAsync(loginRequest);
 
+                if (loginRequestDTO == null)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("login data is required"));
+                }
+                var loginData = await _authService.LoginAsync(loginRequestDTO);
 
-                var response = ApiResponse<object>.Ok(token, "Login successful");
+                if(loginData == null)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Login failed !"));
+                }
+
+                var response = ApiResponse<object>.Ok(loginData, "Login successful");
                 return Ok(response);
+
             }
-            catch (UnauthorizedAccessException ex)
+            catch (Exception ex)
             {
-                var response = ApiResponse<object>.BadRequest(ex.Message);
-                return BadRequest(response);
+                var errorResponse = ApiResponse<object>.Error(500, "An error occurred during login", ex.Message);
+                return StatusCode(500, errorResponse);
             }
 
         }
