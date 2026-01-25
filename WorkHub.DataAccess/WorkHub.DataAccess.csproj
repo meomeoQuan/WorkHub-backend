@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WorkHub.Models\WorkHub.Models.csproj" />
+    <ProjectReference Include="..\WorkHub.Utility\WorkHub.Utility.csproj" />
   </ItemGroup>
 
 </Project>

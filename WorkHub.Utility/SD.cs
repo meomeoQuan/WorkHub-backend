@@ -11,5 +11,8 @@ namespace WorkHub.Utility
         public const string Role_JobSeeker= "JobSeeker";
         public const string Role_Employer = "Employer";
         public const string Role_Admin = "Admin";
+
+        public const string Provider_Google = "Google";
+        public const string Provider_Facebook = "Facebook";
     }
 }

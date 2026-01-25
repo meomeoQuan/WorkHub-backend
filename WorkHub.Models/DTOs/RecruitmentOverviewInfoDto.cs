@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WorkHub.Models.DTOs
 {
-    public class RecruitmentOverviewInfoDto
+    public class RecruitmentOverviewInfoDTO
     {
         public int Id { get; set; }
         public string JobName { get; set; } = null!;

@@ -25,9 +25,9 @@ namespace WorkHub.Controllers
         public async Task<IActionResult> GetAll()
         {
             var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(5,descending: true);
-            var result = _mapper.Map<List<RecruitmentOverviewInfoDto>>(entities);
+            var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
-            var response = ApiResponse<List<RecruitmentOverviewInfoDto>>.Ok(result, "Top 5 recruitment info retrieved successfully");
+            var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 5 recruitment info retrieved successfully");
 
             return Ok(response);
         }
