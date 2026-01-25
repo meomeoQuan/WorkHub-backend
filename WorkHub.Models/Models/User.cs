@@ -45,6 +45,10 @@ public partial class User
 
     public int Age { get; set; }
 
+    public string? Provider { get; set; }
+    public string? ProviderId { get; set; }
+
+
     [InverseProperty("User")]
     public virtual ICollection<Employer> Employers { get; set; } = new List<Employer>();
 

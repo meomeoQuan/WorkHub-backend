@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,16 @@ namespace WorkHub.Business.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly JwtService _jwtService;
+        private readonly IGoogleAuthService _googleAuthService;
 
-        public AuthService(IUnitOfWork unitOfWork, JwtService jwtService)
+        public AuthService(IUnitOfWork unitOfWork, JwtService jwtService, IGoogleAuthService googleAuthService)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
+            _googleAuthService = googleAuthService;
         }
 
-        public async Task RegisterAsync(RegisterRequest request)
+        public async Task RegisterAsync(RegisterRequestDTO request)
         {
             var existing = await _unitOfWork.UserRepository.GetAsync(c => c.Email == request.Email);
             if (existing != null)
@@ -43,7 +46,7 @@ namespace WorkHub.Business.Service
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<string> LoginAsync(LoginRequest request)
+        public async Task<string> LoginAsync(LoginRequestDTO request)
         {
             var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email == request.Email);
             if (user == null)
@@ -55,6 +58,32 @@ namespace WorkHub.Business.Service
 
             return _jwtService.GenerateToken(user);
         }
+
+        public async Task<string> GoogleLoginAsync(string idToken)
+        {
+            var googleUser = await _googleAuthService.VerifyTokenAsync(idToken);
+
+            var user = await _unitOfWork.UserRepository
+                .GetAsync(u => u.Email == googleUser.Email);
+
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = googleUser.Email,
+                    FullName = googleUser.Name,
+                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
+                    Provider = SD.Provider_Google,
+                    ProviderId = googleUser.GoogleId
+                };
+
+                _unitOfWork.UserRepository.Add(user);
+                await _unitOfWork.SaveAsync();
+            }
+
+            return _jwtService.GenerateToken(user);
+        }
+
     }
 
 }

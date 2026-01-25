@@ -97,6 +97,7 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
         });
 
+
         OnModelCreatingPartial(modelBuilder);
     }
 
