@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Azure.Core;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,17 +20,19 @@ namespace WorkHub.Business.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly JwtService _jwtService;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IMapper _mapper;
 
-        public AuthService(IUnitOfWork unitOfWork, JwtService jwtService, IGoogleAuthService googleAuthService)
+        public AuthService(IUnitOfWork unitOfWork, JwtService jwtService, IGoogleAuthService googleAuthService,IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _googleAuthService = googleAuthService;
+            _mapper = mapper;
         }
 
-        public async Task RegisterAsync(RegisterRequestDTO request)
+        public async Task<UserDTO?> RegisterAsync(RegisterRequestDTO request)
         {
-            var existing = await _unitOfWork.UserRepository.GetAsync(c => c.Email == request.Email);
+            var existing = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == request.Email.ToLower());
             if (existing != null)
                 throw new Exception("Email already exists");
 
@@ -44,11 +48,13 @@ namespace WorkHub.Business.Service
 
              _unitOfWork.UserRepository.Add(user);
             await _unitOfWork.SaveAsync();
+
+            return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<string> LoginAsync(LoginRequestDTO request)
+        public async Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO request)
         {
-            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email == request.Email);
+            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == request.Email.ToLower());
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
 
@@ -56,7 +62,13 @@ namespace WorkHub.Business.Service
             if (!BCryptHelper.Decode(request.Password, user.Password))
                 throw new UnauthorizedAccessException("Invalid email or password");
 
-            return _jwtService.GenerateToken(user);
+            var JwtToken = _jwtService.GenerateToken(user);
+
+            return new LoginResponseDTO
+            {
+                Token = JwtToken,
+                UserDTO = _mapper.Map<UserDTO>(user)
+            };
         }
 
         public async Task<string> GoogleLoginAsync(string idToken)
@@ -64,7 +76,7 @@ namespace WorkHub.Business.Service
             var googleUser = await _googleAuthService.VerifyTokenAsync(idToken);
 
             var user = await _unitOfWork.UserRepository
-                .GetAsync(u => u.Email == googleUser.Email);
+                .GetAsync(c => c.Email.ToLower() == googleUser.Email.ToLower());
 
             if (user == null)
             {
