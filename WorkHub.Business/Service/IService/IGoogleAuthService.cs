@@ -9,6 +9,7 @@ namespace WorkHub.Business.Service.IService
 {
     public interface IGoogleAuthService
     {
-        Task<GoogleUserInfoDTO> VerifyTokenAsync(string idToken);
+        Task<GoogleUserInfoDTO> VerifyAuthCodeAsync(string authCode);
+
     }
 }

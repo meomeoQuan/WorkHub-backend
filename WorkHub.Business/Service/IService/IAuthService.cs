@@ -12,6 +12,6 @@ namespace WorkHub.Business.Service.IService
         Task<UserDTO?> RegisterAsync(RegisterRequestDTO RegisterRequest);
         Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO loginRequest);
 
-        Task<string> GoogleLoginAsync(string idToken);
+        Task<LoginResponseDTO?> GoogleLoginAsync(string authCode);
     }
 }

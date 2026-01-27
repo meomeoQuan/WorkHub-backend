@@ -1,159 +1,159 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using WorkHub.Business.Mapping;
-using WorkHub.Business.Service;
-using WorkHub.Business.Service.IService;
-using WorkHub.DataAccess.Data;
-using WorkHub.DataAccess.Repository;
-using WorkHub.DataAccess.Repository.IRepository;
-using WorkHub.DataAccess.Seed;
+﻿    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.IdentityModel.Tokens;
+    using Microsoft.OpenApi.Models;
+    using System;
+    using System.ComponentModel.DataAnnotations;
+    using System.Text;
+    using WorkHub.Business.Mapping;
+    using WorkHub.Business.Service;
+    using WorkHub.Business.Service.IService;
+    using WorkHub.DataAccess.Data;
+    using WorkHub.DataAccess.Repository;
+    using WorkHub.DataAccess.Repository.IRepository;
+    using WorkHub.DataAccess.Seed;
 
-var builder = WebApplication.CreateBuilder(args);
+    var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
-builder.Services.AddControllers();
+    // Controllers
+    builder.Services.AddControllers();
 
 
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+    var secretKey = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+    builder.Services.AddAuthentication(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
     {
-        Title = "WorkHub API",
-        Version = "v1"
-    });
-
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter: Bearer {your JWT token}"
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+
+            ClockSkew = TimeSpan.Zero
+        };
     });
-});
-
-// AutoMapper ✅ PLACE IT HERE
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod());
-});
-
-// DbContext (SQL Server)
-builder.Services.AddDbContext<WorkHubDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
-
-// Health Check
-builder.Services.AddHealthChecks()
-    .AddDbContextCheck<WorkHubDbContext>("Database");
-
-// ================= Add service =================
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<IAuthService,AuthService>();
-builder.Services.AddScoped<IGoogleAuthService,GoogleAuthService>();
-//builder.Services.AddScoped<IEmailService, EmailService>();
-
-// ================= Add service =================
-
-var app = builder.Build();
-
-// ================= PIPELINE =================
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 
-// ================= SEEDING DATA =================
-using (var scope = app.Services.CreateScope())
-{
-    //“Pretend this is one HTTP request lifetime”
-    try
+    // Swagger
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(options =>
     {
-        var db = scope.ServiceProvider.GetRequiredService<WorkHubDbContext>();
-        DbSeeder.Seed(db);
-    }
-    catch (Exception ex)
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "WorkHub API",
+            Version = "v1"
+        });
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter: Bearer {your JWT token}"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
+
+    // AutoMapper ✅ PLACE IT HERE
+    builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+    // CORS
+    builder.Services.AddCors(options =>
     {
-        Console.WriteLine($"Seed failed: {ex.Message}");
+        options.AddPolicy("AllowAll", policy =>
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod());
+    });
+
+    // DbContext (SQL Server)
+    builder.Services.AddDbContext<WorkHubDbContext>(options =>
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        )
+    );
+
+    // Health Check
+    builder.Services.AddHealthChecks()
+        .AddDbContextCheck<WorkHubDbContext>("Database");
+
+    // ================= Add service =================
+
+    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+    builder.Services.AddScoped<JwtService>();
+    builder.Services.AddScoped<IAuthService,AuthService>();
+    builder.Services.AddScoped<IGoogleAuthService,GoogleAuthService>();
+    //builder.Services.AddScoped<IEmailService, EmailService>();
+
+    // ================= Add service =================
+
+    var app = builder.Build();
+
+    // ================= PIPELINE =================
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
     }
-}
-// ================================================
 
-app.UseHttpsRedirection();
 
-// CORS must be BEFORE MapControllers
-app.UseCors("AllowAll");
+    // ================= SEEDING DATA =================
+    using (var scope = app.Services.CreateScope())
+    {
+        //“Pretend this is one HTTP request lifetime”
+        try
+        {
+            var db = scope.ServiceProvider.GetRequiredService<WorkHubDbContext>();
+            DbSeeder.Seed(db);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Seed failed: {ex.Message}");
+        }
+    }
+    // ================================================
 
-app.UseAuthentication(); // 👈 MUST be before authorization
-app.UseAuthorization();
+    app.UseHttpsRedirection();
 
-// Health endpoint (ALB)
-app.MapHealthChecks("/health");
+    // CORS must be BEFORE MapControllers
+    app.UseCors("AllowAll");
 
-app.MapControllers();
+    app.UseAuthentication(); // 👈 MUST be before authorization
+    app.UseAuthorization();
 
-app.Run();
+    // Health endpoint (ALB)
+    app.MapHealthChecks("/health");
+
+    app.MapControllers();
+
+    app.Run();

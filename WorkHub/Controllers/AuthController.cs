@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using WorkHub.Business.Service.IService;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.Models;
@@ -87,18 +89,44 @@ namespace WorkHub.Controllers
         {
             try
             {
-                var token = await _authService.GoogleLoginAsync(idToken);
+                if (string.IsNullOrEmpty(idToken))
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("ID token is required"));
+                }
+                var loginData = await _authService.GoogleLoginAsync(idToken);
 
-                var response = ApiResponse<object>.Ok(token, "Google login successful");
+                if (loginData == null)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Google login failed !"));
+                }
+
+                var response = ApiResponse<LoginResponseDTO>.CreatedAt(loginData, "login successful");
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                var response = ApiResponse<object>.BadRequest(ex.Message);
-                return BadRequest(response);
+                var errorResponse = ApiResponse<object>.Error(500, "An error occurred during login", ex.Message);
+                return StatusCode(500, errorResponse);
             }
-
         }
+
+        //[Authorize]
+        //[HttpGet("me")]
+        //public IActionResult Me()
+        //{
+        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        //    if (userId == null)
+        //        return Unauthorized();
+
+        //    var user = _unitOfWork.UserRepository.GetById(int.Parse(userId));
+
+        //    if (user == null)
+        //        return NotFound();
+
+        //    return Ok(ApiResponse<UserDTO>.Ok(_mapper.Map<UserDTO>(user)));
+        //}
+
     }
 }
