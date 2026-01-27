@@ -41,9 +41,10 @@ namespace WorkHub.Business.Service
             var user = new User
             {
                 Email = request.Email,
-                FullName = request.Email,
+                FullName = request.FullName,
                 Password = hash,
                 Role = request.role,
+                IsVerified = true,
             };
 
              _unitOfWork.UserRepository.Add(user);
@@ -58,6 +59,10 @@ namespace WorkHub.Business.Service
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
 
+            if(user.IsVerified == false)
+            {
+                throw new UnauthorizedAccessException("Account has not been verified");
+            }
 
             if (!BCryptHelper.Decode(request.Password, user.Password))
                 throw new UnauthorizedAccessException("Invalid email or password");
@@ -71,30 +76,43 @@ namespace WorkHub.Business.Service
             };
         }
 
-        public async Task<string> GoogleLoginAsync(string idToken)
+        public Task<LoginResponseDTO?> GoogleLoginAsync(string authCode)
         {
-            var googleUser = await _googleAuthService.VerifyTokenAsync(idToken);
-
-            var user = await _unitOfWork.UserRepository
-                .GetAsync(c => c.Email.ToLower() == googleUser.Email.ToLower());
-
-            if (user == null)
-            {
-                user = new User
-                {
-                    Email = googleUser.Email,
-                    FullName = googleUser.Name,
-                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
-                    Provider = SD.Provider_Google,
-                    ProviderId = googleUser.GoogleId
-                };
-
-                _unitOfWork.UserRepository.Add(user);
-                await _unitOfWork.SaveAsync();
-            }
-
-            return _jwtService.GenerateToken(user);
+            throw new NotImplementedException();
         }
+
+        //public async Task<LoginResponseDTO> GoogleLoginAsync(string idToken)
+        //{
+        //    var googleUser = await _googleAuthService.VerifyTokenAsync(idToken);
+
+        //    var user = await _unitOfWork.UserRepository
+        //        .GetAsync(c => c.Email.ToLower() == googleUser.Email.ToLower());
+
+        //    if (user == null)
+        //    {
+        //        user = new User
+        //        {
+        //            Email = googleUser.Email,
+        //            FullName = googleUser.Name,
+        //            Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
+        //            Provider = SD.Provider_Google,
+        //            ProviderId = googleUser.GoogleId,
+        //            IsVerified = true,
+        //        };
+
+        //        _unitOfWork.UserRepository.Add(user);
+        //        await _unitOfWork.SaveAsync();
+        //    }
+        //     var JwtToken = _jwtService.GenerateToken(user);
+
+        //    return new LoginResponseDTO
+        //        {
+        //        Token = JwtToken,
+        //        UserDTO = _mapper.Map<UserDTO>(user)
+        //    };
+
+
+        //}
 
     }
 

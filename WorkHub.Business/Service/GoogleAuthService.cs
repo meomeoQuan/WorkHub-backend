@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WorkHub.Business.Service.IService;
 using WorkHub.Models.DTOs;
@@ -13,20 +14,39 @@ namespace WorkHub.Business.Service
     public class GoogleAuthService(IConfiguration config) : IGoogleAuthService
     {
         private readonly IConfiguration _config = config;
+        private readonly HttpClient _httpClient = new();
 
+     
 
-
-        public async Task<GoogleUserInfoDTO> VerifyTokenAsync(string idToken)
+        public async Task<GoogleUserInfoDTO> VerifyAuthCodeAsync(string authCode)
         {
-            var settings = new GoogleJsonWebSignature.ValidationSettings
-            {
-                Audience = new[]
+            // 1️⃣ Exchange auth code → tokens
+            var tokenResponse = await _httpClient.PostAsync(
+                "https://oauth2.googleapis.com/token",
+                new FormUrlEncodedContent(new Dictionary<string, string>
                 {
-                _config["Authentication:Google:ClientId"]!
-            }
-            };
+                { "code", authCode },
+                { "client_id", _config["Authentication:Google:ClientId"]! },
+                { "client_secret", _config["Authentication:Google:ClientSecret"]! },
+                { "redirect_uri", "postmessage" }, // 🔥 REQUIRED for SPA
+                { "grant_type", "authorization_code" }
+                })
+            );
 
-            var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+            if (!tokenResponse.IsSuccessStatusCode)
+                throw new Exception("Failed to exchange auth code");
+
+            var json = await tokenResponse.Content.ReadAsStringAsync();
+            var tokenData = JsonSerializer.Deserialize<GoogleTokenResponse>(json)!;
+
+            // 2️⃣ Validate id_token (reuse Google library)
+            var payload = await GoogleJsonWebSignature.ValidateAsync(
+                tokenData.id_token,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { _config["Authentication:Google:ClientId"]! }
+                }
+            );
 
             return new GoogleUserInfoDTO
             {
@@ -36,5 +56,8 @@ namespace WorkHub.Business.Service
                 PictureUrl = payload.Picture
             };
         }
+
+
+
     }
 }

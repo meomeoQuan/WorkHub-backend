@@ -12,8 +12,8 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260125082956_AddProviderToUser")]
-    partial class AddProviderToUser
+    [Migration("20260127102838_AddInit")]
+    partial class AddInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

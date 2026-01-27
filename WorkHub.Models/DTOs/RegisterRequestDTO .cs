@@ -12,12 +12,13 @@ namespace WorkHub.Models.DTOs
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+       
+        public string FullName { get; set; }
         [Required]
         [DataType(DataType.Password)]
         [RegularExpression(
      @"^(?=\S{8,}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).*$"
  )]
-
         public string Password { get; set; }
         [Required]
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
