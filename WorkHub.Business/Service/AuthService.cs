@@ -76,43 +76,43 @@ namespace WorkHub.Business.Service
             };
         }
 
-        public Task<LoginResponseDTO?> GoogleLoginAsync(string authCode)
+        public async Task<LoginResponseDTO?> GoogleLoginAsync(string authCode)
         {
-            throw new NotImplementedException();
+            // 1️⃣ Verify auth code with Google (exchange + validate)
+            var googleUser = await _googleAuthService.VerifyAuthCodeAsync(authCode);
+
+            // 2️⃣ Find user by email
+            var user = await _unitOfWork.UserRepository
+                .GetAsync(u => u.Email.ToLower() == googleUser.Email.ToLower());
+
+            // 3️⃣ Auto-register if not exists
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = googleUser.Email,
+                    FullName = googleUser.Name,
+                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
+                    Provider = SD.Provider_Google,
+                    ProviderId = googleUser.GoogleId,
+                    IsVerified = true
+                };
+
+                _unitOfWork.UserRepository.Add(user);
+                await _unitOfWork.SaveAsync();
+            }
+
+            // 4️⃣ Generate JWT
+            var jwtToken = _jwtService.GenerateToken(user);
+
+            // 5️⃣ Return response
+            return new LoginResponseDTO
+            {
+                Token = jwtToken,
+                UserDTO = _mapper.Map<UserDTO>(user)
+            };
         }
 
-        //public async Task<LoginResponseDTO> GoogleLoginAsync(string idToken)
-        //{
-        //    var googleUser = await _googleAuthService.VerifyTokenAsync(idToken);
-
-        //    var user = await _unitOfWork.UserRepository
-        //        .GetAsync(c => c.Email.ToLower() == googleUser.Email.ToLower());
-
-        //    if (user == null)
-        //    {
-        //        user = new User
-        //        {
-        //            Email = googleUser.Email,
-        //            FullName = googleUser.Name,
-        //            Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
-        //            Provider = SD.Provider_Google,
-        //            ProviderId = googleUser.GoogleId,
-        //            IsVerified = true,
-        //        };
-
-        //        _unitOfWork.UserRepository.Add(user);
-        //        await _unitOfWork.SaveAsync();
-        //    }
-        //     var JwtToken = _jwtService.GenerateToken(user);
-
-        //    return new LoginResponseDTO
-        //        {
-        //        Token = JwtToken,
-        //        UserDTO = _mapper.Map<UserDTO>(user)
-        //    };
-
-
-        //}
 
     }
 
