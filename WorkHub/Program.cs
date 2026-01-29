@@ -112,11 +112,12 @@
     builder.Services.AddScoped<JwtService>();
     builder.Services.AddScoped<IAuthService,AuthService>();
     builder.Services.AddScoped<IGoogleAuthService,GoogleAuthService>();
-    //builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<IEmailService, EmailService>();
 
-    // ================= Add service =================
 
-    var app = builder.Build();
+// ================= Add service =================
+
+var app = builder.Build();
 
     // ================= PIPELINE =================
 

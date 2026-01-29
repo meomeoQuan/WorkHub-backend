@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Core;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,20 @@ namespace WorkHub.Business.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly JwtService _jwtService;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
 
-        public AuthService(IUnitOfWork unitOfWork, JwtService jwtService, IGoogleAuthService googleAuthService,IMapper mapper)
+        public AuthService(IUnitOfWork unitOfWork, 
+                            JwtService jwtService, 
+                            IGoogleAuthService googleAuthService,
+                            IMapper mapper, 
+                            IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _googleAuthService = googleAuthService;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         public async Task<UserDTO?> RegisterAsync(RegisterRequestDTO request)
@@ -37,21 +44,62 @@ namespace WorkHub.Business.Service
                 throw new Exception("Email already exists");
 
             var hash = BCryptHelper.Encode(request.Password);
-
+            var token = Guid.NewGuid().ToString();
             var user = new User
             {
                 Email = request.Email,
                 FullName = request.FullName,
                 Password = hash,
                 Role = request.role,
-                IsVerified = true,
+                IsVerified = false,
+                CreatedAt = DateTime.UtcNow,
+                EmailVerificationToken = BCryptHelper.Encode(token),
+                TokenExpiry = DateTime.UtcNow.AddHours(24)
+
             };
 
              _unitOfWork.UserRepository.Add(user);
             await _unitOfWork.SaveAsync();
 
+            var verifyLink = $"http://localhost:3000/verify-email?token={token}";
+
+            var body = $@"
+                            <h2>Welcome to WorkHub 🎉</h2>
+
+                            <p>Thanks for registering!</p>
+
+                            <p>Please confirm your account by clicking the button below:</p>
+
+                            <a href='{verifyLink}' 
+                               style='
+                                  display:inline-block;
+                                  padding:12px 20px;
+                                  background-color:#4CAF50;
+                                  color:white;
+                                  text-decoration:none;
+                                  border-radius:8px;
+                                  font-weight:bold;
+                               '>
+                               Confirm Account
+                            </a>
+
+                            <p>This link will expire in 24 hours.</p>
+
+                            <p>If you didn’t create this account, you can safely ignore this email.</p>
+                            ";
+
+
+            await _emailService.SendEmailAsync(new EmailRequestDTO
+            {
+                Body = body,
+                To = user.Email,
+                Subject = "Welcome to WorkHub! Please Confirm Your Email",
+                IsHtml = true,
+                Attachments = null
+            });
+
             return _mapper.Map<UserDTO>(user);
-        }
+        }   
 
         public async Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO request)
         {
@@ -95,7 +143,8 @@ namespace WorkHub.Business.Service
                     Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
                     Provider = SD.Provider_Google,
                     ProviderId = googleUser.GoogleId,
-                    IsVerified = true
+                    IsVerified = true,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _unitOfWork.UserRepository.Add(user);

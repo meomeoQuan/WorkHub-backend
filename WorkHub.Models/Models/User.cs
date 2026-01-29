@@ -48,6 +48,9 @@ public partial class User
     public string? Provider { get; set; }
     public string? ProviderId { get; set; }
 
+    public string? EmailVerificationToken { get; set; }
+    public DateTime? TokenExpiry { get; set; }
+
 
     [InverseProperty("User")]
     public virtual ICollection<Employer> Employers { get; set; } = new List<Employer>();
