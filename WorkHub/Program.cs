@@ -14,8 +14,9 @@
     using WorkHub.DataAccess.Repository;
     using WorkHub.DataAccess.Repository.IRepository;
     using WorkHub.DataAccess.Seed;
+using WorkHub.Models.DTOs;
 
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
     // Controllers
     builder.Services.AddControllers();
@@ -113,6 +114,8 @@
     builder.Services.AddScoped<IAuthService,AuthService>();
     builder.Services.AddScoped<IGoogleAuthService,GoogleAuthService>();
     builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 
 
 // ================= Add service =================

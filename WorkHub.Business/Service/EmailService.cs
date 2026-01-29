@@ -1,6 +1,11 @@
-﻿using System;
+﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using WorkHub.Business.Service.IService;
@@ -12,15 +17,48 @@ namespace WorkHub.Business.Service
     public class EmailService : IEmailService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public EmailService(IUnitOfWork unitOfWork)
+        private readonly IConfiguration _configuration;
+        public EmailService(IUnitOfWork unitOfWork, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
         }
-        public Task SendEmailAsync(EmailRequestDTO emailRequestDTO)
+        public async Task SendEmailAsync(EmailRequestDTO emailRequestDTO)
         {
-            throw new NotImplementedException();
+            var email = new MimeMessage();
+
+            email.From.Add(new MailboxAddress(
+                "WorkHub",
+                _configuration["EmailSettings:Username"]
+            ));
+
+            email.To.Add(MailboxAddress.Parse(emailRequestDTO.To));
+            email.Subject = emailRequestDTO.Subject;
+
+            var builder = new BodyBuilder
+            {
+                HtmlBody = emailRequestDTO.Body
+            };
+
+            email.Body = builder.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+
+            await smtp.ConnectAsync(
+                _configuration["EmailSettings:Host"],
+                int.Parse(_configuration["EmailSettings:Port"]),
+                SecureSocketOptions.StartTls
+            );
+
+            await smtp.AuthenticateAsync(
+                _configuration["EmailSettings:Username"],
+                _configuration["EmailSettings:Password"]
+            );
+
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
         }
+
 
         public async Task VerifyEmailAsync(string token)
         {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,18 +24,21 @@ namespace WorkHub.Business.Service
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public AuthService(IUnitOfWork unitOfWork, 
                             JwtService jwtService, 
                             IGoogleAuthService googleAuthService,
                             IMapper mapper, 
-                            IEmailService emailService)
+                            IEmailService emailService,
+                            IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _googleAuthService = googleAuthService;
             _mapper = mapper;
             _emailService = emailService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<UserDTO?> RegisterAsync(RegisterRequestDTO request)
@@ -63,30 +67,14 @@ namespace WorkHub.Business.Service
 
             var verifyLink = $"http://localhost:3000/verify-email?token={token}";
 
-            var body = $@"
-                            <h2>Welcome to WorkHub 🎉</h2>
+            var path = Path.Combine(
+                    _webHostEnvironment.ContentRootPath,
+                    "Templates",
+                    "VerifyEmail.html"
+                );
 
-                            <p>Thanks for registering!</p>
+            var body = await File.ReadAllTextAsync(path);
 
-                            <p>Please confirm your account by clicking the button below:</p>
-
-                            <a href='{verifyLink}' 
-                               style='
-                                  display:inline-block;
-                                  padding:12px 20px;
-                                  background-color:#4CAF50;
-                                  color:white;
-                                  text-decoration:none;
-                                  border-radius:8px;
-                                  font-weight:bold;
-                               '>
-                               Confirm Account
-                            </a>
-
-                            <p>This link will expire in 24 hours.</p>
-
-                            <p>If you didn’t create this account, you can safely ignore this email.</p>
-                            ";
 
 
             await _emailService.SendEmailAsync(new EmailRequestDTO
