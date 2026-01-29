@@ -26,15 +26,20 @@ namespace WorkHub.Business.Service
                 new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                 { "code", authCode },
-                { "client_id", _config["Authentication:Google:ClientId"]! },
-                { "client_secret", _config["Authentication:Google:ClientSecret"]! },
+                { "client_id", _config["Authentication:Google:ClientId"]!.Trim() },
+                { "client_secret", _config["Authentication:Google:ClientSecret"]!.Trim() },
                 { "redirect_uri", "postmessage" }, // 🔥 REQUIRED for SPA
                 { "grant_type", "authorization_code" }
                 })
             );
 
+            var error = await tokenResponse.Content.ReadAsStringAsync();
+
             if (!tokenResponse.IsSuccessStatusCode)
-                throw new Exception("Failed to exchange auth code");
+            {
+                throw new Exception($"Google token error: {error}");
+            }
+
 
             var json = await tokenResponse.Content.ReadAsStringAsync();
             var tokenData = JsonSerializer.Deserialize<GoogleTokenResponse>(json)!;

@@ -85,31 +85,44 @@ namespace WorkHub.Controllers
         }
 
         [HttpPost("google")]
-        public async Task<IActionResult> GoogleLogin([FromBody] string idToken)
+        public async Task<IActionResult> GoogleLogin([FromBody] string authCode)
         {
             try
             {
-                if (string.IsNullOrEmpty(idToken))
+                if (string.IsNullOrWhiteSpace(authCode))
                 {
-                    return BadRequest(ApiResponse<object>.BadRequest("ID token is required"));
+                    return BadRequest(
+                        ApiResponse<object>.BadRequest("Authorization code is required")
+                    );
                 }
-                var loginData = await _authService.GoogleLoginAsync(idToken);
+
+                var loginData = await _authService.GoogleLoginAsync(authCode);
 
                 if (loginData == null)
                 {
-                    return BadRequest(ApiResponse<object>.BadRequest("Google login failed !"));
+                    return BadRequest(
+                        ApiResponse<object>.BadRequest("Google login failed")
+                    );
                 }
 
-                var response = ApiResponse<LoginResponseDTO>.CreatedAt(loginData, "login successful");
+                var response =
+                    ApiResponse<LoginResponseDTO>.CreatedAt(loginData, "Login successful");
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                var errorResponse = ApiResponse<object>.Error(500, "An error occurred during login", ex.Message);
+                var errorResponse =
+                    ApiResponse<object>.Error(
+                        500,
+                        "An error occurred during Google login",
+                        ex.Message
+                    );
+
                 return StatusCode(500, errorResponse);
             }
         }
+
 
         //[Authorize]
         //[HttpGet("me")]
