@@ -52,7 +52,7 @@ namespace WorkHub.Business.Service
             var user = new User
             {
                 Email = request.Email,
-                FullName = request.FullName,
+                FullName = request.FullName ?? request.Email,
                 Password = hash,
                 Role = request.role,
                 IsVerified = false,
