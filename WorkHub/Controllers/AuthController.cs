@@ -135,6 +135,8 @@ namespace WorkHub.Controllers
                 );
             }
 
+          
+
             await _emailService.VerifyEmailAsync(request);
 
             return Ok(
@@ -160,6 +162,54 @@ namespace WorkHub.Controllers
             );
         }
 
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> SendPasswordEmailChanging([FromBody] EmailResendConfirmationDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+            await _authService.SendEmailPasswordChaningRequestAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Email sent successfully")
+            );
+        }
+
+        [HttpPost("password-reset")]
+        public async Task<IActionResult> PasswordChangingRequest([FromBody] ResetPasswordRequestDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.token))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("token is required")
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("NewPassword is required")
+                );
+            }
+
+            await _authService.ResetPasswordAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Password reset successfully")
+            );
+        }
 
         //[Authorize]
         //[HttpGet("me")]

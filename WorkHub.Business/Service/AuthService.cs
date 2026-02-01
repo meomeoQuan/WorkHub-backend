@@ -189,6 +189,67 @@ namespace WorkHub.Business.Service
                 Attachments = null
             });
         }
+
+        public async Task SendEmailPasswordChaningRequestAsync(EmailResendConfirmationDTO email)
+        {
+            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == email.Email.ToLower());
+
+            if (user == null)
+                throw new Exception("Email does not exist");
+
+            
+
+            var token = Guid.NewGuid().ToString();
+
+            user.EmailVerificationToken = token;
+            user.TokenExpiry = DateTime.UtcNow.AddHours(1);
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            var verifyLink = $"http://localhost:3000/reset-password?token={token}";
+
+            var path = Path.Combine(
+                    _webHostEnvironment.ContentRootPath,
+                    "Templates",
+                    "ResetPassword.html"
+                );
+
+            var body = await File.ReadAllTextAsync(path);
+            body = body.Replace("{{RESET_URL}}", verifyLink);
+            await _emailService.SendEmailAsync(new EmailRequestDTO
+            {
+                Body = body,
+                To = user.Email,
+                Subject = "WorkHub: Please Confirm Your New Password ",
+                IsHtml = true,
+                Attachments = null
+            });
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequestDTO)
+        {
+            var user = await _unitOfWork.UserRepository
+                .GetAsync(c => c.EmailVerificationToken == resetPasswordRequestDTO.token && c.Email.ToLower() == resetPasswordRequestDTO.Email.ToLower());
+
+            if (user == null)
+            {
+                throw new Exception("Email does not exist");
+            }
+
+            if (user.TokenExpiry < DateTime.UtcNow)
+            {
+                throw new Exception("Token has expired");
+            }
+
+            var hash = BCryptHelper.Encode(resetPasswordRequestDTO.NewPassword);
+            user.Password = hash;
+            user.EmailVerificationToken = null;
+            user.TokenExpiry = null;
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+
+        }
     }
 
 }
