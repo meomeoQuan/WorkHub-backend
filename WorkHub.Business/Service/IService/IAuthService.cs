@@ -13,5 +13,7 @@ namespace WorkHub.Business.Service.IService
         Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO loginRequest);
 
         Task<LoginResponseDTO?> GoogleLoginAsync(string authCode);
+
+        Task ResendEmailConfirmationAsync(EmailResendConfirmationDTO email);
     }
 }

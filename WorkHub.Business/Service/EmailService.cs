@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using WorkHub.Business.Service.IService;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
+using WorkHub.Utility;
 
 namespace WorkHub.Business.Service
 {
@@ -60,10 +61,10 @@ namespace WorkHub.Business.Service
         }
 
 
-        public async Task VerifyEmailAsync(string token)
+        public async Task VerifyEmailAsync(VerifyEmailRequestDTO emailRequestDTO)
         {
             var user = await _unitOfWork.UserRepository
-                .GetAsync(u => u.EmailVerificationToken == token);
+                .GetAsync(u => u.EmailVerificationToken == emailRequestDTO.Token);
 
             if (user == null)
                 throw new Exception("Invalid token");

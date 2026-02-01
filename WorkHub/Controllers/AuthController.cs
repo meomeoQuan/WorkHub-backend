@@ -17,11 +17,13 @@ namespace WorkHub.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IEmailService _emailService;
 
-        public AuthController(IAuthService authService, IGoogleAuthService googleAuthService)
+        public AuthController(IAuthService authService, IGoogleAuthService googleAuthService, IEmailService emailService)
         {
             _authService = authService;
             _googleAuthService = googleAuthService;
+            _emailService = emailService;
         }
 
         [HttpPost("register")]
@@ -39,7 +41,7 @@ namespace WorkHub.Controllers
 
                 if (user == null)
                 {
-                   return BadRequest(ApiResponse<object>.BadRequest("Registration failed !"));
+                    return BadRequest(ApiResponse<object>.BadRequest("Registration failed !"));
                 }
 
                 var response = ApiResponse<object>.CreatedAt(user, "User registered successfully");
@@ -67,7 +69,7 @@ namespace WorkHub.Controllers
                 }
                 var loginData = await _authService.LoginAsync(loginRequestDTO);
 
-                if(loginData == null)
+                if (loginData == null)
                 {
                     return BadRequest(ApiResponse<object>.BadRequest("Login failed !"));
                 }
@@ -121,6 +123,41 @@ namespace WorkHub.Controllers
 
                 return StatusCode(500, errorResponse);
             }
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> EmailVerify([FromBody] VerifyEmailRequestDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Token))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Token is required")
+                );
+            }
+
+            await _emailService.VerifyEmailAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Email verified successfully")
+            );
+        }
+
+
+        [HttpPost("resend-email")]
+        public async Task<IActionResult> ResendEmailConfirmation([FromBody] EmailResendConfirmationDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+            await _authService.ResendEmailConfirmationAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Email sent successfully")
+            );
         }
 
 
