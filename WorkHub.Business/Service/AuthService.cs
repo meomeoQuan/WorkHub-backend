@@ -57,7 +57,7 @@ namespace WorkHub.Business.Service
                 Role = request.role,
                 IsVerified = false,
                 CreatedAt = DateTime.UtcNow,
-                EmailVerificationToken = BCryptHelper.Encode(token),
+                EmailVerificationToken = token,
                 TokenExpiry = DateTime.UtcNow.AddHours(24)
 
             };
@@ -74,6 +74,7 @@ namespace WorkHub.Business.Service
                 );
 
             var body = await File.ReadAllTextAsync(path);
+            body = body.Replace("{{VERIFICATION_URL}}", verifyLink);
 
 
 

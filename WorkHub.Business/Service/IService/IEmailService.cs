@@ -11,6 +11,6 @@ namespace WorkHub.Business.Service.IService
     {
         Task SendEmailAsync(EmailRequestDTO emailRequestDTO);
 
-         Task VerifyEmailAsync(string token);
+         Task VerifyEmailAsync(VerifyEmailRequestDTO verifyEmailRequestDTO);
     }
 }
