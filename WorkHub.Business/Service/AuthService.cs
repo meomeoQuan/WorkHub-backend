@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using MimeKit.Cryptography;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -151,7 +153,42 @@ namespace WorkHub.Business.Service
             };
         }
 
+        public async Task ResendEmailConfirmationAsync(EmailResendConfirmationDTO email)
+        {
+           var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == email.Email.ToLower());
 
+            if (user == null)
+                throw new Exception("Email does not exist");
+
+            if(user.IsVerified == true)
+                throw new Exception("Account has already been verified");
+
+            var token = Guid.NewGuid().ToString();
+
+            user.EmailVerificationToken = token;
+            user.TokenExpiry = DateTime.UtcNow.AddHours(24);
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            var verifyLink = $"http://localhost:3000/verify-email?token={token}";
+
+            var path = Path.Combine(
+                    _webHostEnvironment.ContentRootPath,
+                    "Templates",
+                    "VerifyEmail.html"
+                );
+
+            var body = await File.ReadAllTextAsync(path);
+            body = body.Replace("{{VERIFICATION_URL}}", verifyLink);
+            await _emailService.SendEmailAsync(new EmailRequestDTO
+            {
+                Body = body,
+                To = user.Email,
+                Subject = "WorkHub: Please Confirm Your Email",
+                IsHtml = true,
+                Attachments = null
+            });
+        }
     }
 
 }

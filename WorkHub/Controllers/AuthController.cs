@@ -141,7 +141,24 @@ namespace WorkHub.Controllers
                 ApiResponse<object>.Ok(null, "Email verified successfully")
             );
         }
-    
+
+
+        [HttpPost("resend-email")]
+        public async Task<IActionResult> ResendEmailConfirmation([FromBody] EmailResendConfirmationDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+            await _authService.ResendEmailConfirmationAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Email sent successfully")
+            );
+        }
 
 
         //[Authorize]
