@@ -19,5 +19,7 @@ namespace WorkHub.Business.Service.IService
         Task SendEmailPasswordChaningRequestAsync(EmailResendConfirmationDTO email);
 
         Task ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequestDTO);
+
+        Task<bool> IsTokenExpired(string token);
     }
 }

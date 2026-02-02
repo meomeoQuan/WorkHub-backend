@@ -190,12 +190,6 @@ namespace WorkHub.Controllers
                 );
             }
 
-            if (string.IsNullOrWhiteSpace(request.token))
-            {
-                return BadRequest(
-                    ApiResponse<object>.BadRequest("token is required")
-                );
-            }
 
             if (string.IsNullOrWhiteSpace(request.NewPassword))
             {
@@ -210,6 +204,35 @@ namespace WorkHub.Controllers
                 ApiResponse<object>.Ok(null, "Password reset successfully")
             );
         }
+
+
+        [HttpPost("validate-reset-token")]
+        public async Task<IActionResult> ValidateResetToken(
+     [FromBody] ValidateResetTokenRequestDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Token))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("TOKEN_INVALID")
+                );
+            }
+
+            var isExpired = await _authService.IsTokenExpired(request.Token);
+
+            if (isExpired)
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("TOKEN_EXPIRED")
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "valid")
+            );
+        }
+
+
+
 
         //[Authorize]
         //[HttpGet("me")]

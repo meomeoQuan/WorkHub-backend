@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace WorkHub.Models.DTOs
 {
-    public class ResetPasswordRequestDTO
+    public class ValidateResetTokenRequestDTO
     {
-       
-        public string Email { get; set; } = null!;
-
-        public string NewPassword { get; set; } = null!;
+        public string Token { get; set; } = string.Empty;
     }
 }
