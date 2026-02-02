@@ -28,10 +28,10 @@ namespace WorkHub.Business.Service
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AuthService(IUnitOfWork unitOfWork, 
-                            JwtService jwtService, 
+        public AuthService(IUnitOfWork unitOfWork,
+                            JwtService jwtService,
                             IGoogleAuthService googleAuthService,
-                            IMapper mapper, 
+                            IMapper mapper,
                             IEmailService emailService,
                             IWebHostEnvironment webHostEnvironment)
         {
@@ -64,7 +64,7 @@ namespace WorkHub.Business.Service
 
             };
 
-             _unitOfWork.UserRepository.Add(user);
+            _unitOfWork.UserRepository.Add(user);
             await _unitOfWork.SaveAsync();
 
             var verifyLink = $"http://localhost:3000/verify-email?token={token}";
@@ -90,7 +90,7 @@ namespace WorkHub.Business.Service
             });
 
             return _mapper.Map<UserDTO>(user);
-        }   
+        }
 
         public async Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO request)
         {
@@ -98,7 +98,7 @@ namespace WorkHub.Business.Service
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
 
-            if(user.IsVerified == false)
+            if (user.IsVerified == false)
             {
                 throw new UnauthorizedAccessException("Account has not been verified");
             }
@@ -155,12 +155,12 @@ namespace WorkHub.Business.Service
 
         public async Task ResendEmailConfirmationAsync(EmailResendConfirmationDTO email)
         {
-           var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == email.Email.ToLower());
+            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == email.Email.ToLower());
 
             if (user == null)
                 throw new Exception("Email does not exist");
 
-            if(user.IsVerified == true)
+            if (user.IsVerified == true)
                 throw new Exception("Account has already been verified");
 
             var token = Guid.NewGuid().ToString();
@@ -189,6 +189,80 @@ namespace WorkHub.Business.Service
                 Attachments = null
             });
         }
-    }
 
+        public async Task SendEmailPasswordChaningRequestAsync(EmailResendConfirmationDTO email)
+        {
+            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == email.Email.ToLower());
+
+            if (user == null)
+                throw new Exception("Email does not exist");
+
+
+
+            var token = Guid.NewGuid().ToString();
+
+            user.EmailVerificationToken = token;
+            user.TokenExpiry = DateTime.UtcNow.AddHours(1);
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            var verifyLink = $"http://localhost:3000/reset-password?token={token}";
+
+            var path = Path.Combine(
+                    _webHostEnvironment.ContentRootPath,
+                    "Templates",
+                    "ResetPassword.html"
+                );
+
+            var body = await File.ReadAllTextAsync(path);
+            body = body.Replace("{{RESET_URL}}", verifyLink);
+            await _emailService.SendEmailAsync(new EmailRequestDTO
+            {
+                Body = body,
+                To = user.Email,
+                Subject = "WorkHub: Please Confirm Your New Password ",
+                IsHtml = true,
+                Attachments = null
+            });
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequestDTO)
+        {
+            var user = await _unitOfWork.UserRepository
+                .GetAsync(c =>  c.Email.ToLower() == resetPasswordRequestDTO.Email.ToLower());
+
+            if (user == null)
+            {
+                throw new Exception("Email does not exist");
+            }
+
+
+            var hash = BCryptHelper.Encode(resetPasswordRequestDTO.NewPassword);
+            user.Password = hash;
+            user.EmailVerificationToken = null;
+            user.TokenExpiry = null;
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+
+        }
+
+        public async Task<bool> IsTokenExpired(string token)
+        {
+            var user = await _unitOfWork.UserRepository
+                .GetAsync(c => c.EmailVerificationToken == token);
+
+            if (user != null)
+            {
+                if (user.TokenExpiry < DateTime.UtcNow)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+    }
 }

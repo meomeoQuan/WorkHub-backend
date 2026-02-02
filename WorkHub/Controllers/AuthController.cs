@@ -135,6 +135,8 @@ namespace WorkHub.Controllers
                 );
             }
 
+          
+
             await _emailService.VerifyEmailAsync(request);
 
             return Ok(
@@ -159,6 +161,77 @@ namespace WorkHub.Controllers
                 ApiResponse<object>.Ok(null, "Email sent successfully")
             );
         }
+
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> SendPasswordEmailChanging([FromBody] EmailResendConfirmationDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+            await _authService.SendEmailPasswordChaningRequestAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Email sent successfully")
+            );
+        }
+
+        [HttpPost("password-reset")]
+        public async Task<IActionResult> PasswordChangingRequest([FromBody] ResetPasswordRequestDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("Email is required")
+                );
+            }
+
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("NewPassword is required")
+                );
+            }
+
+            await _authService.ResetPasswordAsync(request);
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "Password reset successfully")
+            );
+        }
+
+
+        [HttpPost("validate-reset-token")]
+        public async Task<IActionResult> ValidateResetToken(
+     [FromBody] ValidateResetTokenRequestDTO request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Token))
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("TOKEN_INVALID")
+                );
+            }
+
+            var isExpired = await _authService.IsTokenExpired(request.Token);
+
+            if (isExpired)
+            {
+                return BadRequest(
+                    ApiResponse<object>.BadRequest("TOKEN_EXPIRED")
+                );
+            }
+
+            return Ok(
+                ApiResponse<object>.Ok(null, "valid")
+            );
+        }
+
+
 
 
         //[Authorize]
