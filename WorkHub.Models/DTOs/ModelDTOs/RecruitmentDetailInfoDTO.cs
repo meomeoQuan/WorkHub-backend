@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkHub.Models.DTOs
+namespace WorkHub.Models.DTOs.ModelDTOs
 {
-    public class RecruitmentOverviewInfoDTO
+    public class RecruitmentDetailInfoDTO
     {
         public int Id { get; set; }
         public string JobName { get; set; } = null!;
@@ -14,5 +14,14 @@ namespace WorkHub.Models.DTOs
         public string? Location { get; set; }
         public string? Salary { get; set; }
         public bool Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public string Description { get; set; } = null!;
+        public string? Schedule { get; set; }
+
+        public CompanyDetailDTO Company { get; set; } = null!;
+        public EmployerOverviewDTO Employer { get; set; } = null!;
     }
+
+
 }

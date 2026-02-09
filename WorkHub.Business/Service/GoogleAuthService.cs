@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WorkHub.Business.Service.IService;
-using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.AuthDTOs;
 
 namespace WorkHub.Business.Service
 {

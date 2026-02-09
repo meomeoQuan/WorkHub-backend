@@ -12,7 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkHub.Business.Service.IService;
 using WorkHub.DataAccess.Repository.IRepository;
-using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.AuthDTOs;
+using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
