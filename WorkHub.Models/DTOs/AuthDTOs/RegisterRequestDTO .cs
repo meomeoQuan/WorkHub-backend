@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkHub.Models.DTOs
+namespace WorkHub.Models.DTOs.AuthDTOs
 {
     public class RegisterRequestDTO
     {

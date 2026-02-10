@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.AuthDTOs;
+using WorkHub.Models.DTOs.ModelDTOs;
 
 namespace WorkHub.Business.Service.IService
 {

@@ -32,6 +32,12 @@ public partial class RecruitmentInfo
 
     public DateTime CreatedAt { get; set; }
 
+    //===================== New 2/2/2026 ========================
+
+    public string Description { get; set; } = null!;
+
+    //=============================================
+
     public bool Status { get; set; }
 
     [StringLength(200)]

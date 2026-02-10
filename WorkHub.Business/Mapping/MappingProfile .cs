@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.Models;
 
 namespace WorkHub.Business.Mapping

@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WorkHub.Business.Service.IService;
 using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.AuthDTOs;
 using WorkHub.Models.Models;
 
 namespace WorkHub.Controllers
