@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WorkHub.Controllers.Employer
+namespace WorkHub.Controllers.User
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class EmployerController : ControllerBase
+    public class UserController : ControllerBase
     {
     }
 }

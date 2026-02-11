@@ -13,8 +13,7 @@ namespace WorkHub.Utility
             return role switch
             {
                 "Admin" => 0,
-                "Employer" => 1,
-                "JobSeeker" => 2,
+                "User" => 1,
                 _ => throw new ArgumentException("Invalid role", nameof(role)),
             };
         }
@@ -23,8 +22,7 @@ namespace WorkHub.Utility
             return role switch
             {
                 0 => SD.Role_Admin,
-                1 => SD.Role_Employer,
-                2 => SD.Role_JobSeeker,
+                1 => SD.Role_User,
                 _ => throw new ArgumentException("Invalid table name", nameof(role)),
             };
         }

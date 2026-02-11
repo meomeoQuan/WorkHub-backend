@@ -10,7 +10,7 @@ using WorkHub.Models.Models;
 
 namespace WorkHub.DataAccess.Repository
 {
-    public class RecruitmentInfoRepo : Repository<RecruitmentInfo>, IRecruitmentInfoRepo
+    public class RecruitmentInfoRepo : Repository<Recruitment>, IRecruitmentInfoRepo
     {
         private readonly WorkHubDbContext _context;
         public RecruitmentInfoRepo(WorkHubDbContext context) : base(context)
@@ -18,9 +18,9 @@ namespace WorkHub.DataAccess.Repository
             _context = context;
         }
 
-        public void Update(RecruitmentInfo entity)
+        public void Update(Recruitment entity)
         {
-            _context.RecruitmentInfos.Update(entity);
+            _context.Recruitments.Update(entity);
         }
     }
 }

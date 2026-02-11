@@ -7,8 +7,8 @@ using WorkHub.Models.Models;
 
 namespace WorkHub.DataAccess.Repository.IRepository
 {
-    public interface IRecruitmentInfoRepo : IRepository<RecruitmentInfo>
+    public interface IRecruitmentInfoRepo : IRepository<Recruitment>
     {
-        public void Update(RecruitmentInfo entity);   
+        public void Update(Recruitment entity);   
     }
 }

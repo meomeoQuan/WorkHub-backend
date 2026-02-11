@@ -1,173 +1,121 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WorkHub.DataAccess.Data;
+﻿using WorkHub.DataAccess.Data;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
-namespace WorkHub.DataAccess.Seed
+public static class DbSeeder
 {
-    public static class DbSeeder
+    public static void Seed(WorkHubDbContext context)
     {
-        public static void Seed(WorkHubDbContext context)
-        {
-            SeedUsers(context);
-            SeedCompanies(context);
-            SeedEmployers(context);
-            SeedSeekers(context);
-            SeedRecruitments(context);
-            SeedApplications(context);
-        }
+        if (context.Users.Any()) return;
 
         // ================= USERS =================
-        private static void SeedUsers(WorkHubDbContext context)
+
+        var users = new List<User>
         {
-            if (context.Users.Any()) return;
+            new User
+            {
+                Email = "admin@gmail.com",
+                FullName = "Admin",
+                PasswordHash = BCryptHelper.Encode("123"),
+                Role = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin),
+                IsVerified = true
+            },
+            new User
+            {
+                Email = "user1@gmail.com",
+                FullName = "User One",
+                PasswordHash = BCryptHelper.Encode("123"),
+                Role =  RoleMapper.MapRoleToRoleNumber(SD.Role_User),
+                IsVerified = true
+            },
+            new User
+            {
+                Email = "user2@gmail.com",
+                FullName = "User Two",
+                PasswordHash = BCryptHelper.Encode("123"),
+                Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
+                IsVerified = true
+            }
+        };
 
-            context.Users.AddRange(
-                new User
-                {
-                    Email = "admin@workhub.com",
-                    Password = BCryptHelper.Encode("123456"),
-                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin),
-                    IsVerified = true,
-                    FullName = "Admin User",
-                    Age = 30,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new User
-                {
-                    Email = "employer@workhub.com",
-                    Password = BCryptHelper.Encode("123456"),
-                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_Employer),
-                    IsVerified = true,
-                    FullName = "Employer One",
-                    Age = 35,
-                    CreatedAt = DateTime.UtcNow
-                },
-                new User
-                {
-                    Email = "seeker@workhub.com",
-                    Password = BCryptHelper.Encode("123456"),
-                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
-                    IsVerified = true,
-                    FullName = "Job Seeker",
-                    Age = 24,
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+        context.Users.AddRange(users);
+        context.SaveChanges(); // USERS FIRST
 
-            context.SaveChanges();
-        }
+        // ================= USER DETAILS =================
 
-        // ================= COMPANY =================
-        private static void SeedCompanies(WorkHubDbContext context)
+        context.UserDetails.AddRange(users.Select(u => new UserDetail
         {
-            if (context.Companies.Any()) return;
+            UserId = u.Id,
+            FullName = u.Email,
+            Age = 25
+        }));
 
-            context.Companies.Add(
-                new Company
-                {
-                    CompanyName = "WorkHub Tech",
-                    CompanyIndustry = "Software",
-                    CompanySize = 50,
-                    Location = "Ho Chi Minh City",
-                    Phone = "0123456789",
-                    Email = "contact@workhub.com",
-                    Info = "A tech startup"
-                }
-            );
+        // ================= RECRUITMENTS =================
 
-            context.SaveChanges();
-        }
+        var admin = users.First(x => x.Role == RoleMapper.MapRoleToRoleNumber(SD.Role_Admin));
 
-        // ================= EMPLOYER =================
-        private static void SeedEmployers(WorkHubDbContext context)
+        var recruitments = new List<Recruitment>
         {
-            if (context.Employers.Any()) return;
+            new Recruitment { UserId = admin.Id, JobName = "Junior .NET", JobType = "Full-time", Salary = "$800", Status = "Open" },
+            new Recruitment { UserId = admin.Id, JobName = "Frontend Intern", JobType = "Intern", Salary = "$500", Status = "Open" }
+        };
 
-            var employerUser = context.Users.First(u => u.Role == 2);
-            var company = context.Companies.First();
+        context.Recruitments.AddRange(recruitments);
+        context.SaveChanges(); // 🔥 IMPORTANT — now Recruitment IDs exist
 
-            context.Employers.Add(
-                new Employer
-                {
-                    UserId = employerUser.Id,
-                    CompanyId = company.Id,
-                    Bio = "Hiring talented developers"
-                }
-            );
+        // ================= APPLICATIONS =================
 
-            context.SaveChanges();
-        }
+        context.Applications.AddRange(
+            new Application { UserId = users[1].Id, RecruitmentId = recruitments[0].Id },
+            new Application { UserId = users[2].Id, RecruitmentId = recruitments[0].Id }
+        );
 
-        // ================= SEEKER =================
-        private static void SeedSeekers(WorkHubDbContext context)
+        // ================= POSTS =================
+
+        var posts = new List<Post>
         {
-            if (context.Seekers.Any()) return;
+            new Post { UserId = admin.Id, Content = "Hello WorkHub" },
+            new Post { UserId = admin.Id, Content = "Hiring devs" }
+        };
 
-            var seekerUser = context.Users.First(u => u.Role == 3);
+        context.Posts.AddRange(posts);
 
-            context.Seekers.Add(
-                new Seeker
-                {
-                    UserId = seekerUser.Id,
-                    Bio = "Looking for backend roles",
-                    EducationLevel = "Bachelor",
-                    Major = "Software Engineering",
-                    Schedule = "Full-time"
-                }
-            );
+        // ================= COMMENTS =================
 
-            context.SaveChanges();
-        }
-
-        // ================= RECRUITMENT =================
-        private static void SeedRecruitments(WorkHubDbContext context)
+        context.Comments.Add(new Comment
         {
-            if (context.RecruitmentInfos.Any()) return;
+            UserId = users[2].Id,
+            Post = posts[0],
+            Content = "Nice post"
+        });
 
-            var employer = context.Employers.First();
-            var company = context.Companies.First();
+        // ================= FOLLOW =================
 
-            context.RecruitmentInfos.Add(
-                new RecruitmentInfo
-                {
-                    EmployerId = employer.Id,
-                    CompanyId = company.Id,
-                    JobName = "Junior .NET Developer",
-                    JobType = "Full-time",
-                    Location = "Remote",
-                    Salary = "$800 - $1200",
-                    CreatedAt = DateTime.UtcNow,
-                    Status = true,
-                    Schedule = "Mon-Fri"
-                }
-            );
-
-            context.SaveChanges();
-        }
-
-        // ================= APPLICATION =================
-        private static void SeedApplications(WorkHubDbContext context)
+        context.UserFollows.Add(new UserFollow
         {
-            if (context.Applications.Any()) return;
+            FollowerId = users[1].Id,
+            FollowingId = users[0].Id
+        });
 
-            var seeker = context.Seekers.First();
-            var job = context.RecruitmentInfos.First();
+        // ================= LIKE =================
 
-            context.Applications.Add(
-                new Application
-                {
-                    SeekerId = seeker.Id,
-                    RecruitmentId = job.Id,
-                    CreatedAt = DateTime.UtcNow
-                }
-            );
+        context.PostLikes.Add(new PostLike
+        {
+            UserId = users[2].Id,
+            Post = posts[0]
+        });
 
-            context.SaveChanges();
-        }
+        // ================= SCHEDULE =================
+
+        context.UserSchedules.Add(new UserSchedule
+        {
+            UserId = users[2].Id,
+            Title = "Interview",
+            StartTime = DateTime.UtcNow,
+            EndTime = DateTime.UtcNow.AddHours(2)
+        });
+
+        // FINAL SAVE
+        context.SaveChanges();
     }
 }
