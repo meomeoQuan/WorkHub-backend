@@ -14,7 +14,7 @@ namespace WorkHub.Business.Mapping
         public MappingProfile()
         {
             // 🔥 THIS IS WHAT YOU MISSED
-            CreateMap<RecruitmentInfo, RecruitmentOverviewInfoDTO>();
+            CreateMap<Recruitment, RecruitmentOverviewInfoDTO>();
             CreateMap<User,UserDTO>();
 
         }

@@ -27,6 +27,9 @@ namespace WorkHub.DataAccess.Repository.IRepository
         T Get(Expression<Func<T, bool>> filter, string? includeProperties = null);
         IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
         void Add(T entity);
+
+        void AddRange(IEnumerable<T> entities);
+
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entities);
         //=========================================================================================================

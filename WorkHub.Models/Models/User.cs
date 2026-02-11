@@ -1,60 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace WorkHub.Models.Models;
 
-[Table("User")]
-[Index("Email", Name = "UQ__User__A9D1053491BE2FC7", IsUnique = true)]
 public partial class User
 {
-    [Key]
     public int Id { get; set; }
 
-    [StringLength(100)]
-    [Unicode(false)]
     public string Email { get; set; } = null!;
 
-    [StringLength(12)]
-    [Unicode(false)]
+    public string FullName { get; set; }
+
     public string? Phone { get; set; }
 
-    [StringLength(255)]
-    [Unicode(false)]
-    public string ? Password { get; set; }
+    public string? PasswordHash { get; set; }
 
-    public int Role { get; set; }
+    public int ? Role { get; set; }
 
-    public bool IsVerified { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public double? Rating { get; set; }
-
-    [StringLength(100)]
-    public string FullName { get; set; } = null!;
-
-    [StringLength(200)]
-    [Unicode(false)]
-    public string? AvatarUrl { get; set; }
-
-    [StringLength(100)]
-    public string? Location { get; set; }
-
-    public int Age { get; set; }
+    public bool? IsVerified { get; set; }
 
     public string? Provider { get; set; }
+
     public string? ProviderId { get; set; }
 
     public string? EmailVerificationToken { get; set; }
+
     public DateTime? TokenExpiry { get; set; }
 
+    public DateTime? CreatedAt { get; set; }
 
-    [InverseProperty("User")]
-    public virtual ICollection<Employer> Employers { get; set; } = new List<Employer>();
+    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
-    [InverseProperty("User")]
-    public virtual ICollection<Seeker> Seekers { get; set; } = new List<Seeker>();
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
+    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
+    public virtual ICollection<Recruitment> Recruitments { get; set; } = new List<Recruitment>();
+
+    public virtual UserDetail? UserDetail { get; set; }
+
+    public virtual ICollection<UserFollow> UserFollowFollowers { get; set; } = new List<UserFollow>();
+
+    public virtual ICollection<UserFollow> UserFollowFollowings { get; set; } = new List<UserFollow>();
+
+    public virtual ICollection<UserSchedule> UserSchedules { get; set; } = new List<UserSchedule>();
 }

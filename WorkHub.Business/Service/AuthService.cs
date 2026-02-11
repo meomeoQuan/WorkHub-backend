@@ -56,7 +56,7 @@ namespace WorkHub.Business.Service
             {
                 Email = request.Email,
                 FullName = request.FullName ?? request.Email,
-                Password = hash,
+                PasswordHash = hash,
                 Role = request.role,
                 IsVerified = false,
                 CreatedAt = DateTime.UtcNow,
@@ -104,7 +104,7 @@ namespace WorkHub.Business.Service
                 throw new UnauthorizedAccessException("Account has not been verified");
             }
 
-            if (!BCryptHelper.Decode(request.Password, user.Password))
+            if (!BCryptHelper.Decode(request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid email or password");
 
             var JwtToken = _jwtService.GenerateToken(user);
@@ -132,7 +132,7 @@ namespace WorkHub.Business.Service
                 {
                     Email = googleUser.Email,
                     FullName = googleUser.Name,
-                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_JobSeeker),
+                    Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
                     Provider = SD.Provider_Google,
                     ProviderId = googleUser.GoogleId,
                     IsVerified = true,
@@ -239,7 +239,7 @@ namespace WorkHub.Business.Service
 
 
             var hash = BCryptHelper.Encode(resetPasswordRequestDTO.NewPassword);
-            user.Password = hash;
+            user.PasswordHash = hash;
             user.EmailVerificationToken = null;
             user.TokenExpiry = null;
             _unitOfWork.UserRepository.Update(user);

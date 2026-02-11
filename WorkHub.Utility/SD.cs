@@ -8,8 +8,7 @@ namespace WorkHub.Utility
 {
     public static class SD
     {
-        public const string Role_JobSeeker= "JobSeeker";
-        public const string Role_Employer = "Employer";
+        public const string Role_User= "User";
         public const string Role_Admin = "Admin";
 
         public const string Provider_Google = "Google";

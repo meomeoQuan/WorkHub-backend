@@ -3,19 +3,19 @@ using System.Collections.Generic;
 
 namespace WorkHub.Models.Models;
 
-public partial class Application
+public partial class Post
 {
     public int Id { get; set; }
 
     public int UserId { get; set; }
 
-    public int RecruitmentId { get; set; }
-
-    public string? Status { get; set; }
+    public string? Content { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual Recruitment Recruitment { get; set; } = null!;
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
 
     public virtual User User { get; set; } = null!;
 }

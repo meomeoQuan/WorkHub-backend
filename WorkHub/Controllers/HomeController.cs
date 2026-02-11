@@ -21,10 +21,10 @@ namespace WorkHub.Controllers
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-      
-        [HttpGet]
-        public async Task<IActionResult> GetTop4()
-        {
+
+        [HttpGet("top4")]
+        public async Task<IActionResult> GetTop4() { 
+
             var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4,descending: true); // descending is latest first
             var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
@@ -51,7 +51,7 @@ namespace WorkHub.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAllJob()
         {
             var entities = await _unitOfWork.RecruitmentInfoRepo.GetAllPagedAsync(pageIndex: 1 , pageSize: 5); // descending is latest first

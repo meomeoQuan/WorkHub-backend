@@ -13,7 +13,7 @@
     using WorkHub.DataAccess.Data;
     using WorkHub.DataAccess.Repository;
     using WorkHub.DataAccess.Repository.IRepository;
-    using WorkHub.DataAccess.Seed;
+
 using WorkHub.Models.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);

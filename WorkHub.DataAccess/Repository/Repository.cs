@@ -209,5 +209,11 @@ namespace WorkHub.DataAccess.Repository
             }
             return await query.Take(count).ToListAsync();
         }
+
+        public void AddRange(IEnumerable<T> entities)
+        {
+            dbSet.AddRange(entities);
+        }
+
     }
 }
