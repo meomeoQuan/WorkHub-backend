@@ -19,8 +19,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string Description { get; set; } = null!;
         public string? Schedule { get; set; }
 
-        public CompanyDetailDTO Company { get; set; } = null!;
-        public EmployerOverviewDTO Employer { get; set; } = null!;
+        
     }
 
 

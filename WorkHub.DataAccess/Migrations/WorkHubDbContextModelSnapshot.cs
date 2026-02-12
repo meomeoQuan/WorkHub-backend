@@ -113,6 +113,12 @@ namespace WorkHub.DataAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("(sysdatetime())");
 
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PostImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -169,6 +175,9 @@ namespace WorkHub.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Salary")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -186,6 +195,8 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Recruitm__3214EC079D1054A4");
+
+                    b.HasIndex("PostId");
 
                     b.HasIndex(new[] { "UserId" }, "IX_Recruitment_UserId");
 
@@ -454,12 +465,19 @@ namespace WorkHub.DataAccess.Migrations
 
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
+                    b.HasOne("WorkHub.Models.Models.Post", "Post")
+                        .WithMany("Recruitments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WorkHub.Models.Models.User", "User")
                         .WithMany("Recruitments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK__Recruitme__UserI__4BAC3F29");
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });
@@ -518,6 +536,8 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("PostLikes");
+
+                    b.Navigation("Recruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>

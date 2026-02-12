@@ -31,16 +31,16 @@ namespace WorkHub.Utility
 
         //============================ JOIN COLLECTION TABLE STRING ==================================
 
-        public const string CollectionJoin_PostLikes = "PostLikes";
-        public const string CollectionJoin_Comments = "Comments";
-        public const string CollectionJoin_Applications = "Applications";
-        public const string CollectionJoin_Posts = "Posts";
-        public const string CollectionJoin_Recruitments = "Recruitments";
-        public const string CollectionJoin_UserFollowFollowers = "UserFollowFollowers";
-        public const string CollectionJoin_UserFollowFollowings = "UserFollowFollowings";
-        public const string CollectionJoin_UserSchedules = "UserSchedules";
-        public const string CollectionJoin_UserDetail = "UserDetail";
-        public const string CollectionJoin_InverseParentComment = "InverseParentComment";
+        public const string Collection_Join_PostLikes = "PostLikes";
+        public const string Collection_Join_Comments = "Comments";
+        public const string Collection_Join_Applications = "Applications";
+        public const string Collection_Join_Posts = "Posts";
+        public const string Collection_Join_Recruitments = "Recruitments";
+        public const string Collection_Join_UserFollowFollowers = "UserFollowFollowers";
+        public const string Collection_Join_UserFollowFollowings = "UserFollowFollowings";
+        public const string Collection_Join_UserSchedules = "UserSchedules";
+        public const string Collection_Join_UserDetail = "UserDetail";
+        public const string Collection_Join_InverseParentComment = "InverseParentComment";
 
 
     }

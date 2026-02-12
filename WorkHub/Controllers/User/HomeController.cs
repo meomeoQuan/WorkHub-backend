@@ -6,9 +6,10 @@ using WorkHub.DataAccess.Data;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Utility;
 
-namespace WorkHub.Controllers
+namespace WorkHub.Controllers.User
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -26,24 +27,42 @@ namespace WorkHub.Controllers
         [HttpGet("top4")]
         public async Task<IActionResult> GetTop4() { 
 
-            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4,descending: true); // descending is latest first
+            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(3,descending: true); // descending is latest first
             var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
-            var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 5 recruitment info retrieved successfully");
+            var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 3 recruitment info retrieved successfully");
 
             return Ok(response);
         }
 
+
+        // Get top 6 users with credibility rating >= 4 who have been registered for at least 7 days
         [HttpGet("top-credibility-user")]
         public async Task<IActionResult> GetTopCredibilityUser()
         {
-            var entities = await _unitOfWork.UserRepository.GetTopAsync(6, filter: c => c.UserDetail.Rating > 4, orderBy: c => c.UserDetail.Rating, descending: true, includeProperties: SD.Join_UserDetail); // descending is latest first
-            var result = _mapper.Map<List<UserDTO>>(entities);
+            var sevenDaysAgo = DateTime.UtcNow.AddDays(-7);
+            var adminRole = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin);
 
-            var response = ApiResponse<List<UserDTO>>.Ok(result, "Top 6 credibility user retrieved successfully");
+            var entities = await _unitOfWork.UserRepository.GetTopAsync(
+                4,
+                filter: c =>
+                    c.UserDetail != null &&
+                    c.UserDetail.Rating >= 4 &&
+                    c.CreatedAt <= sevenDaysAgo &&
+                    c.Role != adminRole,
+                orderBy: c => c.UserDetail!.Rating,
+                descending: true,
+                includeProperties: SD.Join_UserDetail + "," + SD.Collection_Join_Recruitments
+            );
+
+            var result = _mapper.Map<List<UserFeatureDTO>>(entities);
+
+            var response = ApiResponse<List<UserFeatureDTO>>.Ok(result, "Top 4 credibility users retrieved successfully");
 
             return Ok(response);
         }
+
+
 
 
 

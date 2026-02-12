@@ -61,7 +61,13 @@ namespace WorkHub.Business.Service
                 IsVerified = false,
                 CreatedAt = DateTime.UtcNow,
                 EmailVerificationToken = token,
-                TokenExpiry = DateTime.UtcNow.AddHours(24)
+                TokenExpiry = DateTime.UtcNow.AddHours(24),
+                UserDetail = new UserDetail
+                {
+                    Rating = 5,
+                    
+                }
+
 
             };
 
@@ -136,7 +142,11 @@ namespace WorkHub.Business.Service
                     Provider = SD.Provider_Google,
                     ProviderId = googleUser.GoogleId,
                     IsVerified = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    UserDetail = new UserDetail
+                    {
+                        Rating = 5
+                    }
                 };
 
                 _unitOfWork.UserRepository.Add(user);
