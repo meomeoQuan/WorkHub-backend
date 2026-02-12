@@ -13,7 +13,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string JobType { get; set; } = null!;
         public string? Location { get; set; }
         public string? Salary { get; set; }
-        public bool Status { get; set; }
+        public string Status { get; set; }
 
         public string description { get; set; } = null!;
     }

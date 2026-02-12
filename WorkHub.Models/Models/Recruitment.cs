@@ -9,6 +9,8 @@ public partial class Recruitment
 
     public int UserId { get; set; }
 
+    public int PostId { get; set; }   // 👈 ADD THIS
+
     public string? JobName { get; set; }
 
     public string? JobType { get; set; }
@@ -24,6 +26,8 @@ public partial class Recruitment
     public DateTime? CreatedAt { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+
+    public virtual Post Post { get; set; } = null!;   // 👈 ADD THIS
 
     public virtual User User { get; set; } = null!;
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WorkHub.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class AddInit : Migration
+    public partial class AddNewRelation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -41,7 +41,9 @@ namespace WorkHub.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
+                    Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PostImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
                 },
                 constraints: table =>
@@ -49,32 +51,6 @@ namespace WorkHub.DataAccess.Migrations
                     table.PrimaryKey("PK__Post__3214EC07971C2B27", x => x.Id);
                     table.ForeignKey(
                         name: "FK__Post__UserId__4222D4EF",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Recruitment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    JobType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Schedule = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Recruitm__3214EC079D1054A4", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK__Recruitme__UserI__4BAC3F29",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -217,6 +193,38 @@ namespace WorkHub.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Recruitment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    JobType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Schedule = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__Recruitm__3214EC079D1054A4", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Post_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Application",
                 columns: table => new
                 {
@@ -282,6 +290,11 @@ namespace WorkHub.DataAccess.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PostLike_PostId",
                 table: "PostLike",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recruitment_PostId",
+                table: "Recruitment",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(

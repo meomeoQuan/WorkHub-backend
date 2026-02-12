@@ -138,10 +138,19 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.Schedule).HasMaxLength(255);
             entity.Property(e => e.Status).HasMaxLength(50);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Recruitments)
+            // KEEP user link BUT REMOVE cascade
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.Recruitments)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Recruitme__UserI__4BAC3F29");
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // MAIN relationship (Post owns Recruitment)
+            entity.HasOne(r => r.Post)
+                .WithMany(p => p.Recruitments)
+                .HasForeignKey(r => r.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
+
 
         modelBuilder.Entity<User>(entity =>
         {

@@ -12,6 +12,10 @@ namespace WorkHub.DataAccess.Repository.IRepository
     {
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; }
         public IUserRepository UserRepository { get; }
+
+        public IPostRepository PostRepository { get; }
+
+        public ICommentRepository CommentRepository { get; }
         Task SaveAsync();
     }
 }

@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using WorkHub.Models.Models;
+
+namespace WorkHub.DataAccess.Repository.IRepository
+{
+    public interface ICommentRepository : IRepository<Comment>
+    {
+        public void Update(Comment entity);
+    }
+}

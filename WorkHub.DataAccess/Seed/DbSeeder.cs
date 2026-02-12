@@ -6,116 +6,140 @@ public static class DbSeeder
 {
     public static void Seed(WorkHubDbContext context)
     {
+        var tenDaysAgo = DateTime.UtcNow.AddDays(-10);
+
         if (context.Users.Any()) return;
 
         // ================= USERS =================
 
-        var users = new List<User>
+        var admin = new User
         {
-            new User
-            {
-                Email = "admin@gmail.com",
-                FullName = "Admin",
-                PasswordHash = BCryptHelper.Encode("123"),
-                Role = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin),
-                IsVerified = true
-            },
-            new User
-            {
-                Email = "user1@gmail.com",
-                FullName = "User One",
-                PasswordHash = BCryptHelper.Encode("123"),
-                Role =  RoleMapper.MapRoleToRoleNumber(SD.Role_User),
-                IsVerified = true
-            },
-            new User
-            {
-                Email = "user2@gmail.com",
-                FullName = "User Two",
-                PasswordHash = BCryptHelper.Encode("123"),
-                Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
-                IsVerified = true
-            }
+            Email = "admin@gmail.com",
+            FullName = "Admin",
+            PasswordHash = BCryptHelper.Encode("123"),
+            Role = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin),
+            IsVerified = true,
+            CreatedAt = tenDaysAgo
         };
 
-        context.Users.AddRange(users);
-        context.SaveChanges(); // USERS FIRST
+        var user1 = new User
+        {
+            Email = "user1@gmail.com",
+            FullName = "User One",
+            PasswordHash = BCryptHelper.Encode("123"),
+            Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
+            IsVerified = true,
+            CreatedAt = tenDaysAgo
+        };
+
+        var user2 = new User
+        {
+            Email = "user2@gmail.com",
+            FullName = "User Two",
+            PasswordHash = BCryptHelper.Encode("123"),
+            Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
+            IsVerified = true,
+            CreatedAt = tenDaysAgo
+        };
+
+        context.Users.AddRange(admin, user1, user2);
+        context.SaveChanges();
 
         // ================= USER DETAILS =================
 
-        context.UserDetails.AddRange(users.Select(u => new UserDetail
+        context.UserDetails.AddRange(
+            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 },
+            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 },
+            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 }
+        );
+
+        // ================= POSTS (ONLY NORMAL USERS) =================
+
+        var post1 = new Post
         {
-            UserId = u.Id,
-            FullName = u.Email,
-            Age = 25
-        }));
-
-        // ================= RECRUITMENTS =================
-
-        var admin = users.First(x => x.Role == RoleMapper.MapRoleToRoleNumber(SD.Role_Admin));
-
-        var recruitments = new List<Recruitment>
-        {
-            new Recruitment { UserId = admin.Id, JobName = "Junior .NET", JobType = "Full-time", Salary = "$800", Status = "Open" },
-            new Recruitment { UserId = admin.Id, JobName = "Frontend Intern", JobType = "Intern", Salary = "$500", Status = "Open" }
+            UserId = user1.Id,
+            Header = "First Post",
+            Content = "Welcome to WorkHub 🚀"
         };
 
-        context.Recruitments.AddRange(recruitments);
-        context.SaveChanges(); // 🔥 IMPORTANT — now Recruitment IDs exist
+        var post2 = new Post
+        {
+            UserId = user2.Id,
+            Header = "Hiring Developers",
+            Content = "Looking for frontend + backend devs"
+        };
+
+        context.Posts.AddRange(post1, post2);
+        context.SaveChanges();
+
+        // ================= RECRUITMENTS (ATTACHED TO POSTS) =================
+
+        var recruitment1 = new Recruitment
+        {
+            UserId = user1.Id,
+            PostId = post1.Id,
+            JobName = "Junior .NET",
+            JobType = "Full-time",
+            Salary = "$800",
+            Status = "Open"
+        };
+
+        var recruitment2 = new Recruitment
+        {
+            UserId = user2.Id,
+            PostId = post2.Id,
+            JobName = "Frontend Intern",
+            JobType = "Intern",
+            Salary = "$500",
+            Status = "Open"
+        };
+
+        context.Recruitments.AddRange(recruitment1, recruitment2);
+        context.SaveChanges();
 
         // ================= APPLICATIONS =================
 
         context.Applications.AddRange(
-            new Application { UserId = users[1].Id, RecruitmentId = recruitments[0].Id },
-            new Application { UserId = users[2].Id, RecruitmentId = recruitments[0].Id }
+            new Application { UserId = user2.Id, RecruitmentId = recruitment1.Id },
+            new Application { UserId = user1.Id, RecruitmentId = recruitment2.Id }
         );
 
-        // ================= POSTS =================
-
-        var posts = new List<Post>
-        {
-            new Post { UserId = admin.Id, Content = "Hello WorkHub" },
-            new Post { UserId = admin.Id, Content = "Hiring devs" }
-        };
-
-        context.Posts.AddRange(posts);
-
-        // ================= COMMENTS =================
+        // ================= COMMENT =================
 
         context.Comments.Add(new Comment
         {
-            UserId = users[2].Id,
-            Post = posts[0],
-            Content = "Nice post"
+            UserId = user2.Id,
+            PostId = post1.Id,
+            Content = "Nice post!"
         });
 
         // ================= FOLLOW =================
 
         context.UserFollows.Add(new UserFollow
         {
-            FollowerId = users[1].Id,
-            FollowingId = users[0].Id
+            FollowerId = user1.Id,
+            FollowingId = user2.Id
         });
 
         // ================= LIKE =================
 
         context.PostLikes.Add(new PostLike
         {
-            UserId = users[2].Id,
-            Post = posts[0]
+            UserId = user2.Id,
+            PostId = post1.Id
         });
 
         // ================= SCHEDULE =================
 
         context.UserSchedules.Add(new UserSchedule
         {
-            UserId = users[2].Id,
+            UserId = user2.Id,
             Title = "Interview",
             StartTime = DateTime.UtcNow,
             EndTime = DateTime.UtcNow.AddHours(2)
         });
 
-        // FINAL SAVE
         context.SaveChanges();
     }
+
 }
