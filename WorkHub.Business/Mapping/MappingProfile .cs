@@ -30,32 +30,43 @@ namespace WorkHub.Business.Mapping
 
 
             //=================== Jobs Page MAPPING =================
-            CreateMap<Post, JobPostDTO>()
-     .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
-     .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
-     .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
-     .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
-     .ForMember(d => d.PostImage, o => o.MapFrom(s => s.PostImageUrl))
-     .ForMember(d => d.LikeCount, o => o.MapFrom(s => s.PostLikes.Count))
-     .ForMember(d => d.CommentCount, o => o.MapFrom(s => s.Comments.Count))
 
-     // Recruitment mapping
-     .ForMember(d => d.JobName,
-        o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobName))
+              CreateMap<Post, JobPostDTO>()
+                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
+                 .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
+                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                 .ForMember(d => d.PostImage, o => o.MapFrom(s => s.PostImageUrl))
+                 .ForMember(d => d.LikeCount, o => o.MapFrom(s => s.PostLikes.Count))
+                 .ForMember(d => d.CommentCount, o => o.MapFrom(s => s.Comments.Count))
 
-      .ForMember(d => d.JobId,
-        o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Id))
+                 // Recruitment mapping
 
-    .ForMember(d => d.JobLocation,
-        o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Location))
+                 .ForMember(d => d.JobName,
+                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobName))
 
-    .ForMember(d => d.JobSalaryRange,
-        o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Salary))
+                  .ForMember(d => d.JobId,
+                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Id))
 
-    .ForMember(d => d.JobType,
-        o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobType));
+                .ForMember(d => d.JobLocation,
+                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Location))
+
+                .ForMember(d => d.JobSalaryRange,
+                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Salary))
+
+                .ForMember(d => d.JobType,
+                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobType));
 
 
+            CreateMap<Comment, CommentDTO>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+            .ForMember(d => d.ParentCommentId, o => o.MapFrom(s => s.ParentCommentId))
+            .ForMember(d => d.Content, o => o.MapFrom(s => s.Content))
+            .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.CreatedAt))
+            .ForMember(d => d.UserId, o => o.MapFrom(s => s.User.Id))
+            .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+            .ForMember(d => d.UserUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+            .ForMember(d => d.PostId, o => o.MapFrom(s => s.PostId));
 
 
 
