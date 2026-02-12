@@ -6,6 +6,7 @@ using WorkHub.DataAccess.Data;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs;
+using WorkHub.Utility;
 
 namespace WorkHub.Controllers
 {
@@ -33,11 +34,23 @@ namespace WorkHub.Controllers
             return Ok(response);
         }
 
+        [HttpGet("top-credibility-user")]
+        public async Task<IActionResult> GetTopCredibilityUser()
+        {
+            var entities = await _unitOfWork.UserRepository.GetTopAsync(6, filter: c => c.UserDetail.Rating > 4, orderBy: c => c.UserDetail.Rating, descending: true, includeProperties: SD.Join_UserDetail); // descending is latest first
+            var result = _mapper.Map<List<UserDTO>>(entities);
+
+            var response = ApiResponse<List<UserDTO>>.Ok(result, "Top 6 credibility user retrieved successfully");
+
+            return Ok(response);
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> JobDetails(string jobId)
         {
-            var entity = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id.ToString() == jobId, includeProperties: "Company,Employer");
+            var entity = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id.ToString() == jobId, includeProperties: SD.Join_User);
 
             if (entity == null)
             {
@@ -63,6 +76,7 @@ namespace WorkHub.Controllers
         }
 
 
-        
+
+
     }
 }

@@ -16,6 +16,7 @@ namespace WorkHub.Business.Mapping
             // 🔥 THIS IS WHAT YOU MISSED
             CreateMap<Recruitment, RecruitmentOverviewInfoDTO>();
             CreateMap<User,UserDTO>();
+            
 
         }
     }
