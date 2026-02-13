@@ -18,9 +18,5 @@ namespace WorkHub.Models.DTOs.ModelDTOs
 
         public string Description { get; set; } = null!;
         public string? Schedule { get; set; }
-
-        
     }
-
-
 }

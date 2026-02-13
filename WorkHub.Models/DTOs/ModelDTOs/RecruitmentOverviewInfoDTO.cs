@@ -16,5 +16,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string Status { get; set; }
 
         public string description { get; set; } = null!;
+
+        public string UserName { get; set; } = null!;
+        public string? Avatar { get; set; }
     }
 }
