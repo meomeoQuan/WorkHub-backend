@@ -23,12 +23,18 @@ namespace WorkHub.Controllers.User
         }
 
         [HttpGet("all-post")]
-        public async Task<IActionResult> GetAllJobPosts()
+        public async Task<IActionResult> GetAllJobPosts(int pageIndex = 1, int pageSize = 10)
         {
-            var jobPosts = await _unitOfWork.PostRepository.GetAllAsync(includeProperties: SD.Join_User + "," 
-            + SD.Collection_Join_Comments + "," 
-            + SD.Collection_Join_PostLikes + "," 
-            + SD.Collection_Join_Recruitments);
+            var jobPosts = await _unitOfWork.PostRepository.GetAllPagedAsync(
+                pageIndex,
+                pageSize,
+                includeProperties: SD.Join_User + ","
+                + SD.Collection_Join_Comments + ","
+                + SD.Collection_Join_PostLikes + ","
+                + SD.Collection_Join_Recruitments,
+                orderBy: p => p.CreatedAt,
+                descending: true
+            );
 
             var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
 

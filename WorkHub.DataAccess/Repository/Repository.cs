@@ -80,7 +80,7 @@ namespace WorkHub.DataAccess.Repository
             dbSet.RemoveRange(entities);
         }
 
-        public async Task<IEnumerable<T>> GetAllPagedAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null, int pageIndex = 1, int pageSize = 3)
+        public async Task<IEnumerable<T>> GetAllPagedAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null, int pageIndex = 1, int pageSize = 3, Expression<Func<T, object>>? orderBy = null, bool descending = false)
         {
             IQueryable<T> query = dbSet;
 
@@ -99,29 +99,19 @@ namespace WorkHub.DataAccess.Repository
                 }
             }
 
+            // Apply ordering
+            if (orderBy != null)
+            {
+                query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+            }
+
             // Apply paging
             return await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllPagedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetAllPagedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>>? filter = null, string? includeProperties = null, Expression<Func<T, object>>? orderBy = null, bool descending = false)
         {
-            IQueryable<T> query = dbSet;
-
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            if (!string.IsNullOrEmpty(includeProperties))
-            {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProp);
-                }
-            }
-
-            return await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await GetAllPagedAsync(filter, includeProperties, pageIndex, pageSize, orderBy, descending);
         }
         // offset    movies = 10 -> page 1 -> offset 0 , movies 3 
         // page 2 -> offset 3 , movies 3

@@ -124,11 +124,9 @@ var app = builder.Build();
 
     // ================= PIPELINE =================
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    // Enable Swagger in all environments for testing Render deployment
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
 
     // ================= SEEDING DATA =================

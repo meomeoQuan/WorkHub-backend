@@ -16,7 +16,10 @@ namespace WorkHub.Business.Mapping
         public MappingProfile()
         {
             // 🔥 THIS IS WHAT YOU MISSED
-            CreateMap<Recruitment, RecruitmentOverviewInfoDTO>();
+            CreateMap<Recruitment, RecruitmentOverviewInfoDTO>()
+                .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
 
             //=================== Auth MAPPING =================
             CreateMap<User,UserDTO>();
