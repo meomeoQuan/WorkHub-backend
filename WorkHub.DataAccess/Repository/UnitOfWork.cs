@@ -19,6 +19,8 @@ namespace WorkHub.DataAccess.Repository
             UserRepository = new UserRepository(_db);
             PostRepository =  new PostRepository(_db);
             CommentRepository = new CommentRepository(_db);
+            PostLikeRepository = new PostLikeRepository(_db);
+            userFollowRepository = new UserFollowRepository(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
@@ -28,6 +30,11 @@ namespace WorkHub.DataAccess.Repository
         public IPostRepository PostRepository { get; private set; }
 
         public ICommentRepository CommentRepository { get; private set; }
+
+        public IPostLikeRepository PostLikeRepository { get; private set; }
+
+        public IUserFollowRepository userFollowRepository { get; private set; }
+
         public async Task SaveAsync()
         {
             await _db.SaveChangesAsync();

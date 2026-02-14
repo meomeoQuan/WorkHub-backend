@@ -16,6 +16,10 @@ namespace WorkHub.DataAccess.Repository.IRepository
         public IPostRepository PostRepository { get; }
 
         public ICommentRepository CommentRepository { get; }
+
+        public IPostLikeRepository PostLikeRepository { get; }
+
+        public IUserFollowRepository userFollowRepository { get; }
         Task SaveAsync();
     }
 }

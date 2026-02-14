@@ -12,8 +12,8 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260212101027_AddNewRelation")]
-    partial class AddNewRelation
+    [Migration("20260214064419_AddInit")]
+    partial class AddInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,6 +98,26 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex(new[] { "PostId" }, "IX_Comment_PostId");
 
                     b.ToTable("Comment", (string)null);
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.CommentLikes", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(sysdatetime())");
+
+                    b.HasKey("UserId", "CommentId");
+
+                    b.HasIndex("CommentId");
+
+                    b.ToTable("CommentLikes");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
@@ -434,6 +454,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.CommentLikes", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.Comment", "Comment")
+                        .WithMany("CommentLikes")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("CommentLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.User", "User")
@@ -531,6 +570,8 @@ namespace WorkHub.DataAccess.Migrations
 
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
                 {
+                    b.Navigation("CommentLikes");
+
                     b.Navigation("InverseParentComment");
                 });
 
@@ -551,6 +592,8 @@ namespace WorkHub.DataAccess.Migrations
             modelBuilder.Entity("WorkHub.Models.Models.User", b =>
                 {
                     b.Navigation("Applications");
+
+                    b.Navigation("CommentLikes");
 
                     b.Navigation("Comments");
 

@@ -223,6 +223,24 @@ public partial class WorkHubDbContext : DbContext
                 .HasConstraintName("FK__UserSched__UserI__619B8048");
         });
 
+        modelBuilder.Entity<CommentLikes>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.CommentId });
+
+            entity.Property(e => e.CreatedAt)
+                  .HasDefaultValueSql("(sysdatetime())");
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.CommentLikes)
+                .HasForeignKey(d => d.UserId);
+
+            entity.HasOne(d => d.Comment)
+                .WithMany(p => p.CommentLikes)
+                .HasForeignKey(d => d.CommentId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+
         OnModelCreatingPartial(modelBuilder);
     }
 

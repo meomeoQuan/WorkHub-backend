@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
+using WorkHub.Models.Models;
 using WorkHub.Utility;
 
 namespace WorkHub.Controllers.User
@@ -70,51 +73,180 @@ namespace WorkHub.Controllers.User
         }
 
 
+        //     [HttpPost("all-comments-post")]
+        //     public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
+        //     {
+        //         var comments = await _unitOfWork.CommentRepository.GetAllAsync(
+        //    c => c.PostId == allCommentRequest.PostId,
+        //    includeProperties: SD.Join_User
+        //);
+
+        //         var flat = _mapper.Map<List<CommentDTO>>(comments);
+
+        //         // Root comments
+        //         var roots = flat
+        //             .Where(x => x.ParentCommentId == null)
+        //             .Select(c => new CommentTreeDTO
+        //             {
+        //                 Id = c.Id,
+        //                 UserName = c.UserName,
+        //                 Content = c.Content,
+        //                 CreatedAt = c.CreatedAt
+        //             })
+        //             .ToList();
+
+        //         // Replies
+        //         foreach (var root in roots)
+        //         {
+        //             root.Replies = flat
+        //                 .Where(r => r.ParentCommentId == root.Id)
+        //                 .Select(r => new CommentTreeDTO
+        //                 {
+        //                     Id = r.Id,
+        //                     UserName = r.UserName,
+        //                     Content = r.Content,
+        //                     CreatedAt = r.CreatedAt
+        //                 })
+        //                 .ToList();
+        //         }
+
+        //         var responseData = new
+        //         {
+        //             postId = allCommentRequest.PostId,
+        //             comments = roots
+        //         };
+
+        //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
+
+        //     }
+
         [HttpPost("all-comments-post")]
         public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
         {
             var comments = await _unitOfWork.CommentRepository.GetAllAsync(
-       c => c.PostId == allCommentRequest.PostId,
-       includeProperties: SD.Join_User
-   );
+                c => c.PostId == allCommentRequest.PostId,
+                includeProperties: SD.Join_User
+            );
 
             var flat = _mapper.Map<List<CommentDTO>>(comments);
 
-            // Root comments
-            var roots = flat
-                .Where(x => x.ParentCommentId == null)
-                .Select(c => new CommentTreeDTO
-                {
-                    Id = c.Id,
-                    UserName = c.UserName,
-                    Content = c.Content,
-                    CreatedAt = c.CreatedAt
-                })
-                .ToList();
-
-            // Replies
-            foreach (var root in roots)
-            {
-                root.Replies = flat
-                    .Where(r => r.ParentCommentId == root.Id)
-                    .Select(r => new CommentTreeDTO
-                    {
-                        Id = r.Id,
-                        UserName = r.UserName,
-                        Content = r.Content,
-                        CreatedAt = r.CreatedAt
-                    })
-                    .ToList();
-            }
+            // Recursive tree
+            var tree = BuildTree(flat, null);
 
             var responseData = new
             {
                 postId = allCommentRequest.PostId,
-                comments = roots
+                comments = tree
             };
 
             return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
-
         }
+
+        private List<CommentTreeDTO> BuildTree(List<CommentDTO> comments, int? parentId)
+        {
+            return comments
+                .Where(x => x.ParentCommentId == parentId)
+                .Select(x => new CommentTreeDTO
+                {
+                    Id = x.Id,
+                    UserName = x.UserName,
+                    Content = x.Content,
+                    CreatedAt = x.CreatedAt,
+                    Replies = BuildTree(comments, x.Id)
+                })
+                .ToList();
+        }
+
+        [Authorize]
+        [HttpPost("toggle-like")]
+        public async Task<IActionResult> ToggleLike(ToggleLikeDTO dto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            var existingLike = await _unitOfWork.PostLikeRepository.GetAsync(
+                x => x.UserId == userId && x.PostId == dto.PostId
+            );
+
+            if (existingLike != null)
+            {
+                // UNLIKE
+                _unitOfWork.PostLikeRepository.Remove(existingLike);
+                await _unitOfWork.SaveAsync();
+
+                return Ok(ApiResponse<object>.Ok(null, "Unliked"));
+            }
+
+            // LIKE
+            var newLike = new PostLike
+            {
+                UserId = userId,
+                PostId = dto.PostId
+            };
+
+             _unitOfWork.PostLikeRepository.Add(newLike);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Liked"));
+        }
+
+        [Authorize]
+        [HttpPost("add-comment")]
+        public async Task<IActionResult> AddComment(AddCommentDTO dto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var comment = new Comment
+            {
+                PostId = dto.PostId,
+                Content = dto.Content,
+                ParentCommentId = dto.ParentCommentId, // NULL = root, ID = reply
+                UserId = userId
+            };
+
+             _unitOfWork.CommentRepository.Add(comment);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Comment added"));
+        }
+
+
+        [Authorize]
+        [HttpPost("toggle-follow")]
+        public async Task<IActionResult> ToggleFollow(ToggleFollowDTO dto)
+        {
+            var followerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (followerId == dto.FollowingId)
+                return BadRequest(ApiResponse<object>.BadRequest("You cannot follow yourself"));
+
+            var existing = await _unitOfWork.userFollowRepository.GetAsync(
+                x => x.FollowerId == followerId && x.FollowingId == dto.FollowingId
+            );
+
+            if (existing != null)
+            {
+                // UNFOLLOW
+                _unitOfWork.userFollowRepository.Remove(existing);
+                await _unitOfWork.SaveAsync();
+
+                return Ok(ApiResponse<object>.Ok(null, "Unfollowed"));
+            }
+
+            // FOLLOW
+            var follow = new UserFollow
+            {
+                FollowerId = followerId,
+                FollowingId = dto.FollowingId
+            };
+
+           _unitOfWork.userFollowRepository.Add(follow);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Followed"));
+        }
+
+     
+
+
     }
 }
