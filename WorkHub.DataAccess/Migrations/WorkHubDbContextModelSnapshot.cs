@@ -97,6 +97,26 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("Comment", (string)null);
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.CommentLikes", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(sysdatetime())");
+
+                    b.HasKey("UserId", "CommentId");
+
+                    b.HasIndex("CommentId");
+
+                    b.ToTable("CommentLikes");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -431,6 +451,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.CommentLikes", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.Comment", "Comment")
+                        .WithMany("CommentLikes")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("CommentLikes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.User", "User")
@@ -528,6 +567,8 @@ namespace WorkHub.DataAccess.Migrations
 
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
                 {
+                    b.Navigation("CommentLikes");
+
                     b.Navigation("InverseParentComment");
                 });
 
@@ -548,6 +589,8 @@ namespace WorkHub.DataAccess.Migrations
             modelBuilder.Entity("WorkHub.Models.Models.User", b =>
                 {
                     b.Navigation("Applications");
+
+                    b.Navigation("CommentLikes");
 
                     b.Navigation("Comments");
 
