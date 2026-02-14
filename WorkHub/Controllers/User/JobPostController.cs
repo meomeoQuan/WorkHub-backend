@@ -9,7 +9,9 @@ using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
 using WorkHub.Models.Models;
+using WorkHub.Models.Enums;
 using WorkHub.Utility;
+using System.Linq.Expressions;
 
 namespace WorkHub.Controllers.User
 {
@@ -45,6 +47,105 @@ namespace WorkHub.Controllers.User
             var response = ApiResponse<List<JobPostDTO>>.Ok(result, "All Post retrieved successfully");
 
             return Ok(response);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchJobPosts(
+            string? searchQuery,
+            string? jobType,
+            string? location,
+            string? salaryRange,
+            string? postedDate,
+            string? experienceLevel,
+            string? category,
+            string? workSetting,
+            string? companySize,
+            int pageIndex = 1,
+            int pageSize = 10)
+        {
+            // Refactoring to use combined expressions for EF Core compatibility
+            var queryFilter = PredicateBuilder.True<Post>();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var s = searchQuery.ToLower();
+                queryFilter = queryFilter.And(p => p.Content.ToLower().Contains(s) ||
+                                                   p.User.FullName.ToLower().Contains(s) ||
+                                                   p.Recruitments.Any(r => r.JobName.ToLower().Contains(s) || r.Location.ToLower().Contains(s)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(jobType) && !jobType.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                // Parse the string to enum for EF Core translation
+                if (Enum.TryParse<JobType>(jobType, true, out var jobTypeEnum))
+                {
+                    queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.JobType == jobTypeEnum));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(location) && !location.Equals("all-cities", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Location.Contains(location)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(experienceLevel) && !experienceLevel.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.ExperienceLevel == experienceLevel));
+            }
+
+            if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category == category));
+            }
+
+            if (!string.IsNullOrWhiteSpace(workSetting) && !workSetting.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.WorkSetting == workSetting));
+            }
+
+            if (!string.IsNullOrWhiteSpace(companySize) && !companySize.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.CompanySize == companySize));
+            }
+
+            if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))
+            {
+                DateTime cutoff = DateTime.UtcNow;
+                if (postedDate == "24h") cutoff = cutoff.AddDays(-1);
+                else if (postedDate == "7d") cutoff = cutoff.AddDays(-7);
+                else if (postedDate == "30d") cutoff = cutoff.AddDays(-30);
+
+                queryFilter = queryFilter.And(p => p.CreatedAt >= cutoff);
+            }
+
+            var jobPosts = await _unitOfWork.PostRepository.GetAllPagedAsync(
+                pageIndex,
+                pageSize,
+                queryFilter,
+                includeProperties: SD.Join_User + ","
+                + SD.Collection_Join_Comments + ","
+                + SD.Collection_Join_PostLikes + ","
+                + SD.Collection_Join_Recruitments,
+                orderBy: p => p.CreatedAt,
+                descending: true
+            );
+
+            var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
+
+            return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Search results retrieved successfully"));
+        }
+
+        [HttpGet("cities-filter")]
+        public async Task<IActionResult> GetCitiesFilter()
+        {
+            var recruitments = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync();
+            var cities = recruitments
+                .Where(r => !string.IsNullOrEmpty(r.Location))
+                .Select(r => r.Location)
+                .Distinct()
+                .ToList();
+
+            return Ok(ApiResponse<List<string>>.Ok(cities, "Cities retrieved successfully"));
         }
 
         [Authorize]

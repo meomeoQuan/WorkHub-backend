@@ -80,6 +80,11 @@ public static class DbSeeder
             JobName = "Junior .NET",
             JobType = JobType.FullTime,
             Salary = "$800",
+            Location = "New York, NY",
+            Category = "Tech & IT",
+            ExperienceLevel = "Entry Level",
+            WorkSetting = "On-site",
+            CompanySize = "Medium",
             Status = "Open"
         };
 
@@ -87,13 +92,33 @@ public static class DbSeeder
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend part-time",
+            JobName = "Frontend Developer",
             JobType = JobType.PartTime,
             Salary = "$500",
+            Location = "Remote",
+            Category = "Tech & IT",
+            ExperienceLevel = "Mid Level",
+            WorkSetting = "Remote",
+            CompanySize = "Startup",
             Status = "Open"
         };
 
-        context.Recruitments.AddRange(recruitment1, recruitment2);
+        var recruitment3 = new Recruitment
+        {
+            UserId = user1.Id,
+            PostId = post1.Id,
+            JobName = "Barista",
+            JobType = JobType.PartTime,
+            Salary = "$15/hr",
+            Location = "Chicago, IL",
+            Category = "Food & Beverage",
+            ExperienceLevel = "Entry Level",
+            WorkSetting = "On-site",
+            CompanySize = "Small",
+            Status = "Open"
+        };
+
+        context.Recruitments.AddRange(recruitment1, recruitment2, recruitment3);
         context.SaveChanges();
 
         // ================= APPLICATIONS =================

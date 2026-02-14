@@ -1,0 +1,308 @@
+﻿commit 7efea29b615c45d0886078a590148c3796cbc06b
+Author: meomeoQuan <QUANNADE180924@fpt.edu.vn>
+Date:   Sat Feb 14 18:01:06 2026 +0700
+
+    Create Post
+
+diff --git a/WorkHub.Business/Mapping/MappingProfile .cs b/WorkHub.Business/Mapping/MappingProfile .cs
+index 912e5fe..89cbdd9 100644
+--- a/WorkHub.Business/Mapping/MappingProfile .cs	
++++ b/WorkHub.Business/Mapping/MappingProfile .cs	
+@@ -34,31 +34,18 @@ namespace WorkHub.Business.Mapping
+ 
+             //=================== Jobs Page MAPPING =================
+ 
+-              CreateMap<Post, JobPostDTO>()
+-                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
+-                 .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
+-                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+-                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+-                 .ForMember(d => d.PostImage, o => o.MapFrom(s => s.PostImageUrl))
+-                 .ForMember(d => d.LikeCount, o => o.MapFrom(s => s.PostLikes.Count))
+-                 .ForMember(d => d.CommentCount, o => o.MapFrom(s => s.Comments.Count))
++            CreateMap<Recruitment, JobDTO>();
++
++            CreateMap<Post, JobPostDTO>()
++                .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
++                .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
++                .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
++                .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
++                .ForMember(d => d.PostImage, o => o.MapFrom(s => s.PostImageUrl))
++                .ForMember(d => d.LikeCount, o => o.MapFrom(s => s.PostLikes.Count))
++                .ForMember(d => d.CommentCount, o => o.MapFrom(s => s.Comments.Count))
++                .ForMember(d => d.Jobs, o => o.MapFrom(s => s.Recruitments));
+ 
+-                 // Recruitment mapping
+-
+-                 .ForMember(d => d.JobName,
+-                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobName))
+-
+-                  .ForMember(d => d.JobId,
+-                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Id))
+-
+-                .ForMember(d => d.JobLocation,
+-                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Location))
+-
+-                .ForMember(d => d.JobSalaryRange,
+-                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.Salary))
+-
+-                .ForMember(d => d.JobType,
+-                    o => o.MapFrom(s => s.Recruitments.FirstOrDefault()!.JobType));
+ 
+ 
+             CreateMap<Comment, CommentDTO>()
+diff --git a/WorkHub.DataAccess/Migrations/20260214064419_AddInit.Designer.cs b/WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs
+similarity index 99%
+rename from WorkHub.DataAccess/Migrations/20260214064419_AddInit.Designer.cs
+rename to WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs
+index 86962b4..71b6190 100644
+--- a/WorkHub.DataAccess/Migrations/20260214064419_AddInit.Designer.cs
++++ b/WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs
+@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
+ namespace WorkHub.DataAccess.Migrations
+ {
+     [DbContext(typeof(WorkHubDbContext))]
+-    [Migration("20260214064419_AddInit")]
++    [Migration("20260214094204_AddInit")]
+     partial class AddInit
+     {
+         /// <inheritdoc />
+@@ -136,9 +136,6 @@ namespace WorkHub.DataAccess.Migrations
+                         .HasColumnType("datetime2")
+                         .HasDefaultValueSql("(sysdatetime())");
+ 
+-                    b.Property<string>("Header")
+-                        .HasColumnType("nvarchar(max)");
+-
+                     b.Property<string>("PostImageUrl")
+                         .HasColumnType("nvarchar(max)");
+ 
+diff --git a/WorkHub.DataAccess/Migrations/20260214064419_AddInit.cs b/WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs
+similarity index 99%
+rename from WorkHub.DataAccess/Migrations/20260214064419_AddInit.cs
+rename to WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs
+index c15a49f..7d33d5b 100644
+--- a/WorkHub.DataAccess/Migrations/20260214064419_AddInit.cs
++++ b/WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs
+@@ -41,7 +41,6 @@ namespace WorkHub.DataAccess.Migrations
+                     Id = table.Column<int>(type: "int", nullable: false)
+                         .Annotation("SqlServer:Identity", "1, 1"),
+                     UserId = table.Column<int>(type: "int", nullable: false),
+-                    Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                     Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                     PostImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
+diff --git a/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs b/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
+index baeca4c..0d1973c 100644
+--- a/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
++++ b/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
+@@ -133,9 +133,6 @@ namespace WorkHub.DataAccess.Migrations
+                         .HasColumnType("datetime2")
+                         .HasDefaultValueSql("(sysdatetime())");
+ 
+-                    b.Property<string>("Header")
+-                        .HasColumnType("nvarchar(max)");
+-
+                     b.Property<string>("PostImageUrl")
+                         .HasColumnType("nvarchar(max)");
+ 
+diff --git a/WorkHub.DataAccess/Seed/DbSeeder.cs b/WorkHub.DataAccess/Seed/DbSeeder.cs
+index 41ff7d7..b6e0ee3 100644
+--- a/WorkHub.DataAccess/Seed/DbSeeder.cs
++++ b/WorkHub.DataAccess/Seed/DbSeeder.cs
+@@ -58,14 +58,12 @@ public static class DbSeeder
+         var post1 = new Post
+         {
+             UserId = user1.Id,
+-            Header = "First Post",
+             Content = "Welcome to WorkHub ≡ƒÜÇ"
+         };
+ 
+         var post2 = new Post
+         {
+             UserId = user2.Id,
+-            Header = "Hiring Developers",
+             Content = "Looking for frontend + backend devs"
+         };
+ 
+diff --git a/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/CreatePostDTO.cs b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/CreatePostDTO.cs
+new file mode 100644
+index 0000000..2ded807
+--- /dev/null
++++ b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/CreatePostDTO.cs
+@@ -0,0 +1,18 @@
++∩╗┐using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
++{
++    public class CreatePostDTO
++    {
++        public string? Content { get; set; }
++
++        public string? PostImageUrl { get; set; }
++
++        public List<int>? RecruitmentIds { get; set; }
++    }
++
++}
+diff --git a/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobDTO.cs b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobDTO.cs
+new file mode 100644
+index 0000000..8962930
+--- /dev/null
++++ b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobDTO.cs
+@@ -0,0 +1,18 @@
++∩╗┐using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
++{
++    public class JobDTO
++    {
++        public int Id { get; set; }
++        public string JobName { get; set; }
++        public string Location { get; set; }
++        public string Salary { get; set; }
++        public string JobType { get; set; }
++    }
++
++}
+diff --git a/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobPostDTO.cs b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobPostDTO.cs
+index 7f9c081..7b18f39 100644
+--- a/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobPostDTO.cs
++++ b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/JobPostDTO.cs
+@@ -23,13 +23,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
+         public string? AvatarUrl { get; set; }
+ 
+         // Job info
++        public List<JobDTO> Jobs { get; set; }
+ 
+-        public int JobId { get; set; }  
+-        public string? JobLocation { get; set; }
+-        public string? JobSalaryRange { get; set; }
+-        public string? JobType { get; set; }
+-
+-        public string? JobName { get; set; }
+ 
+         // Engagement
+         public int LikeCount { get; set; }
+diff --git a/WorkHub.Models/Models/Post.cs b/WorkHub.Models/Models/Post.cs
+index f46b243..0f44d45 100644
+--- a/WorkHub.Models/Models/Post.cs
++++ b/WorkHub.Models/Models/Post.cs
+@@ -9,8 +9,6 @@ public partial class Post
+ 
+     public int UserId { get; set; }
+ 
+-   
+-    public string ? Header { get; set; }
+ 
+     public string? Content { get; set; }
+ 
+diff --git a/WorkHub/Controllers/User/JobPostController.cs b/WorkHub/Controllers/User/JobPostController.cs
+index f6a02db..833d7ee 100644
+--- a/WorkHub/Controllers/User/JobPostController.cs
++++ b/WorkHub/Controllers/User/JobPostController.cs
+@@ -46,6 +46,41 @@ namespace WorkHub.Controllers.User
+             return Ok(response);
+         }
+ 
++        [Authorize]
++        [HttpGet("all-post-following")]
++        public async Task<IActionResult> GetAllFollowingPosts(int pageIndex = 1, int pageSize = 10)
++        {
++            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
++
++            // 1. Get IDs of users I follow
++            var followingIds = (await _unitOfWork.userFollowRepository.GetAllAsync(
++                x => x.FollowerId == userId
++            )).Select(x => x.FollowingId).ToList();
++
++            // If following nobody ΓåÆ empty feed
++            if (!followingIds.Any())
++                return Ok(ApiResponse<List<JobPostDTO>>.Ok(new List<JobPostDTO>(), "No following posts"));
++
++            // 2. Get posts from followed users
++            var jobPosts = await _unitOfWork.PostRepository.GetAllPagedAsync(
++                pageIndex,
++                pageSize,
++                p => followingIds.Contains(p.UserId),
++                includeProperties: SD.Join_User + ","
++                    + SD.Collection_Join_Comments + ","
++                    + SD.Collection_Join_PostLikes + ","
++                    + SD.Collection_Join_Recruitments,
++                orderBy: p => p.CreatedAt,
++                descending: true
++            );
++
++            var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
++
++            return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Following posts retrieved"));
++        }
++
++
++
+ 
+         [HttpPost("single-post")]
+         public async Task<IActionResult> GetCommentByPost(SinglePostRequestDTO singlePostRequest)
+@@ -119,7 +154,7 @@ namespace WorkHub.Controllers.User
+         //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
+ 
+         //     }
+-
++        [Authorize]
+         [HttpPost("all-comments-post")]
+         public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
+         {
+@@ -157,6 +192,45 @@ namespace WorkHub.Controllers.User
+                 .ToList();
+         }
+ 
++
++        [Authorize]
++        [HttpPost("create-post")]
++        [Authorize]
++        public async Task<IActionResult> CreatePost(CreatePostDTO dto)
++        {
++            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
++
++            var post = new Post
++            {
++                UserId = userId,
++                Content = dto.Content,
++                PostImageUrl = dto.PostImageUrl,
++                CreatedAt = DateTime.UtcNow
++            };
++
++            _unitOfWork.PostRepository.Add(post);
++            await _unitOfWork.SaveAsync(); // generate Post.Id
++
++            // Attach recruitments (optional)
++            if (dto.RecruitmentIds?.Any() == true)
++            {
++                var recruitments = await _unitOfWork.RecruitmentInfoRepo
++                    .GetAllAsync(r => dto.RecruitmentIds.Contains(r.Id));
++
++                foreach (var r in recruitments)
++                {
++                    r.PostId = post.Id;   // Γ£à LINK TO POST
++                }
++
++                await _unitOfWork.SaveAsync();
++            }
++
++            return Ok(ApiResponse<object>.Ok(null, "Post created successfully"));
++        }
++
++
++
++
+         [Authorize]
+         [HttpPost("toggle-like")]
+         public async Task<IActionResult> ToggleLike(ToggleLikeDTO dto)

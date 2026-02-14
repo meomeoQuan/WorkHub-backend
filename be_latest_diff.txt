@@ -1,0 +1,263 @@
+﻿commit 348110dab65a8484ee15cf2ce8df3b08b123f187
+Author: meomeoQuan <QUANNADE180924@fpt.edu.vn>
+Date:   Sat Feb 14 22:51:35 2026 +0700
+
+    Add enum Type job
+
+diff --git a/WorkHub.Business/Mapping/MappingProfile .cs b/WorkHub.Business/Mapping/MappingProfile .cs
+index 89cbdd9..c099eee 100644
+--- a/WorkHub.Business/Mapping/MappingProfile .cs	
++++ b/WorkHub.Business/Mapping/MappingProfile .cs	
+@@ -21,6 +21,11 @@ namespace WorkHub.Business.Mapping
+                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
+ 
++            CreateMap<Recruitment, RecruitmentSelectDTO>()
++             .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
++                .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
++
++
+             //=================== Auth MAPPING =================
+             CreateMap<User,UserDTO>();
+ 
+diff --git a/WorkHub.DataAccess/Data/WorkHubDbContext.cs b/WorkHub.DataAccess/Data/WorkHubDbContext.cs
+index 1e3adcd..f95d186 100644
+--- a/WorkHub.DataAccess/Data/WorkHubDbContext.cs
++++ b/WorkHub.DataAccess/Data/WorkHubDbContext.cs
+@@ -132,7 +132,9 @@ public partial class WorkHubDbContext : DbContext
+ 
+             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+             entity.Property(e => e.JobName).HasMaxLength(255);
+-            entity.Property(e => e.JobType).HasMaxLength(100);
++            entity.Property(e => e.JobType)
++       .IsRequired();
++
+             entity.Property(e => e.Location).HasMaxLength(255);
+             entity.Property(e => e.Salary).HasMaxLength(100);
+             entity.Property(e => e.Schedule).HasMaxLength(255);
+diff --git a/WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs b/WorkHub.DataAccess/Migrations/20260214153906_AddInit.Designer.cs
+similarity index 99%
+rename from WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs
+rename to WorkHub.DataAccess/Migrations/20260214153906_AddInit.Designer.cs
+index 71b6190..b02f41b 100644
+--- a/WorkHub.DataAccess/Migrations/20260214094204_AddInit.Designer.cs
++++ b/WorkHub.DataAccess/Migrations/20260214153906_AddInit.Designer.cs
+@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
+ namespace WorkHub.DataAccess.Migrations
+ {
+     [DbContext(typeof(WorkHubDbContext))]
+-    [Migration("20260214094204_AddInit")]
++    [Migration("20260214153906_AddInit")]
+     partial class AddInit
+     {
+         /// <inheritdoc />
+@@ -187,9 +187,8 @@ namespace WorkHub.DataAccess.Migrations
+                         .HasMaxLength(255)
+                         .HasColumnType("nvarchar(255)");
+ 
+-                    b.Property<string>("JobType")
+-                        .HasMaxLength(100)
+-                        .HasColumnType("nvarchar(100)");
++                    b.Property<int>("JobType")
++                        .HasColumnType("int");
+ 
+                     b.Property<string>("Location")
+                         .HasMaxLength(255)
+diff --git a/WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs b/WorkHub.DataAccess/Migrations/20260214153906_AddInit.cs
+similarity index 99%
+rename from WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs
+rename to WorkHub.DataAccess/Migrations/20260214153906_AddInit.cs
+index 7d33d5b..f874d2f 100644
+--- a/WorkHub.DataAccess/Migrations/20260214094204_AddInit.cs
++++ b/WorkHub.DataAccess/Migrations/20260214153906_AddInit.cs
+@@ -200,7 +200,7 @@ namespace WorkHub.DataAccess.Migrations
+                     UserId = table.Column<int>(type: "int", nullable: false),
+                     PostId = table.Column<int>(type: "int", nullable: false),
+                     JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+-                    JobType = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
++                    JobType = table.Column<int>(type: "int", nullable: false),
+                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                     Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+diff --git a/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs b/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
+index 0d1973c..20293d0 100644
+--- a/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
++++ b/WorkHub.DataAccess/Migrations/WorkHubDbContextModelSnapshot.cs
+@@ -184,9 +184,8 @@ namespace WorkHub.DataAccess.Migrations
+                         .HasMaxLength(255)
+                         .HasColumnType("nvarchar(255)");
+ 
+-                    b.Property<string>("JobType")
+-                        .HasMaxLength(100)
+-                        .HasColumnType("nvarchar(100)");
++                    b.Property<int>("JobType")
++                        .HasColumnType("int");
+ 
+                     b.Property<string>("Location")
+                         .HasMaxLength(255)
+diff --git a/WorkHub.DataAccess/Seed/DbSeeder.cs b/WorkHub.DataAccess/Seed/DbSeeder.cs
+index b6e0ee3..d7017ae 100644
+--- a/WorkHub.DataAccess/Seed/DbSeeder.cs
++++ b/WorkHub.DataAccess/Seed/DbSeeder.cs
+@@ -1,4 +1,5 @@
+ ∩╗┐using WorkHub.DataAccess.Data;
++using WorkHub.Models.Enums;
+ using WorkHub.Models.Models;
+ using WorkHub.Utility;
+ 
+@@ -77,7 +78,7 @@ public static class DbSeeder
+             UserId = user1.Id,
+             PostId = post1.Id,
+             JobName = "Junior .NET",
+-            JobType = "Full-time",
++            JobType = JobType.FullTime,
+             Salary = "$800",
+             Status = "Open"
+         };
+@@ -86,8 +87,8 @@ public static class DbSeeder
+         {
+             UserId = user2.Id,
+             PostId = post2.Id,
+-            JobName = "Frontend Intern",
+-            JobType = "Intern",
++            JobName = "Frontend part-time",
++            JobType = JobType.PartTime,
+             Salary = "$500",
+             Status = "Open"
+         };
+diff --git a/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/RecruitmentSelectDTO.cs b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/RecruitmentSelectDTO.cs
+new file mode 100644
+index 0000000..2c4f256
+--- /dev/null
++++ b/WorkHub.Models/DTOs/ModelDTOs/JobsDTOs/RecruitmentSelectDTO.cs
+@@ -0,0 +1,24 @@
++∩╗┐using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
++{
++    public class RecruitmentSelectDTO
++    {
++        public int Id { get; set; }
++        public string? JobName { get; set; }
++        public string? JobType { get; set; }
++        public string? Location { get; set; }
++        public string? Salary { get; set; }
++        public string? Status { get; set; }
++
++        public string? UserAvatar { get; set; }
++        public string? UserName { get; set; }
++
++
++    }
++
++}
+diff --git a/WorkHub.Models/Enums/JobType.cs b/WorkHub.Models/Enums/JobType.cs
+new file mode 100644
+index 0000000..65917e0
+--- /dev/null
++++ b/WorkHub.Models/Enums/JobType.cs
+@@ -0,0 +1,17 @@
++∩╗┐using System;
++using System.Collections.Generic;
++using System.Linq;
++using System.Text;
++using System.Threading.Tasks;
++
++namespace WorkHub.Models.Enums
++{
++    public enum JobType
++    {
++        FullTime = 1,
++        PartTime = 2,
++        Freelance = 3,
++        Seasonal = 4,
++        Remote = 5
++    }
++}
+diff --git a/WorkHub.Models/Models/Recruitment.cs b/WorkHub.Models/Models/Recruitment.cs
+index 4703f06..9485ba5 100644
+--- a/WorkHub.Models/Models/Recruitment.cs
++++ b/WorkHub.Models/Models/Recruitment.cs
+@@ -1,5 +1,6 @@
+ ∩╗┐using System;
+ using System.Collections.Generic;
++using WorkHub.Models.Enums;
+ 
+ namespace WorkHub.Models.Models;
+ 
+@@ -13,7 +14,7 @@ public partial class Recruitment
+ 
+     public string? JobName { get; set; }
+ 
+-    public string? JobType { get; set; }
++    public JobType JobType { get; set; }
+ 
+     public string? Location { get; set; }
+ 
+diff --git a/WorkHub/Controllers/AuthController.cs b/WorkHub/Controllers/AuthController.cs
+index 05a8c9d..0801e65 100644
+--- a/WorkHub/Controllers/AuthController.cs
++++ b/WorkHub/Controllers/AuthController.cs
+@@ -87,6 +87,8 @@ namespace WorkHub.Controllers
+ 
+         }
+ 
++      
++
+         [HttpPost("google")]
+         public async Task<IActionResult> GoogleLogin([FromBody] string authCode)
+         {
+diff --git a/WorkHub/Controllers/User/JobPostController.cs b/WorkHub/Controllers/User/JobPostController.cs
+index 833d7ee..e9fb2d7 100644
+--- a/WorkHub/Controllers/User/JobPostController.cs
++++ b/WorkHub/Controllers/User/JobPostController.cs
+@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
+ using System.Security.Claims;
+ using WorkHub.DataAccess.Repository.IRepository;
+ using WorkHub.Models.DTOs;
++using WorkHub.Models.DTOs.ModelDTOs;
+ using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
+ using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
+ using WorkHub.Models.Models;
+@@ -192,6 +193,27 @@ namespace WorkHub.Controllers.User
+                 .ToList();
+         }
+ 
++        [Authorize]
++        [HttpGet("loading-create-post")]
++        public async Task<IActionResult> LoadingCreatePost()
++        {
++            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
++
++            var jobs = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.UserId == userId);
++
++            if(jobs !=null && jobs.Any())
++            {
++                var jobDTOs = _mapper.Map<List<RecruitmentSelectDTO>>(jobs);
++                var responseData = new
++                {
++                    jobs = jobDTOs.ToList(),
++                };
++                return Ok(ApiResponse<object>.Ok(responseData, "Jobs retrieved successfully"));
++            }
++
++            return BadRequest(ApiResponse<object>.BadRequest(null, "Jobs not found !"));
++        }
++
+ 
+         [Authorize]
+         [HttpPost("create-post")]
+@@ -231,6 +253,9 @@ namespace WorkHub.Controllers.User
+ 
+ 
+ 
++
++
++
+         [Authorize]
+         [HttpPost("toggle-like")]
+         public async Task<IActionResult> ToggleLike(ToggleLikeDTO dto)
