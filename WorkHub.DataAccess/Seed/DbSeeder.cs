@@ -1,4 +1,5 @@
 ﻿using WorkHub.DataAccess.Data;
+using WorkHub.Models.Enums;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -77,7 +78,7 @@ public static class DbSeeder
             UserId = user1.Id,
             PostId = post1.Id,
             JobName = "Junior .NET",
-            JobType = "Full-time",
+            JobType = JobType.FullTime,
             Salary = "$800",
             Status = "Open"
         };
@@ -86,8 +87,8 @@ public static class DbSeeder
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend Intern",
-            JobType = "Intern",
+            JobName = "Frontend part-time",
+            JobType = JobType.PartTime,
             Salary = "$500",
             Status = "Open"
         };

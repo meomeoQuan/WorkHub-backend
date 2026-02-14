@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
 using WorkHub.Models.Models;
@@ -192,6 +193,27 @@ namespace WorkHub.Controllers.User
                 .ToList();
         }
 
+        [Authorize]
+        [HttpGet("loading-create-post")]
+        public async Task<IActionResult> LoadingCreatePost()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var jobs = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.UserId == userId);
+
+            if(jobs !=null && jobs.Any())
+            {
+                var jobDTOs = _mapper.Map<List<RecruitmentSelectDTO>>(jobs);
+                var responseData = new
+                {
+                    jobs = jobDTOs.ToList(),
+                };
+                return Ok(ApiResponse<object>.Ok(responseData, "Jobs retrieved successfully"));
+            }
+
+            return BadRequest(ApiResponse<object>.BadRequest(null, "Jobs not found !"));
+        }
+
 
         [Authorize]
         [HttpPost("create-post")]
@@ -227,6 +249,9 @@ namespace WorkHub.Controllers.User
 
             return Ok(ApiResponse<object>.Ok(null, "Post created successfully"));
         }
+
+
+
 
 
 
