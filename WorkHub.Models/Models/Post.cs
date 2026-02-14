@@ -9,8 +9,6 @@ public partial class Post
 
     public int UserId { get; set; }
 
-   
-    public string ? Header { get; set; }
 
     public string? Content { get; set; }
 

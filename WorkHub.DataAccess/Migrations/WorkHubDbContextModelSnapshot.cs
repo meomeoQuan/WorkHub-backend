@@ -133,9 +133,6 @@ namespace WorkHub.DataAccess.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("(sysdatetime())");
 
-                    b.Property<string>("Header")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PostImageUrl")
                         .HasColumnType("nvarchar(max)");
 

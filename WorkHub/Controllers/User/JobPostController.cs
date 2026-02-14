@@ -46,6 +46,41 @@ namespace WorkHub.Controllers.User
             return Ok(response);
         }
 
+        [Authorize]
+        [HttpGet("all-post-following")]
+        public async Task<IActionResult> GetAllFollowingPosts(int pageIndex = 1, int pageSize = 10)
+        {
+            var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+            // 1. Get IDs of users I follow
+            var followingIds = (await _unitOfWork.userFollowRepository.GetAllAsync(
+                x => x.FollowerId == userId
+            )).Select(x => x.FollowingId).ToList();
+
+            // If following nobody → empty feed
+            if (!followingIds.Any())
+                return Ok(ApiResponse<List<JobPostDTO>>.Ok(new List<JobPostDTO>(), "No following posts"));
+
+            // 2. Get posts from followed users
+            var jobPosts = await _unitOfWork.PostRepository.GetAllPagedAsync(
+                pageIndex,
+                pageSize,
+                p => followingIds.Contains(p.UserId),
+                includeProperties: SD.Join_User + ","
+                    + SD.Collection_Join_Comments + ","
+                    + SD.Collection_Join_PostLikes + ","
+                    + SD.Collection_Join_Recruitments,
+                orderBy: p => p.CreatedAt,
+                descending: true
+            );
+
+            var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
+
+            return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Following posts retrieved"));
+        }
+
+
+
 
         [HttpPost("single-post")]
         public async Task<IActionResult> GetCommentByPost(SinglePostRequestDTO singlePostRequest)
@@ -119,7 +154,7 @@ namespace WorkHub.Controllers.User
         //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
 
         //     }
-
+        [Authorize]
         [HttpPost("all-comments-post")]
         public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
         {
@@ -156,6 +191,45 @@ namespace WorkHub.Controllers.User
                 })
                 .ToList();
         }
+
+
+        [Authorize]
+        [HttpPost("create-post")]
+        [Authorize]
+        public async Task<IActionResult> CreatePost(CreatePostDTO dto)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var post = new Post
+            {
+                UserId = userId,
+                Content = dto.Content,
+                PostImageUrl = dto.PostImageUrl,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _unitOfWork.PostRepository.Add(post);
+            await _unitOfWork.SaveAsync(); // generate Post.Id
+
+            // Attach recruitments (optional)
+            if (dto.RecruitmentIds?.Any() == true)
+            {
+                var recruitments = await _unitOfWork.RecruitmentInfoRepo
+                    .GetAllAsync(r => dto.RecruitmentIds.Contains(r.Id));
+
+                foreach (var r in recruitments)
+                {
+                    r.PostId = post.Id;   // ✅ LINK TO POST
+                }
+
+                await _unitOfWork.SaveAsync();
+            }
+
+            return Ok(ApiResponse<object>.Ok(null, "Post created successfully"));
+        }
+
+
+
 
         [Authorize]
         [HttpPost("toggle-like")]

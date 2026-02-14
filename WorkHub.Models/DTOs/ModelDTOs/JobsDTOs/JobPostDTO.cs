@@ -23,13 +23,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
         public string? AvatarUrl { get; set; }
 
         // Job info
+        public List<JobDTO> Jobs { get; set; }
 
-        public int JobId { get; set; }  
-        public string? JobLocation { get; set; }
-        public string? JobSalaryRange { get; set; }
-        public string? JobType { get; set; }
-
-        public string? JobName { get; set; }
 
         // Engagement
         public int LikeCount { get; set; }
