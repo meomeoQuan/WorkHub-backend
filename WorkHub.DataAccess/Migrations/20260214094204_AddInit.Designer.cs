@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260214064419_AddInit")]
+    [Migration("20260214094204_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -135,9 +135,6 @@ namespace WorkHub.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("(sysdatetime())");
-
-                    b.Property<string>("Header")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PostImageUrl")
                         .HasColumnType("nvarchar(max)");

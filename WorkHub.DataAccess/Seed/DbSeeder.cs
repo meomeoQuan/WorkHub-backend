@@ -58,14 +58,12 @@ public static class DbSeeder
         var post1 = new Post
         {
             UserId = user1.Id,
-            Header = "First Post",
             Content = "Welcome to WorkHub 🚀"
         };
 
         var post2 = new Post
         {
             UserId = user2.Id,
-            Header = "Hiring Developers",
             Content = "Looking for frontend + backend devs"
         };
 
