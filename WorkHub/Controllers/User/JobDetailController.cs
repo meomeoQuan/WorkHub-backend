@@ -5,7 +5,7 @@ namespace WorkHub.Controllers.User
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class JobController : ControllerBase
+    public class JobDetailController : ControllerBase
     {
     }
 }
