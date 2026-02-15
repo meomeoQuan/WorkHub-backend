@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260215065948_AddInit")]
+    [Migration("20260215175509_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -118,6 +118,45 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex("CommentId");
 
                     b.ToTable("CommentLikes");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<long>("OrderCode")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
@@ -411,6 +450,36 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("UserSchedule", (string)null);
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.UserSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserSubscriptions");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Application", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.Recruitment", "Recruitment")
@@ -473,6 +542,17 @@ namespace WorkHub.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.Order", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -572,6 +652,17 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.UserSubscription", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithOne("Subscription")
+                        .HasForeignKey("WorkHub.Models.Models.UserSubscription", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
                 {
                     b.Navigation("CommentLikes");
@@ -601,11 +692,16 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Navigation("Comments");
 
+                    b.Navigation("Orders");
+
                     b.Navigation("PostLikes");
 
                     b.Navigation("Posts");
 
                     b.Navigation("Recruitments");
+
+                    b.Navigation("Subscription")
+                        .IsRequired();
 
                     b.Navigation("UserDetail");
 

@@ -35,6 +35,29 @@ namespace WorkHub.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    OrderCode = table.Column<long>(type: "bigint", nullable: false),
+                    Amount = table.Column<long>(type: "bigint", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "Pending"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
+                    PaidAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Post",
                 columns: table => new
                 {
@@ -132,6 +155,27 @@ namespace WorkHub.DataAccess.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    StartAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -314,6 +358,11 @@ namespace WorkHub.DataAccess.Migrations
                 column: "CommentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Post_UserId",
                 table: "Post",
                 column: "UserId");
@@ -354,6 +403,12 @@ namespace WorkHub.DataAccess.Migrations
                 name: "IX_UserSchedule_UserId",
                 table: "UserSchedule",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_UserId",
+                table: "UserSubscriptions",
+                column: "UserId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -366,6 +421,9 @@ namespace WorkHub.DataAccess.Migrations
                 name: "CommentLikes");
 
             migrationBuilder.DropTable(
+                name: "Orders");
+
+            migrationBuilder.DropTable(
                 name: "PostLike");
 
             migrationBuilder.DropTable(
@@ -376,6 +434,9 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserSchedule");
+
+            migrationBuilder.DropTable(
+                name: "UserSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "Recruitment");

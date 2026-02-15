@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,8 @@ using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
+using WorkHub.Models.Models;
+using WorkHub.Utility;
 
 
 namespace WorkHub.Controllers.User
@@ -33,7 +36,7 @@ namespace WorkHub.Controllers.User
         }
 
         [Authorize]
-        [HttpPost("create")]
+        [HttpPost("create-payment")]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentDTO req)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -77,6 +80,17 @@ namespace WorkHub.Controllers.User
             {
                 var paymentLink = await _client.PaymentRequests.CreateAsync(paymentRequest);
 
+                 _unitOfWork.OrderRepository.Add(new Order
+                {
+                    OrderCode = orderCode,
+                    UserId = userId,
+                    Amount = req.TotalAmount,
+                    Status = "Pending",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await _unitOfWork.SaveAsync();
+
 
                 var response = new
                 {
@@ -93,58 +107,73 @@ namespace WorkHub.Controllers.User
         
         }
 
-        //// Trang hủy
-        //[HttpGet]
-        //public IActionResult CancelUrl(int orderCode)
-        //{
-        //    var order = _context.OrderTables.FirstOrDefault(o => o.OrderID == orderCode);
+        [HttpGet("cancel-payment")]
+        [Authorize]
+        public async Task<IActionResult> CancelUrl(long orderCode)
+        {
+            var order = await _unitOfWork.OrderRepository.GetAsync(
+                o => o.OrderCode == orderCode,
+                includeProperties: SD.Join_User
+            );
 
-        //    if (order == null)
-        //    {
-        //        return NotFound(new { message = "Order không tồn tại" });
-        //    }
+            if (order == null)
+                return NotFound(ApiResponse<object>.NotFound("Order không tồn tại"));
 
-        //    // Cập nhật trạng thái đơn hàng thành "Canceled"
-        //    order.Status = OrderStatus.Cancelled;
-        //    order.UpdatedAt = DateTime.UtcNow;
-        //    _context.SaveChanges();
+            // prevent double update
+            if (order.Status == SD.OrderStatus_Canceled)
+                return Ok(ApiResponse<object>.Ok(null, "Order already canceled"));
 
-        //    return View();
-        //}
+            order.Status = SD.OrderStatus_Canceled;
+            order.PaidAt = null; // ❗ canceled = not paid
 
-        //[HttpGet]
-        //public async Task<IActionResult> ReturnUrl(int orderCode)
-        //{
-        //    // Tìm đơn hàng trong database với User
-        //    var order = await _context.OrderTables
-        //        .Include(o => o.User) // Ensure User is loaded
-        //        .FirstOrDefaultAsync(o => o.OrderID == 2);
+            await _unitOfWork.SaveAsync();
 
-        //    if (order == null)
-        //    {
-        //        return NotFound(new { message = "Order không tồn tại" });
-        //    }
-
-        //    if (order.User == null)
-        //    {
-        //        return NotFound(new { message = "User không tồn tại trong đơn hàng" });
-        //    }
+            return Ok(ApiResponse<object>.Ok(null, "Payment canceled successfully"));
+        }
 
 
+        [HttpGet("return-payment")]
+        [Authorize]
+        public async Task<IActionResult> ReturnUrl(long orderCode)
+        {
+            var order = await _unitOfWork.OrderRepository.GetAsync(
+                o => o.OrderCode == orderCode,
+                includeProperties: SD.Join_User
+            );
 
-        //    // Cập nhật trạng thái đơn hàng thành "Completed"
-        //    order.Status = OrderStatus.Completed;
-        //    order.UpdatedAt = DateTime.UtcNow;
+            if (order == null)
+                return NotFound(ApiResponse<object>.NotFound("Order không tồn tại"));
 
-        //    await _context.SaveChangesAsync(); // Ensure async save
+            if (order.User == null)
+                return NotFound(ApiResponse<object>.NotFound("User không tồn tại trong đơn hàng"));
+
+            // 🔒 Prevent duplicate processing
+            if (order.Status == SD.OrderStatus_Paid)
+                return Ok(ApiResponse<object>.Ok(null, "Order already paid"));
+
+            if (order.Status == SD.OrderStatus_Canceled)
+                return BadRequest(ApiResponse<object>.BadRequest(null, "Order was canceled"));
+
+            // ✅ Mark paid
+            order.Status = SD.OrderStatus_Paid;
+            order.PaidAt = DateTime.UtcNow;
+
+            await _unitOfWork.SaveAsync();
+
+            var response = new
+            {
+                orderCode = order.OrderCode,
+                amount = order.Amount,
+                userEmail = order.User.Email
+            };
+
+            return Ok(ApiResponse<object>.Ok(response, "Payment Successful"));
+        }
 
 
 
-        //    // Gửi QR code qua email
-        //    await GenerateTicket(order);
-
-        //    return View();
-        //}
 
     }
+
 }
+
