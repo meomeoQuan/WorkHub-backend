@@ -49,9 +49,9 @@ public static class DbSeeder
         // ================= USER DETAILS =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 },
-            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 },
-            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 }
+            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 ,Rating = 5.0},
+            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 , Rating = 4.6 },
+            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 , Rating = 4.1}
         );
 
         // ================= POSTS (ONLY NORMAL USERS) =================
