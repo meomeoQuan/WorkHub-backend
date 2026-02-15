@@ -28,6 +28,11 @@ public partial class WorkHubDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<UserSubscription> UserSubscriptions { get; set; }
+     public virtual DbSet<CommentLikes> CommentLikes { get; set; }
+
     public virtual DbSet<UserDetail> UserDetails { get; set; }
 
     public virtual DbSet<UserFollow> UserFollows { get; set; }
@@ -239,6 +244,47 @@ public partial class WorkHubDbContext : DbContext
                 .WithMany(p => p.CommentLikes)
                 .HasForeignKey(d => d.CommentId)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(o => o.OrderCode).IsRequired();
+
+            entity.Property(o => o.Amount).IsRequired();
+
+            entity.Property(o => o.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
+
+            entity.Property(o => o.CreatedAt)
+           .HasDefaultValueSql("GETUTCDATE()");
+
+            entity.HasOne(o => o.User).WithMany(u => u.Orders).HasForeignKey(o => o.UserId)
+                    .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<UserSubscription>(entity =>
+        {
+            entity.HasKey(o => o.Id);
+
+            entity.Property(o => o.StartAt).IsRequired();
+
+            entity.Property(o => o.EndAt).IsRequired();
+
+            entity.Property(s => s.IsActive)
+                .HasDefaultValue(false);
+
+            entity.HasIndex(s => s.UserId)
+         .IsUnique();   // 🔥 ensures ONE subscription per user
+
+            entity.HasOne(s => s.User)
+                  .WithOne(u => u.Subscription)
+                  .HasForeignKey<UserSubscription>(s => s.UserId)
+                  .OnDelete(DeleteBehavior.NoAction);
+
+
         });
 
 

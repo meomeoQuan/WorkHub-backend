@@ -49,9 +49,9 @@ public static class DbSeeder
         // ================= USER DETAILS =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 },
-            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 },
-            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 }
+            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 ,Rating = 5.0},
+            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 , Rating = 4.6 },
+            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 , Rating = 4.1}
         );
 
         // ================= POSTS (ONLY NORMAL USERS) =================
@@ -163,7 +163,54 @@ public static class DbSeeder
             EndTime = DateTime.UtcNow.AddHours(2)
         });
 
+        // ================= ORDERS =================
+
+        var order1 = new Order
+        {
+            UserId = user1.Id,
+            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            Amount = 2000,
+            Status = "Paid",
+            CreatedAt = tenDaysAgo,
+            PaidAt = DateTime.UtcNow
+        };
+
+        var order2 = new Order
+        {
+            UserId = user2.Id,
+            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 1,
+            Amount = 1500,
+            Status = "Pending",
+            CreatedAt = tenDaysAgo
+        };
+
+        context.Orders.AddRange(order1, order2);
         context.SaveChanges();
+
+
+        // ================= USER SUBSCRIPTIONS =================
+
+        context.UserSubscriptions.AddRange(
+            new UserSubscription
+            {
+                UserId = user1.Id,
+                StartAt = DateTime.UtcNow.AddDays(-5),
+                EndAt = DateTime.UtcNow.AddDays(25),
+                IsActive = true
+            },
+            new UserSubscription
+            {
+                UserId = user2.Id,
+                StartAt = DateTime.UtcNow.AddDays(-10),
+                EndAt = DateTime.UtcNow.AddDays(-1),
+                IsActive = false
+            }
+        );
+
+        context.SaveChanges();
+
+
+       
     }
 
 }

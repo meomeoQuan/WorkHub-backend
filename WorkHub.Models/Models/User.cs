@@ -44,9 +44,14 @@ public partial class User
 
     public virtual UserDetail? UserDetail { get; set; }
 
+    public virtual UserSubscription Subscription { get; set; }
+
+
     public virtual ICollection<UserFollow> UserFollowFollowers { get; set; } = new List<UserFollow>();
 
     public virtual ICollection<UserFollow> UserFollowFollowings { get; set; } = new List<UserFollow>();
 
     public virtual ICollection<UserSchedule> UserSchedules { get; set; } = new List<UserSchedule>();
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

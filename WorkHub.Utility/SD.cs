@@ -8,6 +8,13 @@ namespace WorkHub.Utility
 {
     public static class SD
     {
+        //=================== ORDER STATUS ==================
+
+        public const string OrderStatus_Pending = "Pending";
+        public const string OrderStatus_Paid = "Paid";
+        public const string OrderStatus_Canceled = "Canceled";
+
+
         //=================== ROLES ==================
 
         public const string Role_User= "User";
@@ -27,6 +34,7 @@ namespace WorkHub.Utility
         public const string Join_Follower = "Follower";
         public const string Join_Following = "Following";
         public const string Join_ParentComment = "ParentComment";
+        public const string Join_Subscription = "Subscription";
 
 
         //============================ JOIN COLLECTION TABLE STRING ==================================
@@ -41,6 +49,7 @@ namespace WorkHub.Utility
         public const string Collection_Join_UserSchedules = "UserSchedules";
         public const string Collection_Join_UserDetail = "UserDetail";
         public const string Collection_Join_InverseParentComment = "InverseParentComment";
+        public const string Collection_Join_Orders = "Orders";
 
 
     }

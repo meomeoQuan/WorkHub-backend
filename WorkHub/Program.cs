@@ -1,20 +1,15 @@
-﻿    using Microsoft.AspNetCore.Authentication.Cookies;
-    using Microsoft.AspNetCore.Authentication.JwtBearer;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.IdentityModel.Tokens;
-    using Microsoft.OpenApi.Models;
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.Text;
-    using WorkHub.Business.Mapping;
-    using WorkHub.Business.Service;
-    using WorkHub.Business.Service.IService;
-    using WorkHub.DataAccess.Data;
-    using WorkHub.DataAccess.Repository;
-    using WorkHub.DataAccess.Repository.IRepository;
-
-using WorkHub.Models.DTOs;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Text;
+using WorkHub.Business.Mapping;
+using WorkHub.Business.Service;
+using WorkHub.Business.Service.IService;
+using WorkHub.DataAccess.Data;
+using WorkHub.DataAccess.Repository;
+using WorkHub.DataAccess.Repository.IRepository;
+using PayOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,8 +98,23 @@ var builder = WebApplication.CreateBuilder(args);
         )
     );
 
-    // Health Check
-    builder.Services.AddHealthChecks()
+// Configure payOS for order controller
+builder.Services.AddKeyedSingleton("OrderClient", (sp, key) =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    return new PayOSClient(new PayOSOptions
+    {
+        ClientId = config["PayOS:ClientId"] ?? Environment.GetEnvironmentVariable("PAYOS_CLIENT_ID"),
+        ApiKey = config["PayOS:ApiKey"] ?? Environment.GetEnvironmentVariable("PAYOS_API_KEY"),
+        ChecksumKey = config["PayOS:ChecksumKey"] ?? Environment.GetEnvironmentVariable("PAYOS_CHECKSUM_KEY"),
+        LogLevel = LogLevel.Debug,
+    });
+});
+
+
+
+// Health Check
+builder.Services.AddHealthChecks()
         .AddDbContextCheck<WorkHubDbContext>("Database");
 
     // ================= Add service =================
