@@ -22,7 +22,7 @@ public partial class Recruitment
 
     public string? Status { get; set; }
 
-    public string? Schedule { get; set; }
+   
     public string? ExperienceLevel { get; set; }
     public string? Category { get; set; }
     public string? WorkSetting { get; set; }

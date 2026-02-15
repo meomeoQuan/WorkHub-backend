@@ -137,7 +137,6 @@ public partial class WorkHubDbContext : DbContext
 
             entity.Property(e => e.Location).HasMaxLength(255);
             entity.Property(e => e.Salary).HasMaxLength(100);
-            entity.Property(e => e.Schedule).HasMaxLength(255);
             entity.Property(e => e.Status).HasMaxLength(50);
 
             // KEEP user link BUT REMOVE cascade

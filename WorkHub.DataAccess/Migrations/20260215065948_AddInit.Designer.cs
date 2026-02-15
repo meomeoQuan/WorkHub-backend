@@ -12,8 +12,8 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260214174354_AddFilterFieldsToRecruitment")]
-    partial class AddFilterFieldsToRecruitment
+    [Migration("20260215065948_AddInit")]
+    partial class AddInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -209,10 +209,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("Salary")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Schedule")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
