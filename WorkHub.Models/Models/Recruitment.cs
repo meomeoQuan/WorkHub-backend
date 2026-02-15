@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WorkHub.Models.Enums;
 
 namespace WorkHub.Models.Models;
 
@@ -13,7 +14,7 @@ public partial class Recruitment
 
     public string? JobName { get; set; }
 
-    public string? JobType { get; set; }
+    public JobType JobType { get; set; }
 
     public string? Location { get; set; }
 
@@ -21,7 +22,11 @@ public partial class Recruitment
 
     public string? Status { get; set; }
 
-    public string? Schedule { get; set; }
+   
+    public string? ExperienceLevel { get; set; }
+    public string? Category { get; set; }
+    public string? WorkSetting { get; set; }
+    public string? CompanySize { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

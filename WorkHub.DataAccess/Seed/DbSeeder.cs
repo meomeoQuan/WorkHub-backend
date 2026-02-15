@@ -1,4 +1,5 @@
 ﻿using WorkHub.DataAccess.Data;
+using WorkHub.Models.Enums;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -77,8 +78,13 @@ public static class DbSeeder
             UserId = user1.Id,
             PostId = post1.Id,
             JobName = "Junior .NET",
-            JobType = "Full-time",
+            JobType = JobType.FullTime,
             Salary = "$800",
+            Location = "Ha noi",
+            Category = "Tech & IT",
+            ExperienceLevel = "Entry Level",
+            WorkSetting = "On-site",
+            CompanySize = "Medium",
             Status = "Open"
         };
 
@@ -86,13 +92,33 @@ public static class DbSeeder
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend Intern",
-            JobType = "Intern",
+            JobName = "Frontend Developer",
+            JobType = JobType.PartTime,
             Salary = "$500",
+            Location = "sai gon",
+            Category = "Tech & IT",
+            ExperienceLevel = "Mid Level",
+            WorkSetting = "Remote",
+            CompanySize = "Startup",
             Status = "Open"
         };
 
-        context.Recruitments.AddRange(recruitment1, recruitment2);
+        var recruitment3 = new Recruitment
+        {
+            UserId = user1.Id,
+            PostId = post1.Id,
+            JobName = "Barista",
+            JobType = JobType.PartTime,
+            Salary = "$15/hr",
+            Location = "da nang",
+            Category = "Food & Beverage",
+            ExperienceLevel = "Entry Level",
+            WorkSetting = "On-site",
+            CompanySize = "Small",
+            Status = "Open"
+        };
+
+        context.Recruitments.AddRange(recruitment1, recruitment2, recruitment3);
         context.SaveChanges();
 
         // ================= APPLICATIONS =================

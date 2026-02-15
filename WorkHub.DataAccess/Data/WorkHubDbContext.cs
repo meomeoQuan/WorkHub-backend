@@ -132,10 +132,11 @@ public partial class WorkHubDbContext : DbContext
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
             entity.Property(e => e.JobName).HasMaxLength(255);
-            entity.Property(e => e.JobType).HasMaxLength(100);
+            entity.Property(e => e.JobType)
+       .IsRequired();
+
             entity.Property(e => e.Location).HasMaxLength(255);
             entity.Property(e => e.Salary).HasMaxLength(100);
-            entity.Property(e => e.Schedule).HasMaxLength(255);
             entity.Property(e => e.Status).HasMaxLength(50);
 
             // KEEP user link BUT REMOVE cascade

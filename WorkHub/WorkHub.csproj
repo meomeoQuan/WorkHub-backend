@@ -31,6 +31,7 @@
   <ItemGroup>
     <ProjectReference Include="..\WorkHub.Business\WorkHub.Business.csproj" />
     <ProjectReference Include="..\WorkHub.DataAccess\WorkHub.DataAccess.csproj" />
+    <ProjectReference Include="..\WorkHub.Utility\WorkHub.Utility.csproj" />
   </ItemGroup>
 
 </Project>

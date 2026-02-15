@@ -21,6 +21,11 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
 
+            CreateMap<Recruitment, RecruitmentSelectDTO>()
+             .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
+
+
             //=================== Auth MAPPING =================
             CreateMap<User,UserDTO>();
 
