@@ -23,6 +23,7 @@ namespace WorkHub.DataAccess.Repository
             userFollowRepository = new UserFollowRepository(_db);
             OrderRepository = new OrderRepository(_db);
             UserSubscriptionRepository = new UserSubscriptionRepository(_db);
+            JobCategoryRepo = new CategoryRepository(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
@@ -40,6 +41,10 @@ namespace WorkHub.DataAccess.Repository
         public IOrderRepository OrderRepository { get; private set; }
 
         public IUserSubscriptionRepository UserSubscriptionRepository { get; private set; }
+
+        public IJobTypeRepository JobTypeRepo { get; private set; }
+
+        public ICategoryRepository JobCategoryRepo { get; private set; }
 
         public async Task SaveAsync()
         {

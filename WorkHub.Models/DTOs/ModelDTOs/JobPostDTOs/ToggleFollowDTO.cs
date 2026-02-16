@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WorkHub.Models.DTOs.ModelDTOs.JobsDTOs
+namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
 {
-    public class SinglePostRequestDTO
+    public class ToggleFollowDTO
     {
-        public int PostId { get; set; }
+        public int FollowingId { get; set; }
     }
+
 }

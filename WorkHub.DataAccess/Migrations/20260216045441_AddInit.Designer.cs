@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260215175509_AddInit")]
+    [Migration("20260216045441_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -218,7 +218,8 @@ namespace WorkHub.DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("CompanySize")
                         .HasColumnType("nvarchar(max)");
@@ -245,6 +246,9 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Requirements")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Salary")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -258,6 +262,10 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Property<string>("WorkSetting")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WorkTime")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id")
                         .HasName("PK__Recruitm__3214EC079D1054A4");

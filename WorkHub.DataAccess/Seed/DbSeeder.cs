@@ -207,6 +207,19 @@ public static class DbSeeder
             }
         );
 
+                context.JobTypes.AddRange(
+            new JobType { Name = SD.JobType_PartTime },
+            new JobType { Name = SD.JobType_Freelance },
+            new JobType { Name = SD.JobType_Seasonal }
+        );
+
+        context.Categories.AddRange(
+            new Category { Name = SD.Category_IT },
+            new Category { Name = SD.Category_Retail },
+            new Category { Name = SD.Category_Education }
+        );
+
+
         context.SaveChanges();
 
 
