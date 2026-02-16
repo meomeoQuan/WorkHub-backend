@@ -7,9 +7,8 @@ using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
-using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
-using WorkHub.Models.Enums;
 using WorkHub.Utility;
 using System.Linq.Expressions;
 
@@ -76,11 +75,10 @@ namespace WorkHub.Controllers.User
 
             if (!string.IsNullOrWhiteSpace(jobType) && !jobType.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                // Parse the string to enum for EF Core translation
-                if (Enum.TryParse<JobType>(jobType, true, out var jobTypeEnum))
-                {
-                    queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.JobType == jobTypeEnum));
-                }
+                 queryFilter = queryFilter.And(p =>
+                 p.Recruitments.Any(r => r.JobType.Name == jobType)
+ );
+
             }
 
             if (!string.IsNullOrWhiteSpace(location) && !location.Equals("all-cities", StringComparison.OrdinalIgnoreCase))
@@ -95,7 +93,7 @@ namespace WorkHub.Controllers.User
 
             if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category == category));
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category.Name == category));
             }
 
             if (!string.IsNullOrWhiteSpace(workSetting) && !workSetting.Equals("all", StringComparison.OrdinalIgnoreCase))
@@ -185,8 +183,20 @@ namespace WorkHub.Controllers.User
 
 
         [HttpPost("single-post")]
+        [Authorize]
         public async Task<IActionResult> GetCommentByPost(SinglePostRequestDTO singlePostRequest)
         {
+            
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+
+            if(user == null)
+            {
+                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
+              
+
             var post = await _unitOfWork.PostRepository.GetAsync(
                 c => c.Id == singlePostRequest.PostId,
                 includeProperties: SD.Join_User + ","
@@ -257,7 +267,7 @@ namespace WorkHub.Controllers.User
 
         //     }
         [Authorize]
-        [HttpPost("all-comments-post")]
+        [HttpGet("all-comments-post")]
         public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
         {
             var comments = await _unitOfWork.CommentRepository.GetAllAsync(
@@ -323,6 +333,13 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
+            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
+
             var post = new Post
             {
                 UserId = userId,
@@ -361,7 +378,14 @@ namespace WorkHub.Controllers.User
         [HttpPost("toggle-like")]
         public async Task<IActionResult> ToggleLike(ToggleLikeDTO dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
 
             var existingLike = await _unitOfWork.PostLikeRepository.GetAsync(
                 x => x.UserId == userId && x.PostId == dto.PostId
@@ -395,6 +419,13 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
+            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
+
             var comment = new Comment
             {
                 PostId = dto.PostId,
@@ -415,6 +446,14 @@ namespace WorkHub.Controllers.User
         public async Task<IActionResult> ToggleFollow(ToggleFollowDTO dto)
         {
             var followerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        
+
+            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == followerId);
+
+            if (user == null)
+            {
+                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
 
             if (followerId == dto.FollowingId)
                 return BadRequest(ApiResponse<object>.BadRequest("You cannot follow yourself"));

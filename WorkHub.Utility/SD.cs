@@ -8,6 +8,18 @@ namespace WorkHub.Utility
 {
     public static class SD
     {
+
+
+        // ===== Job Types =====
+        public const string JobType_PartTime = "Part Time";
+        public const string JobType_Freelance = "Freelance";
+        public const string JobType_Seasonal = "Seasonal";
+
+        // ===== Categories =====
+        public const string Category_IT = "IT";
+        public const string Category_Retail = "Retail";
+        public const string Category_Education = "Education";
+
         //=================== ORDER STATUS ==================
 
         public const string OrderStatus_Pending = "Pending";

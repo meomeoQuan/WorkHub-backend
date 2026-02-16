@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using WorkHub.Models.Enums;
+
 
 namespace WorkHub.Models.Models;
 
@@ -9,30 +9,32 @@ public partial class Recruitment
     public int Id { get; set; }
 
     public int UserId { get; set; }
-
-    public int PostId { get; set; }   // 👈 ADD THIS
+    public int PostId { get; set; }
 
     public string? JobName { get; set; }
 
-    public JobType JobType { get; set; }
+    public int CategoryId { get; set; }
+    public int JobTypeId { get; set; }
+
+    public Category Category { get; set; } = null!;
+    public JobType JobType { get; set; } = null!;
 
     public string? Location { get; set; }
-
     public string? Salary { get; set; }
-
     public string? Status { get; set; }
 
-   
+    public string? Requirements { get; set; }
+    public string? WorkTime { get; set; }
+
     public string? ExperienceLevel { get; set; }
-    public string? Category { get; set; }
     public string? WorkSetting { get; set; }
     public string? CompanySize { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+    public virtual ICollection<Application> Applications { get; set; } 
 
-    public virtual Post Post { get; set; } = null!;   // 👈 ADD THIS
-
+    public virtual Post Post { get; set; } = null!;
     public virtual User User { get; set; } = null!;
 }
+

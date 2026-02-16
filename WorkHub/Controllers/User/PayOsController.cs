@@ -48,7 +48,7 @@ namespace WorkHub.Controllers.User
        
 
             if (user == null)
-                return BadRequest(ApiResponse<object>.BadRequest(null, "User not found"));
+                return BadRequest(ApiResponse<object>.BadRequest(null, "User Unauthorize"));
 
             var orderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 

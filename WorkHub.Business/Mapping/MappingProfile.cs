@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
-using WorkHub.Models.DTOs.ModelDTOs.JobsDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
 using WorkHub.Models.Models;
 
 namespace WorkHub.Business.Mapping
@@ -24,6 +26,20 @@ namespace WorkHub.Business.Mapping
             CreateMap<Recruitment, RecruitmentSelectDTO>()
              .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
+
+            CreateMap<CreateJobRequestDTO, Recruitment>()
+                .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobTitle))
+                .ForMember(d => d.Salary, o => o.MapFrom(s => s.SalaryRange))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+                .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
+                .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.UserId, o => o.Ignore())
+                .ForMember(d => d.PostId, o => o.Ignore());
+
 
 
             //=================== Auth MAPPING =================
@@ -62,6 +78,20 @@ namespace WorkHub.Business.Mapping
             .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
             .ForMember(d => d.UserUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
             .ForMember(d => d.PostId, o => o.MapFrom(s => s.PostId));
+
+            CreateMap<CreatePaymentDTO, Order>()
+            .ForMember(d => d.Amount, o => o.MapFrom(s => s.TotalAmount))
+            .ForMember(d => d.Status, o => o.MapFrom(_ => "Pending"))
+            .ForMember(d => d.CreatedAt, o => o.Ignore())
+            .ForMember(d => d.Id, o => o.Ignore())
+            .ForMember(d => d.UserId, o => o.Ignore())
+            .ForMember(d => d.OrderCode, o => o.Ignore())
+            .ForMember(d => d.PaidAt, o => o.Ignore());
+
+            CreateMap<JobType, JobTypeDTO>();
+            CreateMap<Category, CategoryDTO>();
+
+
 
 
 

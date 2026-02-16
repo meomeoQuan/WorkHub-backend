@@ -248,8 +248,10 @@ namespace WorkHub.DataAccess.Migrations
                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     ExperienceLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     WorkSetting = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")

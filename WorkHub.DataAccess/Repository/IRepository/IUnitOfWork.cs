@@ -24,6 +24,10 @@ namespace WorkHub.DataAccess.Repository.IRepository
         public IOrderRepository OrderRepository { get; }
 
         public IUserSubscriptionRepository  UserSubscriptionRepository { get; }
+
+       public IJobTypeRepository JobTypeRepo { get; }
+
+        public ICategoryRepository JobCategoryRepo { get; }  
         Task SaveAsync();
     }
 }

@@ -39,6 +39,12 @@ public partial class WorkHubDbContext : DbContext
 
     public virtual DbSet<UserSchedule> UserSchedules { get; set; }
 
+    public virtual DbSet<JobType> JobTypes { get; set; }
+
+    public virtual DbSet<Category> Categories { get; set; }
+
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=WorkHub;User Id=sa;Password=YourPassword123!;TrustServerCertificate=True;");
@@ -129,20 +135,50 @@ public partial class WorkHubDbContext : DbContext
 
         modelBuilder.Entity<Recruitment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__Recruitm__3214EC079D1054A4");
+            entity.HasKey(e => e.Id)
+                .HasName("PK__Recruitm__3214EC079D1054A4");
 
             entity.ToTable("Recruitment");
 
             entity.HasIndex(e => e.UserId, "IX_Recruitment_UserId");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
-            entity.Property(e => e.JobName).HasMaxLength(255);
-            entity.Property(e => e.JobType)
-       .IsRequired();
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetime())");
 
-            entity.Property(e => e.Location).HasMaxLength(255);
-            entity.Property(e => e.Salary).HasMaxLength(100);
-            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.JobName)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.JobType)
+                .IsRequired();
+
+            entity.Property(e => e.Location)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Salary)
+                .HasMaxLength(100);
+
+            entity.Property(e => e.Status)
+                .HasMaxLength(50);
+
+            // ===== NEW PROPERTIES =====
+
+            entity.Property(e => e.Category)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.Requirements)
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.WorkTime)
+                .HasMaxLength(255);
+
+            entity.Property(e => e.ExperienceLevel)
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.WorkSetting)
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(e => e.CompanySize)
+                .HasColumnType("nvarchar(max)");
 
             // KEEP user link BUT REMOVE cascade
             entity.HasOne(d => d.User)
@@ -155,7 +191,17 @@ public partial class WorkHubDbContext : DbContext
                 .WithMany(p => p.Recruitments)
                 .HasForeignKey(r => r.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.Category)
+      .WithMany(c => c.Recruitments)
+      .HasForeignKey(r => r.CategoryId);
+
+            entity.HasOne(r => r.JobType)
+                  .WithMany(j => j.Recruitments)
+                  .HasForeignKey(r => r.JobTypeId);
+
         });
+
 
 
         modelBuilder.Entity<User>(entity =>
