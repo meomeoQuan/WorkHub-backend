@@ -33,5 +33,11 @@ public partial class UserDetail
 
     public string? IndustryFocus { get; set; }
 
+    public string? Website { get; set; }
+
+    public string? CompanySize { get; set; }
+
+    public int? FoundedYear { get; set; }
+
     public virtual User User { get; set; } = null!;
 }

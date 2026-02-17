@@ -12,6 +12,32 @@ namespace WorkHub.DataAccess.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -244,14 +270,14 @@ namespace WorkHub.DataAccess.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     PostId = table.Column<int>(type: "int", nullable: false),
                     JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    JobType = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    JobTypeId = table.Column<int>(type: "int", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     ExperienceLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Category = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     WorkSetting = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
@@ -259,6 +285,18 @@ namespace WorkHub.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__Recruitm__3214EC079D1054A4", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_JobTypes_JobTypeId",
+                        column: x => x.JobTypeId,
+                        principalTable: "JobTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Recruitment_Post_PostId",
                         column: x => x.PostId,
@@ -375,6 +413,16 @@ namespace WorkHub.DataAccess.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Recruitment_CategoryId",
+                table: "Recruitment",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recruitment_JobTypeId",
+                table: "Recruitment",
+                column: "JobTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Recruitment_PostId",
                 table: "Recruitment",
                 column: "PostId");
@@ -445,6 +493,12 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Comment");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "JobTypes");
 
             migrationBuilder.DropTable(
                 name: "Post");

@@ -31,7 +31,10 @@ public partial class WorkHubDbContext : DbContext
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<UserSubscription> UserSubscriptions { get; set; }
-     public virtual DbSet<CommentLikes> CommentLikes { get; set; }
+    public virtual DbSet<CommentLikes> CommentLikes { get; set; }
+
+    public virtual DbSet<UserExperience> UserExperiences { get; set; }
+    public virtual DbSet<UserEducation> UserEducations { get; set; }
 
     public virtual DbSet<UserDetail> UserDetails { get; set; }
 

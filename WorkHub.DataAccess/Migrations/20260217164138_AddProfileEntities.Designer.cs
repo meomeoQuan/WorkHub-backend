@@ -12,8 +12,8 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260216045441_AddInit")]
-    partial class AddInit
+    [Migration("20260217164138_AddProfileEntities")]
+    partial class AddProfileEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,6 +61,23 @@ namespace WorkHub.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("Application", (string)null);
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
@@ -118,6 +135,23 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex("CommentId");
 
                     b.ToTable("CommentLikes");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.JobType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobTypes");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Order", b =>
@@ -217,9 +251,8 @@ namespace WorkHub.DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
 
                     b.Property<string>("CompanySize")
                         .HasColumnType("nvarchar(max)");
@@ -236,7 +269,7 @@ namespace WorkHub.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("JobType")
+                    b.Property<int>("JobTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Location")
@@ -269,6 +302,10 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Recruitm__3214EC079D1054A4");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("JobTypeId");
 
                     b.HasIndex("PostId");
 
@@ -358,12 +395,18 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CompanySize")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EducationLevel")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("FoundedYear")
+                        .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .HasMaxLength(255)
@@ -394,6 +437,9 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Website")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id")
                         .HasName("PK__UserDeta__3214EC073F2B3337");
 
@@ -401,6 +447,81 @@ namespace WorkHub.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("UserDetail", (string)null);
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.UserEducation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Degree")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EndYear")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FieldOfStudy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("School")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StartYear")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserEducations");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.UserExperience", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Company")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExperiences");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.UserFollow", b =>
@@ -599,6 +720,18 @@ namespace WorkHub.DataAccess.Migrations
 
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
+                    b.HasOne("WorkHub.Models.Models.Category", "Category")
+                        .WithMany("Recruitments")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.JobType", "JobType")
+                        .WithMany("Recruitments")
+                        .HasForeignKey("JobTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("WorkHub.Models.Models.Post", "Post")
                         .WithMany("Recruitments")
                         .HasForeignKey("PostId")
@@ -610,6 +743,10 @@ namespace WorkHub.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("JobType");
 
                     b.Navigation("Post");
 
@@ -624,6 +761,28 @@ namespace WorkHub.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK__UserDetai__UserI__3E52440B");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.UserEducation", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("UserEducations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.UserExperience", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("UserExperiences")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -671,11 +830,21 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.Category", b =>
+                {
+                    b.Navigation("Recruitments");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
                 {
                     b.Navigation("CommentLikes");
 
                     b.Navigation("InverseParentComment");
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.JobType", b =>
+                {
+                    b.Navigation("Recruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
@@ -712,6 +881,10 @@ namespace WorkHub.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("UserDetail");
+
+                    b.Navigation("UserEducations");
+
+                    b.Navigation("UserExperiences");
 
                     b.Navigation("UserFollowFollowers");
 

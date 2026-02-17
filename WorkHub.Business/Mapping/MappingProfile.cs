@@ -31,10 +31,12 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobTitle))
                 .ForMember(d => d.Salary, o => o.MapFrom(s => s.SalaryRange))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
-                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category))
+                .ForMember(d => d.CategoryId, o => o.Ignore()) // Handle manually in Controller
+                .ForMember(d => d.Category, o => o.Ignore()) // Ignore Nav Prop
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
                 .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
-                .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType))
+                .ForMember(d => d.JobTypeId, o => o.MapFrom(s => s.JobType)) // Map to FK
+                .ForMember(d => d.JobType, o => o.Ignore()) // Ignore Nav Prop
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.UserId, o => o.Ignore())
@@ -92,6 +94,37 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<JobType, JobTypeDTO>();
             CreateMap<Category, CategoryDTO>();
+
+            //=================== User Profile MAPPING =================
+            CreateMap<UserExperience, UserExperienceDTO>().ReverseMap();
+            CreateMap<UserEducation, UserEducationDTO>().ReverseMap();
+            CreateMap<UserSchedule, UserScheduleDTO>().ReverseMap();
+
+            CreateMap<User, UserProfileDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName))
+                .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
+                .ForMember(d => d.Phone, o => o.MapFrom(s => s.Phone))
+                .ForMember(d => d.Role, o => o.MapFrom(s => s.Role))
+                .ForMember(d => d.Provider, o => o.MapFrom(s => s.Provider))
+                // Map from UserDetail
+                .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.AvatarUrl : null))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Location : null))
+                .ForMember(d => d.Bio, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Bio : null))
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.JobPreference : null)) // Using JobPreference as Title
+                .ForMember(d => d.CvUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CvUrl : null))
+                .ForMember(d => d.Website, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Website : null))
+                .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CompanySize : null))
+                .ForMember(d => d.FoundedYear, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.FoundedYear : null))
+                .ForMember(d => d.Industry, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.IndustryFocus : null))
+                // Collections
+                .ForMember(d => d.Experiences, o => o.MapFrom(s => s.UserExperiences))
+                .ForMember(d => d.Educations, o => o.MapFrom(s => s.UserEducations))
+                .ForMember(d => d.Schedules, o => o.MapFrom(s => s.UserSchedules))
+                // Skills (Splitting string)
+                .ForMember(d => d.Skills, o => o.MapFrom(s => s.UserDetail != null && !string.IsNullOrEmpty(s.UserDetail.Skills) 
+                    ? s.UserDetail.Skills.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList() 
+                    : new List<string>()));
 
 
 

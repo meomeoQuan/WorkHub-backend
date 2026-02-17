@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorkHub.DataAccess.Data;
+using WorkHub.Models.Models;
 using static Azure.Core.HttpHeader;
 
 namespace WorkHub.DataAccess.Repository.IRepository
@@ -27,7 +28,12 @@ namespace WorkHub.DataAccess.Repository.IRepository
 
        public IJobTypeRepository JobTypeRepo { get; }
 
-        public ICategoryRepository JobCategoryRepo { get; }  
+        public ICategoryRepository JobCategoryRepo { get; }
+        
+        public IRepository<UserExperience> UserExperienceRepository { get; }
+        public IRepository<UserEducation> UserEducationRepository { get; }
+        public IRepository<UserSchedule> UserScheduleRepository { get; }
+
         Task SaveAsync();
     }
 }
