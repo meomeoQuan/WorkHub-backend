@@ -46,8 +46,13 @@ public partial class WorkHubDbContext : DbContext
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost,1433;Database=WorkHub;User Id=sa;Password=YourPassword123!;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer("Server=localhost,1433;Database=WorkHub;User Id=sa;Password=YourPassword123!;TrustServerCertificate=True;");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,8 +153,7 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.JobName)
                 .HasMaxLength(255);
 
-            entity.Property(e => e.JobType)
-                .IsRequired();
+            // entity.Property(e => e.JobType).IsRequired(); // Removed conflicting scalar config
 
             entity.Property(e => e.Location)
                 .HasMaxLength(255);
@@ -162,8 +166,7 @@ public partial class WorkHubDbContext : DbContext
 
             // ===== NEW PROPERTIES =====
 
-            entity.Property(e => e.Category)
-                .HasMaxLength(255);
+            // entity.Property(e => e.Category).HasMaxLength(255); // Removed conflicting scalar config
 
             entity.Property(e => e.Requirements)
                 .HasColumnType("nvarchar(max)");

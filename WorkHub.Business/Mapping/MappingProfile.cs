@@ -55,7 +55,9 @@ namespace WorkHub.Business.Mapping
 
             //=================== Jobs Page MAPPING =================
 
-            CreateMap<Recruitment, JobDTO>();
+            CreateMap<Recruitment, JobDTO>()
+             .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
+             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name));
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))

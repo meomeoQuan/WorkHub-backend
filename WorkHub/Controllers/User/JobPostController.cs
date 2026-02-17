@@ -36,7 +36,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
-                + SD.Collection_Join_Recruitments,
+                + SD.Collection_Join_Recruitments + ".JobType," 
+                + SD.Collection_Join_Recruitments + ".Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -123,7 +124,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
-                + SD.Collection_Join_Recruitments,
+                + SD.Collection_Join_Recruitments + ".JobType,"
+                + SD.Collection_Join_Recruitments + ".Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -169,7 +171,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                     + SD.Collection_Join_Comments + ","
                     + SD.Collection_Join_PostLikes + ","
-                    + SD.Collection_Join_Recruitments,
+                    + SD.Collection_Join_Recruitments + ".JobType,"
+                    + SD.Collection_Join_Recruitments + ".Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -202,7 +205,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                                 + SD.Collection_Join_Comments + ","
                                 + SD.Collection_Join_PostLikes + ","
-                                + SD.Collection_Join_Recruitments
+                                + SD.Collection_Join_Recruitments + ".JobType,"
+                                + SD.Collection_Join_Recruitments + ".Category"
             );
 
             if (post == null)

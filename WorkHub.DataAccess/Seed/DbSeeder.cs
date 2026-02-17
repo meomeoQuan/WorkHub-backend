@@ -1,5 +1,5 @@
 ﻿using WorkHub.DataAccess.Data;
-using WorkHub.Models.Enums;
+// using WorkHub.Models.Enums; // Removed
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -49,9 +49,9 @@ public static class DbSeeder
         // ================= USER DETAILS =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 ,Rating = 5.0},
-            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 , Rating = 4.6 },
-            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 , Rating = 4.1}
+            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30, Rating = 5.0 },
+            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25, Rating = 4.6 },
+            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24, Rating = 4.1 }
         );
 
         // ================= POSTS (ONLY NORMAL USERS) =================
@@ -71,6 +71,25 @@ public static class DbSeeder
         context.Posts.AddRange(post1, post2);
         context.SaveChanges();
 
+        // ================= JOB TYPES & CATEGORIES =================
+        // Must seed these BEFORE Recruitments
+
+        var fullTime = new JobType { Name = SD.JobType_FullTime };
+        var partTime = new JobType { Name = SD.JobType_PartTime };
+        var freelance = new JobType { Name = SD.JobType_Freelance };
+        var seasonal = new JobType { Name = SD.JobType_Seasonal };
+
+        context.JobTypes.AddRange(fullTime, partTime, freelance, seasonal);
+
+        var catIT = new Category { Name = SD.Category_IT };
+        var catRetail = new Category { Name = SD.Category_Retail };
+        var catEdu = new Category { Name = SD.Category_Education };
+        var catFB = new Category { Name = "Food & Beverage" }; // Adding missing one from original seed
+
+        context.Categories.AddRange(catIT, catRetail, catEdu, catFB);
+        context.SaveChanges();
+
+
         // ================= RECRUITMENTS (ATTACHED TO POSTS) =================
 
         var recruitment1 = new Recruitment
@@ -78,10 +97,10 @@ public static class DbSeeder
             UserId = user1.Id,
             PostId = post1.Id,
             JobName = "Junior .NET",
-            JobType = JobType.FullTime,
+            JobType = fullTime,      // Link to Entity
             Salary = "$800",
             Location = "Ha noi",
-            Category = "Tech & IT",
+            Category = catIT,        // Link to Entity
             ExperienceLevel = "Entry Level",
             WorkSetting = "On-site",
             CompanySize = "Medium",
@@ -93,10 +112,10 @@ public static class DbSeeder
             UserId = user2.Id,
             PostId = post2.Id,
             JobName = "Frontend Developer",
-            JobType = JobType.PartTime,
+            JobType = partTime,      // Link to Entity
             Salary = "$500",
             Location = "sai gon",
-            Category = "Tech & IT",
+            Category = catIT,        // Link to Entity
             ExperienceLevel = "Mid Level",
             WorkSetting = "Remote",
             CompanySize = "Startup",
@@ -108,10 +127,10 @@ public static class DbSeeder
             UserId = user1.Id,
             PostId = post1.Id,
             JobName = "Barista",
-            JobType = JobType.PartTime,
+            JobType = partTime,      // Link to Entity
             Salary = "$15/hr",
             Location = "da nang",
-            Category = "Food & Beverage",
+            Category = catFB,        // Link to Entity
             ExperienceLevel = "Entry Level",
             WorkSetting = "On-site",
             CompanySize = "Small",
@@ -206,24 +225,9 @@ public static class DbSeeder
                 IsActive = false
             }
         );
-
-                context.JobTypes.AddRange(
-            new JobType { Name = SD.JobType_PartTime },
-            new JobType { Name = SD.JobType_Freelance },
-            new JobType { Name = SD.JobType_Seasonal }
-        );
-
-        context.Categories.AddRange(
-            new Category { Name = SD.Category_IT },
-            new Category { Name = SD.Category_Retail },
-            new Category { Name = SD.Category_Education }
-        );
-
-
+        
         context.SaveChanges();
 
-
-       
     }
 
 }
