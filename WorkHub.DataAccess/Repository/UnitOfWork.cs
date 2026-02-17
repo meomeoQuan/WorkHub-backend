@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WorkHub.DataAccess.Data;
+using WorkHub.Models.Models;
 using WorkHub.DataAccess.Repository.IRepository;
 
 namespace WorkHub.DataAccess.Repository
@@ -24,6 +25,11 @@ namespace WorkHub.DataAccess.Repository
             OrderRepository = new OrderRepository(_db);
             UserSubscriptionRepository = new UserSubscriptionRepository(_db);
             JobCategoryRepo = new CategoryRepository(_db);
+            JobTypeRepo = new JobTypeRepository(_db);
+
+            UserExperienceRepository = new Repository<UserExperience>(_db);
+            UserEducationRepository = new Repository<UserEducation>(_db);
+            UserScheduleRepository = new Repository<UserSchedule>(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
@@ -45,6 +51,10 @@ namespace WorkHub.DataAccess.Repository
         public IJobTypeRepository JobTypeRepo { get; private set; }
 
         public ICategoryRepository JobCategoryRepo { get; private set; }
+
+        public IRepository<UserExperience> UserExperienceRepository { get; private set; }
+        public IRepository<UserEducation> UserEducationRepository { get; private set; }
+        public IRepository<UserSchedule> UserScheduleRepository { get; private set; }
 
         public async Task SaveAsync()
         {

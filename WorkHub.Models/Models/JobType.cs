@@ -11,7 +11,7 @@ namespace WorkHub.Models.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
 
-        public ICollection<Recruitment> Recruitments { get; set; }
+        public ICollection<Recruitment> Recruitments { get; set; } = new List<Recruitment>();
     }
 
 }

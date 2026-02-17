@@ -11,6 +11,7 @@ namespace WorkHub.Utility
 
 
         // ===== Job Types =====
+        public const string JobType_FullTime = "Full Time";
         public const string JobType_PartTime = "Part Time";
         public const string JobType_Freelance = "Freelance";
         public const string JobType_Seasonal = "Seasonal";

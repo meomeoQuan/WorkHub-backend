@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WorkHub.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    partial class WorkHubDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260217155616_AddInit")]
+    partial class AddInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,18 +395,12 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanySize")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EducationLevel")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
-
-                    b.Property<int?>("FoundedYear")
-                        .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .HasMaxLength(255)
@@ -434,9 +431,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Website")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id")
                         .HasName("PK__UserDeta__3214EC073F2B3337");
 
@@ -444,81 +438,6 @@ namespace WorkHub.DataAccess.Migrations
                         .IsUnique();
 
                     b.ToTable("UserDetail", (string)null);
-                });
-
-            modelBuilder.Entity("WorkHub.Models.Models.UserEducation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Degree")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EndYear")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FieldOfStudy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("School")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StartYear")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserEducations");
-                });
-
-            modelBuilder.Entity("WorkHub.Models.Models.UserExperience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Company")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserExperiences");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.UserFollow", b =>
@@ -762,28 +681,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("WorkHub.Models.Models.UserEducation", b =>
-                {
-                    b.HasOne("WorkHub.Models.Models.User", "User")
-                        .WithMany("UserEducations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WorkHub.Models.Models.UserExperience", b =>
-                {
-                    b.HasOne("WorkHub.Models.Models.User", "User")
-                        .WithMany("UserExperiences")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("WorkHub.Models.Models.UserFollow", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.User", "Follower")
@@ -878,10 +775,6 @@ namespace WorkHub.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("UserDetail");
-
-                    b.Navigation("UserEducations");
-
-                    b.Navigation("UserExperiences");
 
                     b.Navigation("UserFollowFollowers");
 

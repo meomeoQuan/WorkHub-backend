@@ -1,5 +1,4 @@
 ﻿using WorkHub.DataAccess.Data;
-using WorkHub.Models.Enums;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -7,9 +6,35 @@ public static class DbSeeder
 {
     public static void Seed(WorkHubDbContext context)
     {
-        var tenDaysAgo = DateTime.UtcNow.AddDays(-10);
+        // ================= JOB TYPES =================
+        if (!context.JobTypes.Any())
+        {
+            var fullTime = new JobType { Name = SD.JobType_FullTime };
+            var partTime = new JobType { Name = SD.JobType_PartTime };
+            var freelance = new JobType { Name = SD.JobType_Freelance };
+            var seasonal = new JobType { Name = SD.JobType_Seasonal };
 
+            context.JobTypes.AddRange(fullTime, partTime, freelance, seasonal);
+            context.SaveChanges();
+        }
+
+        // ================= CATEGORIES =================
+        if (!context.Categories.Any())
+        {
+            var catIT = new Category { Name = SD.Category_IT };
+            var catRetail = new Category { Name = SD.Category_Retail };
+            var catEdu = new Category { Name = SD.Category_Education };
+            var catFB = new Category { Name = "Food & Beverage" };
+
+            context.Categories.AddRange(catIT, catRetail, catEdu, catFB);
+            context.SaveChanges();
+        }
+
+        // Check if users exist for the remaining data
         if (context.Users.Any()) return;
+
+        var now = DateTime.UtcNow;
+        var tenDaysAgo = now.AddDays(-10);
 
         // ================= USERS =================
 
@@ -46,95 +71,99 @@ public static class DbSeeder
         context.Users.AddRange(admin, user1, user2);
         context.SaveChanges();
 
-        // ================= USER DETAILS =================
+        // ================= USER DETAIL =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = admin.FullName, Age = 30 ,Rating = 5.0},
-            new UserDetail { UserId = user1.Id, FullName = user1.FullName, Age = 25 , Rating = 4.6 },
-            new UserDetail { UserId = user2.Id, FullName = user2.FullName, Age = 24 , Rating = 4.1}
+            new UserDetail { UserId = admin.Id, FullName = "Admin", Age = 30, Rating = 5 },
+            new UserDetail { UserId = user1.Id, FullName = "User One", Age = 25, Rating = 4.5 },
+            new UserDetail { UserId = user2.Id, FullName = "User Two", Age = 24, Rating = 4.2 }
         );
 
-        // ================= POSTS (ONLY NORMAL USERS) =================
+        // Need to fetch JobTypes and Categories since they might have been seeded previously
+        var fullTimeEntity = context.JobTypes.FirstOrDefault(j => j.Name == SD.JobType_FullTime);
+        var partTimeEntity = context.JobTypes.FirstOrDefault(j => j.Name == SD.JobType_PartTime);
+        var catITEntity = context.Categories.FirstOrDefault(c => c.Name == SD.Category_IT);
 
-        var post1 = new Post
-        {
-            UserId = user1.Id,
-            Content = "Welcome to WorkHub 🚀"
-        };
+        // ================= POSTS =================
 
-        var post2 = new Post
-        {
-            UserId = user2.Id,
-            Content = "Looking for frontend + backend devs"
-        };
+        var post1 = new Post { UserId = user1.Id, Content = "Welcome to WorkHub 🚀" };
+        var post2 = new Post { UserId = user2.Id, Content = "Hiring devs ASAP" };
 
         context.Posts.AddRange(post1, post2);
         context.SaveChanges();
 
-        // ================= RECRUITMENTS (ATTACHED TO POSTS) =================
+        // ================= RECRUITMENT =================
 
-        var recruitment1 = new Recruitment
+        var rec1 = new Recruitment
         {
             UserId = user1.Id,
             PostId = post1.Id,
             JobName = "Junior .NET",
-            JobType = JobType.FullTime,
+            CategoryId = catITEntity?.Id ?? 1, // Fallback safe
+            JobTypeId = fullTimeEntity?.Id ?? 1,
             Salary = "$800",
-            Location = "Ha noi",
-            Category = "Tech & IT",
-            ExperienceLevel = "Entry Level",
-            WorkSetting = "On-site",
+            Location = "Ha Noi",
+            Status = "Open",
+            ExperienceLevel = "Entry",
+            WorkSetting = "Onsite",
             CompanySize = "Medium",
-            Status = "Open"
+            Requirements = "C#, EF Core",
+            WorkTime = "Mon-Fri"
         };
 
-        var recruitment2 = new Recruitment
+        var rec2 = new Recruitment
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend Developer",
-            JobType = JobType.PartTime,
+            JobName = "Frontend Dev",
+            CategoryId = catITEntity?.Id ?? 1,
+            JobTypeId = partTimeEntity?.Id ?? 1,
             Salary = "$500",
-            Location = "sai gon",
-            Category = "Tech & IT",
-            ExperienceLevel = "Mid Level",
+            Location = "Sai Gon",
+            Status = "Open",
+            ExperienceLevel = "Mid",
             WorkSetting = "Remote",
             CompanySize = "Startup",
-            Status = "Open"
+            Requirements = "React",
+            WorkTime = "Flexible"
         };
 
-        var recruitment3 = new Recruitment
-        {
-            UserId = user1.Id,
-            PostId = post1.Id,
-            JobName = "Barista",
-            JobType = JobType.PartTime,
-            Salary = "$15/hr",
-            Location = "da nang",
-            Category = "Food & Beverage",
-            ExperienceLevel = "Entry Level",
-            WorkSetting = "On-site",
-            CompanySize = "Small",
-            Status = "Open"
-        };
-
-        context.Recruitments.AddRange(recruitment1, recruitment2, recruitment3);
+        context.Recruitments.AddRange(rec1, rec2);
         context.SaveChanges();
 
-        // ================= APPLICATIONS =================
+        // ================= APPLICATION =================
 
-        context.Applications.AddRange(
-            new Application { UserId = user2.Id, RecruitmentId = recruitment1.Id },
-            new Application { UserId = user1.Id, RecruitmentId = recruitment2.Id }
-        );
+        var app1 = new Application { UserId = user2.Id, RecruitmentId = rec1.Id };
+        var app2 = new Application { UserId = user1.Id, RecruitmentId = rec2.Id };
 
-        // ================= COMMENT =================
+        context.Applications.AddRange(app1, app2);
 
-        context.Comments.Add(new Comment
+        // ================= COMMENTS =================
+
+        var comment = new Comment
         {
             UserId = user2.Id,
             PostId = post1.Id,
-            Content = "Nice post!"
+            Content = "Looks fire 🔥"
+        };
+
+        context.Comments.Add(comment);
+        context.SaveChanges();
+
+        // ================= COMMENT LIKES =================
+
+        context.CommentLikes.Add(new CommentLikes
+        {
+            UserId = user1.Id,
+            CommentId = comment.Id
+        });
+
+        // ================= POST LIKE =================
+
+        context.PostLikes.Add(new PostLike
+        {
+            UserId = user2.Id,
+            PostId = post1.Id
         });
 
         // ================= FOLLOW =================
@@ -145,22 +174,14 @@ public static class DbSeeder
             FollowingId = user2.Id
         });
 
-        // ================= LIKE =================
-
-        context.PostLikes.Add(new PostLike
-        {
-            UserId = user2.Id,
-            PostId = post1.Id
-        });
-
         // ================= SCHEDULE =================
 
         context.UserSchedules.Add(new UserSchedule
         {
             UserId = user2.Id,
             Title = "Interview",
-            StartTime = DateTime.UtcNow,
-            EndTime = DateTime.UtcNow.AddHours(2)
+            StartTime = now,
+            EndTime = now.AddHours(2)
         });
 
         // ================= ORDERS =================
@@ -171,59 +192,30 @@ public static class DbSeeder
             OrderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
             Amount = 2000,
             Status = "Paid",
-            CreatedAt = tenDaysAgo,
-            PaidAt = DateTime.UtcNow
+            PaidAt = now
         };
 
-        var order2 = new Order
-        {
-            UserId = user2.Id,
-            OrderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + 1,
-            Amount = 1500,
-            Status = "Pending",
-            CreatedAt = tenDaysAgo
-        };
+        context.Orders.Add(order1);
 
-        context.Orders.AddRange(order1, order2);
-        context.SaveChanges();
-
-
-        // ================= USER SUBSCRIPTIONS =================
+        // ================= SUBSCRIPTIONS =================
 
         context.UserSubscriptions.AddRange(
             new UserSubscription
             {
                 UserId = user1.Id,
-                StartAt = DateTime.UtcNow.AddDays(-5),
-                EndAt = DateTime.UtcNow.AddDays(25),
+                StartAt = now.AddDays(-5),
+                EndAt = now.AddDays(30),
                 IsActive = true
             },
             new UserSubscription
             {
                 UserId = user2.Id,
-                StartAt = DateTime.UtcNow.AddDays(-10),
-                EndAt = DateTime.UtcNow.AddDays(-1),
+                StartAt = now.AddDays(-10),
+                EndAt = now.AddDays(-1),
                 IsActive = false
             }
         );
 
-                context.JobTypes.AddRange(
-            new JobType { Name = SD.JobType_PartTime },
-            new JobType { Name = SD.JobType_Freelance },
-            new JobType { Name = SD.JobType_Seasonal }
-        );
-
-        context.Categories.AddRange(
-            new Category { Name = SD.Category_IT },
-            new Category { Name = SD.Category_Retail },
-            new Category { Name = SD.Category_Education }
-        );
-
-
         context.SaveChanges();
-
-
-       
     }
-
 }
