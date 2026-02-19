@@ -5,6 +5,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs
     public class ApplicationDTO
     {
         public int Id { get; set; }
+        public int ApplicantId { get; set; }
         public string ApplicantName { get; set; }
         public string ApplicantEmail { get; set; }
         public string ApplicantAvatar { get; set; }
