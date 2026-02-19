@@ -9,6 +9,7 @@ using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs;
 using WorkHub.Models.Models;
 
 namespace WorkHub.Business.Mapping
@@ -126,9 +127,35 @@ namespace WorkHub.Business.Mapping
                     ? s.UserDetail.Skills.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).ToList() 
                     : new List<string>()));
 
+            CreateMap<UserProfileDTO, User>()
+                .ForMember(d => d.UserDetail, o => o.MapFrom(s => s))
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.Email, o => o.Ignore())
+                .ForMember(d => d.PasswordHash, o => o.Ignore())
+                .ForMember(d => d.UserExperiences, o => o.Ignore())
+                .ForMember(d => d.UserEducations, o => o.Ignore())
+                .ForMember(d => d.UserSchedules, o => o.Ignore());
+
+            CreateMap<UserProfileDTO, UserDetail>()
+                 .ForMember(d => d.UserId, o => o.Ignore())
+                 .ForMember(d => d.Id, o => o.Ignore())
+                 .ForMember(d => d.JobPreference, o => o.MapFrom(s => s.Title))
+                 .ForMember(d => d.IndustryFocus, o => o.MapFrom(s => s.Industry))
+                 .ForMember(d => d.Skills, o => o.MapFrom(s => string.Join(",", s.Skills)));
 
 
 
+
+
+
+            CreateMap<Application, ApplicationDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.ApplicantName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.ApplicantEmail, o => o.MapFrom(s => s.User.Email))
+                .ForMember(d => d.ApplicantAvatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
+                .ForMember(d => d.JobTitle, o => o.MapFrom(s => s.Recruitment.JobName))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
+                .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt));
 
         }
     }

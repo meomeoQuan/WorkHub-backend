@@ -30,6 +30,7 @@ namespace WorkHub.DataAccess.Repository
             UserExperienceRepository = new Repository<UserExperience>(_db);
             UserEducationRepository = new Repository<UserEducation>(_db);
             UserScheduleRepository = new Repository<UserSchedule>(_db);
+            ApplicationRepository = new Repository<Application>(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
@@ -55,6 +56,7 @@ namespace WorkHub.DataAccess.Repository
         public IRepository<UserExperience> UserExperienceRepository { get; private set; }
         public IRepository<UserEducation> UserEducationRepository { get; private set; }
         public IRepository<UserSchedule> UserScheduleRepository { get; private set; }
+        public IRepository<Application> ApplicationRepository { get; private set; }
 
         public async Task SaveAsync()
         {

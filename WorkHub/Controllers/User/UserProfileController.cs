@@ -61,32 +61,20 @@ namespace WorkHub.Controllers.User
                 return NotFound(ApiResponse<object>.NotFound("User not found"));
             }
 
-            // Update Basic Info
-            user.FullName = userProfileDTO.FullName;
-            user.Phone = userProfileDTO.Phone;
-            // Email is usually not editable freely due to verification, but allowing for now if needed or ignored
-            // user.Email = userProfileDTO.Email; 
-
-            // Update UserDetail
+            // Update Basic Info & UserDetail via AutoMapper
+            _mapper.Map(userProfileDTO, user);
+            
+            // Handle UserDetail creation if it was null but now mapped? 
+            // AutoMapper might instantiate it if configured, but here we are mapping to existing `user` entity.
+            // If `user.UserDetail` is null, AutoMapper will try to map to it. 
+            // Let's ensure UserDetail exists if it's null, or let AutoMapper handle it if it can (for nested objects, usually needs existing instance or creates new if property is null).
+            // Better approach: explicit check as before for safety or let EF Core fixup.
             if (user.UserDetail == null)
             {
-                user.UserDetail = new UserDetail { UserId = userId };
-                // Add to context if it was null? Accessing via navigation should be tracked if we attach it.
-                // But safer to let EF Core handle it via navigation.
+                 user.UserDetail = new UserDetail { UserId = userId };
+                 // Re-map to ensure the new instance gets populated
+                 _mapper.Map(userProfileDTO, user.UserDetail);
             }
-
-            user.UserDetail.AvatarUrl = userProfileDTO.AvatarUrl;
-            user.UserDetail.Location = userProfileDTO.Location;
-            user.UserDetail.Bio = userProfileDTO.Bio;
-            user.UserDetail.JobPreference = userProfileDTO.Title; // Map Title -> JobPreference
-            user.UserDetail.CvUrl = userProfileDTO.CvUrl;
-            user.UserDetail.Website = userProfileDTO.Website;
-            user.UserDetail.CompanySize = userProfileDTO.CompanySize;
-            user.UserDetail.FoundedYear = userProfileDTO.FoundedYear;
-            user.UserDetail.IndustryFocus = userProfileDTO.Industry;
-            
-            // Join Skills list to string
-            user.UserDetail.Skills = string.Join(",", userProfileDTO.Skills);
 
 
             // Update Experiences (Full Sync Strategy)
