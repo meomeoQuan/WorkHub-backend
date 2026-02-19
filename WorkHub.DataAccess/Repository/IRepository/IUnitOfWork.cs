@@ -34,6 +34,8 @@ namespace WorkHub.DataAccess.Repository.IRepository
         public IRepository<UserEducation> UserEducationRepository { get; }
         public IRepository<UserSchedule> UserScheduleRepository { get; }
 
+        public IRepository<Application> ApplicationRepository { get; }
+
         Task SaveAsync();
     }
 }
