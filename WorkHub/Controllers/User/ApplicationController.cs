@@ -30,7 +30,8 @@ namespace WorkHub.Controllers.User
         {
             try
             {
-                Expression<Func<Application, bool>> filterExpression = a => true;
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+                Expression<Func<Application, bool>> filterExpression = a => a.Recruitment.UserId == userId;
 
                 // 1. Filter by Status
                 if (!string.IsNullOrEmpty(filter.Status) && filter.Status != "All Status")
@@ -86,7 +87,7 @@ namespace WorkHub.Controllers.User
             }
             catch (Exception ex)
             {
-                 return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
+                return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
             }
         }
 
@@ -106,9 +107,9 @@ namespace WorkHub.Controllers.User
 
                 return Ok(ApiResponse<IEnumerable<JobNameDTO>>.Ok(jobDTOs, "Job names retrieved successfully"));
             }
-             catch (Exception ex)
+            catch (Exception ex)
             {
-                 return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
+                return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
             }
         }
 
@@ -128,41 +129,7 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<List<string>>.Ok(statuses, "Application statuses retrieved successfully"));
         }
     }
+}
 
     // Helper extension methods for Expression combining if not already present in Utility
-    public static class ExpressionExtensions
-    {
-        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1, Expression<Func<T, bool>> expr2)
-        {
-            var parameter = Expression.Parameter(typeof(T));
 
-            var leftVisitor = new ReplaceExpressionVisitor(expr1.Parameters[0], parameter);
-            var left = leftVisitor.Visit(expr1.Body);
-
-            var rightVisitor = new ReplaceExpressionVisitor(expr2.Parameters[0], parameter);
-            var right = rightVisitor.Visit(expr2.Body);
-
-            return Expression.Lambda<Func<T, bool>>(
-                Expression.AndAlso(left, right), parameter);
-        }
-
-        private class ReplaceExpressionVisitor : ExpressionVisitor
-        {
-            private readonly Expression _oldValue;
-            private readonly Expression _newValue;
-
-            public ReplaceExpressionVisitor(Expression oldValue, Expression newValue)
-            {
-                _oldValue = oldValue;
-                _newValue = newValue;
-            }
-
-            public override Expression Visit(Expression node)
-            {
-                if (node == _oldValue)
-                    return _newValue;
-                return base.Visit(node);
-            }
-        }
-    }
-}

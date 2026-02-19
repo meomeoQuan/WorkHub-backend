@@ -13,6 +13,10 @@ public partial class Application
 
     public string? Status { get; set; }
 
+    public string? CoverLetter { get; set; }
+
+    public string? CvUrl { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public virtual Recruitment Recruitment { get; set; } = null!;

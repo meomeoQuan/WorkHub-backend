@@ -10,7 +10,9 @@ using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs;
 using WorkHub.Models.Models;
+using WorkHub.Utility;
 
 namespace WorkHub.Business.Mapping
 {
@@ -150,6 +152,7 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<Application, ApplicationDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.ApplicantId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.ApplicantName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.ApplicantEmail, o => o.MapFrom(s => s.User.Email))
                 .ForMember(d => d.ApplicantAvatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
@@ -160,6 +163,25 @@ namespace WorkHub.Business.Mapping
             CreateMap<Recruitment, JobNameDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
                 .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobName));
+
+            //=================== My Application MAPPING =================
+
+            CreateMap<Application, MyApplicationDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.JobId, o => o.MapFrom(s => s.RecruitmentId))
+                .ForMember(d => d.JobName, o => o.MapFrom(s => s.Recruitment.JobName))
+                .ForMember(d => d.Company, o => o.MapFrom(s => s.Recruitment.User.FullName))
+                .ForMember(d => d.CompanyLogo, o => o.MapFrom(s => s.Recruitment.User.UserDetail != null ? s.Recruitment.User.UserDetail.AvatarUrl : null))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.Recruitment.Location))
+                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.Recruitment.JobType.Name))
+                .ForMember(d => d.Salary, o => o.MapFrom(s => s.Recruitment.Salary))
+                .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt))
+                .ForMember(d => d.Status, o => o.MapFrom(s =>
+                    s.Status == ApplicationStatus.New ? "Pending" :
+                    s.Status == ApplicationStatus.Reviewing ? "Under Review" :
+                    s.Status == ApplicationStatus.Shortlisted ? "Under Review" : 
+                    s.Status == ApplicationStatus.Interviewed ? "Under Review" : // Map intermediate statuses to "Under Review" if needed, or keep detailed? User asked for "Under Review" specifically.
+                    s.Status)); // Fallback or Accepted/Rejected
 
         }
     }
