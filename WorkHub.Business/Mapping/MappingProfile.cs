@@ -157,6 +157,10 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
                 .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt));
 
+            CreateMap<Recruitment, JobNameDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobName));
+
         }
     }
 }
