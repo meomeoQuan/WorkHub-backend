@@ -89,6 +89,44 @@ namespace WorkHub.Controllers.User
                  return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
             }
         }
+
+        [Authorize]
+        [HttpGet("get-jobs")]
+        public async Task<IActionResult> GetJobNames()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+                var jobs = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(
+                    filter: r => r.UserId == userId
+                );
+
+                var jobDTOs = _mapper.Map<IEnumerable<JobNameDTO>>(jobs);
+
+                return Ok(ApiResponse<IEnumerable<JobNameDTO>>.Ok(jobDTOs, "Job names retrieved successfully"));
+            }
+             catch (Exception ex)
+            {
+                 return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        [HttpGet("get-statuses")]
+        public IActionResult GetApplicationStatuses()
+        {
+            var statuses = new List<string>
+            {
+                ApplicationStatus.New,
+                ApplicationStatus.Reviewing,
+                ApplicationStatus.Shortlisted,
+                ApplicationStatus.Interviewed,
+                ApplicationStatus.Rejected,
+                ApplicationStatus.Accepted
+            };
+
+            return Ok(ApiResponse<List<string>>.Ok(statuses, "Application statuses retrieved successfully"));
+        }
     }
 
     // Helper extension methods for Expression combining if not already present in Utility
