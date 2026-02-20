@@ -41,6 +41,17 @@ namespace WorkHub.Business.Service
                 HtmlBody = emailRequestDTO.Body
             };
 
+            if (emailRequestDTO.Attachments != null && emailRequestDTO.Attachments.Any())
+            {
+                foreach (var filePath in emailRequestDTO.Attachments)
+                {
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        builder.Attachments.Add(filePath);
+                    }
+                }
+            }
+
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
