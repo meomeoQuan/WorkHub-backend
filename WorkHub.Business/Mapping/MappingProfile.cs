@@ -12,6 +12,7 @@ using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.ScheduleDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -203,9 +204,14 @@ namespace WorkHub.Business.Mapping
                     s.Status == ApplicationStatus.New ? "Pending" :
                     s.Status == ApplicationStatus.Reviewing ? "Under Review" :
                     s.Status == ApplicationStatus.Shortlisted ? "Under Review" : 
-                    s.Status == ApplicationStatus.Interviewed ? "Under Review" : // Map intermediate statuses to "Under Review" if needed, or keep detailed? User asked for "Under Review" specifically.
+                    s.Status == ApplicationStatus.Interviewed ? "Under Review" : 
                     s.Status)); // Fallback or Accepted/Rejected
 
+            //=================== Schedule MAPPING =================
+            CreateMap<CreateScheduleDTO, UserSchedule>();
+            CreateMap<UpdateScheduleDTO, UserSchedule>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UserSchedule, ScheduleViewDTO>();
         }
     }
 }
