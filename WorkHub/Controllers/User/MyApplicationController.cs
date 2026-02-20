@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
+using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;

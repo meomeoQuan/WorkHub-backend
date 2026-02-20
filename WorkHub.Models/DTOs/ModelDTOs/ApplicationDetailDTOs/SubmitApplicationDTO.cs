@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
-namespace WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs
+namespace WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs
 {
     public class SubmitApplicationDTO
     {

@@ -10,6 +10,7 @@ using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.PaymentDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
@@ -159,6 +160,28 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.JobTitle, o => o.MapFrom(s => s.Recruitment.JobName))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
                 .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt));
+
+            CreateMap<Application, ApplicationDetailDTO>()
+                // Candidate Info
+                .ForMember(d => d.ApplicantId, o => o.MapFrom(s => s.UserId))
+                .ForMember(d => d.ApplicantName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.ApplicantEmail, o => o.MapFrom(s => s.User.Email))
+                .ForMember(d => d.ApplicantPhone, o => o.MapFrom(s => s.User.Phone))
+                .ForMember(d => d.ApplicantLocation, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Location : null))
+                .ForMember(d => d.ApplicantAvatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
+                // Application Info
+                .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt))
+                .ForMember(d => d.CoverLetter, o => o.MapFrom(s => s.CoverLetter))
+                .ForMember(d => d.CvUrl, o => o.MapFrom(s => s.CvUrl))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
+                // Job Info
+                .ForMember(d => d.RecruitmentId, o => o.MapFrom(s => s.RecruitmentId))
+                .ForMember(d => d.JobTitle, o => o.MapFrom(s => s.Recruitment.JobName))
+                .ForMember(d => d.CompanyName, o => o.MapFrom(s => s.Recruitment.User.FullName)) // Assuming Recruiter Name is Company Name equivalent here
+                .ForMember(d => d.JobLocation, o => o.MapFrom(s => s.Recruitment.Location))
+                // Collections
+                .ForMember(d => d.Educations, o => o.MapFrom(s => s.User.UserEducations))
+                .ForMember(d => d.Experiences, o => o.MapFrom(s => s.User.UserExperiences));
 
             CreateMap<Recruitment, JobNameDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
