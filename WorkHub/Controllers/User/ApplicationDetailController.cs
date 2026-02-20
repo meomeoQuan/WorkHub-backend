@@ -7,6 +7,8 @@ using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 
+using WorkHub.Utility;
+
 namespace WorkHub.Controllers.User
 {
     [Route("api/[controller]")]
@@ -40,11 +42,6 @@ namespace WorkHub.Controllers.User
                     return NotFound(ApiResponse<object>.Error(404, "Application not found"));
                 }
 
-                // Security Check: Only the Recruiter (Employer) OR the Applicant can view this
-                // User requested "Employer Application Detail View", so Recruiter check is primary.
-                // Assuming "MyApplicationDetail" implies "Details of an application I received" (Employer) 
-                // OR "Details of my application" (Applicant). 
-                // Given the fields requested (candidate info), it's strongly implied for Employer.
                 if (application.Recruitment.UserId != userId && application.UserId != userId)
                 {
                     return Forbid();
@@ -53,6 +50,55 @@ namespace WorkHub.Controllers.User
                 var applicationDetailDTO = _mapper.Map<ApplicationDetailDTO>(application);
 
                 return Ok(ApiResponse<ApplicationDetailDTO>.Ok(applicationDetailDTO, "Application details retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, $"Internal server error: {ex.Message}"));
+            }
+        }
+
+        [HttpPost("update-status")]
+        [Authorize]
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateApplicationStatusDTO updateDTO)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+                var application = await _unitOfWork.ApplicationRepository.GetAsync(a => a.Id == updateDTO.ApplicationId);
+
+                if (application == null)
+                {
+                    return NotFound(ApiResponse<object>.Error(404, "Application not found"));
+                }
+
+                // Security Check: Applicant cannot update their own status
+                if (application.UserId == userId)
+                {
+                     return Forbid();
+                }
+
+                // Validate Status
+                var validStatuses = new List<string> 
+                { 
+                    ApplicationStatus.New, 
+                    ApplicationStatus.Reviewing, 
+                    ApplicationStatus.Shortlisted, 
+                    ApplicationStatus.Interviewed, 
+                    ApplicationStatus.Accepted, 
+                    ApplicationStatus.Rejected 
+                };
+
+                if (!validStatuses.Contains(updateDTO.Status))
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, "Invalid status value."));
+                }
+
+                application.Status = updateDTO.Status;
+                //_unitOfWork.ApplicationRepository.Update(application);
+                await _unitOfWork.SaveAsync();
+
+                return Ok(ApiResponse<object>.Ok(null, "Application status updated successfully"));
             }
             catch (Exception ex)
             {
