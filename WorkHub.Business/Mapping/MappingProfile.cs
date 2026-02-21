@@ -36,6 +36,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.ExperienceLevel, o => o.MapFrom(s => s.ExperienceLevel))
                 .ForMember(d => d.WorkSetting, o => o.MapFrom(s => s.WorkSetting))
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
@@ -54,6 +55,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.CategoryId, o => o.Ignore()) // Handle manually in Controller
                 .ForMember(d => d.Category, o => o.Ignore()) // Ignore Nav Prop
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
                 .ForMember(d => d.JobTypeId, o => o.MapFrom(s => s.JobType)) // Map to FK
                 .ForMember(d => d.JobType, o => o.Ignore()) // Ignore Nav Prop

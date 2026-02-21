@@ -98,8 +98,8 @@ public static class DbSeeder
         {
             UserId = user1.Id,
             PostId = post1.Id,
-            JobName = "Junior .NET",
-            CategoryId = catITEntity?.Id ?? 1, // Fallback safe
+            JobName = "Junior .NET Developer",
+            CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = fullTimeEntity?.Id ?? 1,
             Salary = "$800",
             Location = "Ha Noi",
@@ -107,15 +107,16 @@ public static class DbSeeder
             ExperienceLevel = "Entry",
             WorkSetting = "Onsite",
             CompanySize = "Medium",
-            Requirements = "C#, EF Core",
-            WorkTime = "Mon-Fri"
+            Requirements = "Basic knowledge of C#, .NET Core, and Entity Framework Core. Understanding of OOP principles and RESTful API development. Familiar with SQL Server and Git. Willing to learn, good problem-solving skills, and ability to work in a team.",
+            WorkTime = "Full-time position, Monday to Friday (8:30 AM – 5:30 PM). Occasionally required to support deployment or testing outside normal hours.",
+            Benefits = "Competitive salary, annual performance review, social insurance, lunch allowance, professional training programs, and clear career path to Mid-level Developer."
         };
 
         var rec2 = new Recruitment
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend Dev",
+            JobName = "Frontend Developer",
             CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = partTimeEntity?.Id ?? 1,
             Salary = "$500",
@@ -124,8 +125,9 @@ public static class DbSeeder
             ExperienceLevel = "Mid",
             WorkSetting = "Remote",
             CompanySize = "Startup",
-            Requirements = "React",
-            WorkTime = "Flexible"
+            Requirements = "Strong experience with React.js, JavaScript (ES6+), HTML5, and CSS3. Familiar with RESTful APIs, state management (Redux or Context API), and responsive design. Experience working in Agile/Scrum teams and using Git for version control.",
+            WorkTime = "Flexible working hours (4–6 hours per day), Monday to Friday. Must attend weekly online sprint meetings and deliver assigned tasks on time.",
+            Benefits = "Remote-first environment, performance-based bonus, fast promotion opportunities, startup culture, and access to premium online learning platforms."
         };
 
         context.Recruitments.AddRange(rec1, rec2);

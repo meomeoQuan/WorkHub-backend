@@ -21,6 +21,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string UserName { get; set; } = null!;
         public string? Avatar { get; set; }
         public string? Requirements { get; set; }
+        public string? Benefits { get; set; }
         public string? ExperienceLevel { get; set; }
         public string? WorkSetting { get; set; }
         public string? Category { get; set; }

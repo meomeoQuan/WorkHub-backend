@@ -24,6 +24,7 @@ public partial class Recruitment
     public string? Status { get; set; }
 
     public string? Requirements { get; set; }
+    public string? Benefits { get; set; }
     public string? WorkTime { get; set; }
 
     public string? ExperienceLevel { get; set; }

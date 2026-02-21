@@ -22,6 +22,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobDTOs
 
         // Multiline textarea (one per line)
         public string? Requirements { get; set; }
+        public string? Benefits { get; set; }
 
         // Optional images
         public List<IFormFile>? JobImages { get; set; }
