@@ -6,6 +6,7 @@ using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 
@@ -215,6 +216,41 @@ namespace WorkHub.Controllers.User
             await _unitOfWork.SaveAsync();
 
             return Ok(ApiResponse<object>.Ok(new { avatarUrl }, "Avatar uploaded successfully"));
+        }
+
+
+        [Authorize]
+        [HttpGet("all-user-jobs")]
+        public async Task<IActionResult> GetAllUserJobs()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var jobs = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(
+                r => r.UserId == userId,
+                includeProperties: "JobType,Category"
+            );
+
+            var result = _mapper.Map<List<JobDTO>>(jobs);
+
+            return Ok(ApiResponse<List<JobDTO>>.Ok(result, "User jobs retrieved successfully"));
+        }
+
+        [Authorize]
+        [HttpGet("all-user-posts")]
+        public async Task<IActionResult> GetAllUserPosts()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var posts = await _unitOfWork.PostRepository.GetAllAsync(
+                p => p.UserId == userId,
+                includeProperties: SD.Join_User + ","
+                    + SD.Collection_Join_Comments + ","
+                    + SD.Collection_Join_PostLikes + ","
+                    + SD.Collection_Join_Recruitments + ".JobType," 
+                    + SD.Collection_Join_Recruitments + ".Category"
+            );
+
+            var result = _mapper.Map<List<JobPostDTO>>(posts);
+
+            return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "User posts retrieved successfully"));
         }
     }
 }
