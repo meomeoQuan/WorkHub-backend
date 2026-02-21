@@ -139,6 +139,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.JobPreference : null))
                 .ForMember(d => d.About, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Bio : null))
                 .ForMember(d => d.Description, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Description : null))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Rating : 0))
                 .ForMember(d => d.CvUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CvUrl : null))
                 .ForMember(d => d.Website, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Website : null))
                 .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CompanySize : null))

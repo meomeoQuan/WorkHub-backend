@@ -14,6 +14,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? Location { get; set; }
         public int Role { get; set; }
         public string? Provider { get; set; }
+        public double Rating { get; set; }
 
         // Extended Profile Info (from UserDetail)
         public string? Bio { get; set; }
