@@ -156,6 +156,7 @@ var app = builder.Build();
     // ================================================
 
     app.UseHttpsRedirection();
+    app.UseStaticFiles();
 
     // CORS must be BEFORE MapControllers
     app.UseCors("AllowAll");

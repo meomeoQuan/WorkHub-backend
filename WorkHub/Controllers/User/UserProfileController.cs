@@ -169,5 +169,52 @@ namespace WorkHub.Controllers.User
 
             return Ok(ApiResponse<object>.Ok(null, "Profile updated successfully"));
         }
+
+        [Authorize]
+        [HttpPost("upload-avatar")]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(ApiResponse<object>.BadRequest("No file uploaded"));
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: "UserDetail"
+            );
+
+            if (user == null)
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
+
+            // Ensure UserDetail exists
+            if (user.UserDetail == null)
+            {
+                user.UserDetail = new UserDetail { UserId = userId };
+                _unitOfWork.UserDetailRepository.Add(user.UserDetail);
+            }
+
+            // Create uploads directory if not exists
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            // Generate unique filename
+            var fileName = $"{userId}_{DateTime.UtcNow.Ticks}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Update database
+            var avatarUrl = $"/uploads/avatars/{fileName}";
+            user.UserDetail.AvatarUrl = avatarUrl;
+            
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(new { avatarUrl }, "Avatar uploaded successfully"));
+        }
     }
 }
