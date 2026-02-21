@@ -19,5 +19,6 @@ namespace WorkHub.Models.DTOs.ModelDTOs
 
         public string UserName { get; set; } = null!;
         public string? Avatar { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

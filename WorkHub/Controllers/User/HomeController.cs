@@ -27,7 +27,7 @@ namespace WorkHub.Controllers.User
         [HttpGet("top4")]
         public async Task<IActionResult> GetTop4() { 
 
-            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4, descending: true, includeProperties: SD.Join_Post + "," + SD.Join_User); // descending is latest first
+            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4, orderBy: r => r.CreatedAt, descending: true, includeProperties: SD.Join_Post + "," + SD.Join_User); // descending is latest first
             var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
             var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 4 recruitment info retrieved successfully");
@@ -66,10 +66,10 @@ namespace WorkHub.Controllers.User
 
 
 
-        [HttpPost]
+        [HttpGet("job-detail/{jobId}")]
         public async Task<IActionResult> JobDetails(string jobId)
         {
-            var entity = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id.ToString() == jobId, includeProperties: SD.Join_User);
+            var entity = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id.ToString() == jobId, includeProperties: SD.Join_User + "," + SD.Join_Post + ",JobType,Category," + SD.Join_User + "." + SD.Join_UserDetail);
 
             if (entity == null)
             {
@@ -86,7 +86,7 @@ namespace WorkHub.Controllers.User
         [HttpGet("all")]
         public async Task<IActionResult> GetAllJob()
         {
-            var entities = await _unitOfWork.RecruitmentInfoRepo.GetAllPagedAsync(pageIndex: 1 , pageSize: 5); // descending is latest first
+            var entities = await _unitOfWork.RecruitmentInfoRepo.GetAllPagedAsync(pageIndex: 1, pageSize: 5, orderBy: r => r.CreatedAt, descending: true); // descending is latest first
             var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
             var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 5 recruitment info retrieved successfully");

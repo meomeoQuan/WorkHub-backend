@@ -18,5 +18,14 @@ namespace WorkHub.Models.DTOs.ModelDTOs
 
         public string Description { get; set; } = null!;
         public string? Schedule { get; set; }
+        public string UserName { get; set; } = null!;
+        public string? Avatar { get; set; }
+        public string? Requirements { get; set; }
+        public string? ExperienceLevel { get; set; }
+        public string? WorkSetting { get; set; }
+        public string? Category { get; set; }
+        public string? CompanyBio { get; set; }
+        public double CompanyRating { get; set; }
+        public string? CompanyIndustry { get; set; }
     }
 }
