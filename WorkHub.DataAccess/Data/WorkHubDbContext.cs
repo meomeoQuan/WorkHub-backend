@@ -247,6 +247,7 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.Location).HasMaxLength(255);
             entity.Property(e => e.Major).HasMaxLength(255);
             entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.GoogleMapsEmbedUrl).HasColumnType("nvarchar(max)");
 
             entity.HasOne(d => d.User).WithOne(p => p.UserDetail)
                 .HasForeignKey<UserDetail>(d => d.UserId)

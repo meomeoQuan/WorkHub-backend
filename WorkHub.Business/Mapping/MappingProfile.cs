@@ -145,6 +145,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CompanySize : null))
                 .ForMember(d => d.FoundedYear, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.FoundedYear : null))
                 .ForMember(d => d.Industry, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.IndustryFocus : null))
+                .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.GoogleMapsEmbedUrl : null))
                 // Collections
                 .ForMember(d => d.Experiences, o => o.MapFrom(s => s.UserExperiences))
                 .ForMember(d => d.Educations, o => o.MapFrom(s => s.UserEducations))
@@ -169,6 +170,7 @@ namespace WorkHub.Business.Mapping
                  .ForMember(d => d.JobPreference, o => o.MapFrom(s => s.Title))
                  .ForMember(d => d.IndustryFocus, o => o.MapFrom(s => s.Industry))
                  .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                 .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.GoogleMapsEmbedUrl))
                  .ForMember(d => d.Skills, o => o.MapFrom(s => string.Join(",", s.Skills)));
 
 

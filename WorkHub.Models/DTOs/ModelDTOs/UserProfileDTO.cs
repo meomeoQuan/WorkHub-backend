@@ -28,6 +28,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? CompanySize { get; set; }
         public int? FoundedYear { get; set; }
         public string? Industry { get; set; } // Mapped from IndustryFocus
+        public string? GoogleMapsEmbedUrl { get; set; }
 
         // Collections
         public List<string> Skills { get; set; } = new List<string>(); // Skills is stored as string in DB, will need split
