@@ -36,10 +36,14 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.ExperienceLevel, o => o.MapFrom(s => s.ExperienceLevel))
                 .ForMember(d => d.WorkSetting, o => o.MapFrom(s => s.WorkSetting))
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.CompanyBio, o => o.MapFrom(s => s.User.UserDetail.Bio))
+                .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.User.UserDetail.CompanySize))
+                .ForMember(d => d.CompanyDescription, o => o.MapFrom(s => s.User.UserDetail.Description))
+                .ForMember(d => d.CompanyLocation, o => o.MapFrom(s => s.User.UserDetail.Location))
                 .ForMember(d => d.CompanyRating, o => o.MapFrom(s => s.User.UserDetail.Rating))
                 .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail.IndustryFocus));
 
@@ -54,6 +58,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.CategoryId, o => o.Ignore()) // Handle manually in Controller
                 .ForMember(d => d.Category, o => o.Ignore()) // Ignore Nav Prop
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
                 .ForMember(d => d.JobTypeId, o => o.MapFrom(s => s.JobType)) // Map to FK
                 .ForMember(d => d.JobType, o => o.Ignore()) // Ignore Nav Prop
@@ -131,7 +136,10 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Location : null))
                 .ForMember(d => d.Bio, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Bio : null))
-                .ForMember(d => d.Title, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.JobPreference : null)) // Using JobPreference as Title
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.JobPreference : null))
+                .ForMember(d => d.About, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Bio : null))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Description : null))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Rating : 0))
                 .ForMember(d => d.CvUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CvUrl : null))
                 .ForMember(d => d.Website, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Website : null))
                 .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CompanySize : null))
@@ -160,6 +168,7 @@ namespace WorkHub.Business.Mapping
                  .ForMember(d => d.Id, o => o.Ignore())
                  .ForMember(d => d.JobPreference, o => o.MapFrom(s => s.Title))
                  .ForMember(d => d.IndustryFocus, o => o.MapFrom(s => s.Industry))
+                 .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
                  .ForMember(d => d.Skills, o => o.MapFrom(s => string.Join(",", s.Skills)));
 
 

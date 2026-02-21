@@ -14,11 +14,13 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? Location { get; set; }
         public int Role { get; set; }
         public string? Provider { get; set; }
+        public double Rating { get; set; }
 
         // Extended Profile Info (from UserDetail)
         public string? Bio { get; set; }
         public string? Title { get; set; } // Mapped from JobPreference or new field if needed, using JobPreference for now based on context
         public string? About { get; set; } // Often same as Bio
+        public string? Description { get; set; }
         public string? CvUrl { get; set; }
         
         // Company Info (for Recruiters/Companies)

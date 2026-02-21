@@ -55,7 +55,8 @@ public static class DbSeeder
             PasswordHash = BCryptHelper.Encode("123"),
             Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
             IsVerified = true,
-            CreatedAt = tenDaysAgo
+            CreatedAt = tenDaysAgo,
+            
         };
 
         var user2 = new User
@@ -65,7 +66,8 @@ public static class DbSeeder
             PasswordHash = BCryptHelper.Encode("123"),
             Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
             IsVerified = true,
-            CreatedAt = tenDaysAgo
+            CreatedAt = tenDaysAgo,
+           
         };
 
         context.Users.AddRange(admin, user1, user2);
@@ -74,9 +76,9 @@ public static class DbSeeder
         // ================= USER DETAIL =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = "Admin", Age = 30, Rating = 5 },
-            new UserDetail { UserId = user1.Id, FullName = "User One", Age = 25, Rating = 4.5 },
-            new UserDetail { UserId = user2.Id, FullName = "User Two", Age = 24, Rating = 4.2 }
+            new UserDetail { UserId = admin.Id, FullName = "Admin", Age = 30, Rating = 5, Description = "Platform Administrator with expertise in system security and user management." },
+            new UserDetail { UserId = user1.Id, FullName = "User One", Age = 25, Rating = 4.5, Description = "Passionate full-stack developer with a focus on .NET and React technologies." },
+            new UserDetail { UserId = user2.Id, FullName = "User Two", Age = 24, Rating = 4.2, Description = "UI/UX Designer who loves creating beautiful and intuitive user interfaces." }
         );
 
         // Need to fetch JobTypes and Categories since they might have been seeded previously
@@ -98,8 +100,8 @@ public static class DbSeeder
         {
             UserId = user1.Id,
             PostId = post1.Id,
-            JobName = "Junior .NET",
-            CategoryId = catITEntity?.Id ?? 1, // Fallback safe
+            JobName = "Junior .NET Developer",
+            CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = fullTimeEntity?.Id ?? 1,
             Salary = "$800",
             Location = "Ha Noi",
@@ -107,15 +109,16 @@ public static class DbSeeder
             ExperienceLevel = "Entry",
             WorkSetting = "Onsite",
             CompanySize = "Medium",
-            Requirements = "C#, EF Core",
-            WorkTime = "Mon-Fri"
+            Requirements = "Basic knowledge of C#, .NET Core, and Entity Framework Core. Understanding of OOP principles and RESTful API development. Familiar with SQL Server and Git. Willing to learn, good problem-solving skills, and ability to work in a team.",
+            WorkTime = "Full-time position, Monday to Friday (8:30 AM – 5:30 PM). Occasionally required to support deployment or testing outside normal hours.",
+            Benefits = "Competitive salary, annual performance review, social insurance, lunch allowance, professional training programs, and clear career path to Mid-level Developer."
         };
 
         var rec2 = new Recruitment
         {
             UserId = user2.Id,
             PostId = post2.Id,
-            JobName = "Frontend Dev",
+            JobName = "Frontend Developer",
             CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = partTimeEntity?.Id ?? 1,
             Salary = "$500",
@@ -124,8 +127,9 @@ public static class DbSeeder
             ExperienceLevel = "Mid",
             WorkSetting = "Remote",
             CompanySize = "Startup",
-            Requirements = "React",
-            WorkTime = "Flexible"
+            Requirements = "Strong experience with React.js, JavaScript (ES6+), HTML5, and CSS3. Familiar with RESTful APIs, state management (Redux or Context API), and responsive design. Experience working in Agile/Scrum teams and using Git for version control.",
+            WorkTime = "Flexible working hours (4–6 hours per day), Monday to Friday. Must attend weekly online sprint meetings and deliver assigned tasks on time.",
+            Benefits = "Remote-first environment, performance-based bonus, fast promotion opportunities, startup culture, and access to premium online learning platforms."
         };
 
         context.Recruitments.AddRange(rec1, rec2);

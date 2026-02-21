@@ -27,7 +27,7 @@ namespace WorkHub.Controllers.User
         [HttpGet("top4")]
         public async Task<IActionResult> GetTop4() { 
 
-            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4, orderBy: r => r.CreatedAt, descending: true, includeProperties: SD.Join_Post + "," + SD.Join_User); // descending is latest first
+            var entities = await _unitOfWork.RecruitmentInfoRepo.GetTopAsync(4, orderBy: r => r.CreatedAt, descending: true, includeProperties: SD.Join_Post + "," + SD.Join_User ); // descending is latest first
             var result = _mapper.Map<List<RecruitmentOverviewInfoDTO>>(entities);
 
             var response = ApiResponse<List<RecruitmentOverviewInfoDTO>>.Ok(result, "Top 4 recruitment info retrieved successfully");

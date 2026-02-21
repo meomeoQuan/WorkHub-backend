@@ -123,13 +123,66 @@ namespace WorkHub.DataAccess.Migrations
                     CvUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     JobPreference = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Skills = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IndustryFocus = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                    IndustryFocus = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FoundedYear = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK__UserDeta__3214EC073F2B3337", x => x.Id);
                     table.ForeignKey(
                         name: "FK__UserDetai__UserI__3E52440B",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserEducations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    School = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Degree = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FieldOfStudy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartYear = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EndYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserEducations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserEducations_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserExperiences",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Company = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserExperiences", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserExperiences_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -276,6 +329,7 @@ namespace WorkHub.DataAccess.Migrations
                     Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Benefits = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     ExperienceLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WorkSetting = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -343,6 +397,8 @@ namespace WorkHub.DataAccess.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     RecruitmentId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, defaultValue: "New"),
+                    CoverLetter = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CvUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
                 },
                 constraints: table =>
@@ -439,6 +495,16 @@ namespace WorkHub.DataAccess.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserEducations_UserId",
+                table: "UserEducations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserExperiences_UserId",
+                table: "UserExperiences",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserFollow_FollowingId",
                 table: "UserFollow",
                 column: "FollowingId");
@@ -478,6 +544,12 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserDetail");
+
+            migrationBuilder.DropTable(
+                name: "UserEducations");
+
+            migrationBuilder.DropTable(
+                name: "UserExperiences");
 
             migrationBuilder.DropTable(
                 name: "UserFollow");
