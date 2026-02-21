@@ -28,6 +28,21 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
 
+            CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
+                .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.Post.Content))
+                .ForMember(d => d.Schedule, o => o.MapFrom(s => s.WorkTime))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status == "Active"))
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+                .ForMember(d => d.ExperienceLevel, o => o.MapFrom(s => s.ExperienceLevel))
+                .ForMember(d => d.WorkSetting, o => o.MapFrom(s => s.WorkSetting))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
+                .ForMember(d => d.CompanyBio, o => o.MapFrom(s => s.User.UserDetail.Bio))
+                .ForMember(d => d.CompanyRating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+                .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail.IndustryFocus));
+
             CreateMap<Recruitment, RecruitmentSelectDTO>()
              .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
