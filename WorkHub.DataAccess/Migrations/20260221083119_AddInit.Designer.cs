@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260221080331_AddInit")]
+    [Migration("20260221083119_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -408,6 +408,9 @@ namespace WorkHub.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CvUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EducationLevel")

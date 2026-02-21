@@ -126,7 +126,8 @@ namespace WorkHub.DataAccess.Migrations
                     IndustryFocus = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FoundedYear = table.Column<int>(type: "int", nullable: true)
+                    FoundedYear = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

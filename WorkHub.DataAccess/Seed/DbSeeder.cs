@@ -55,7 +55,8 @@ public static class DbSeeder
             PasswordHash = BCryptHelper.Encode("123"),
             Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
             IsVerified = true,
-            CreatedAt = tenDaysAgo
+            CreatedAt = tenDaysAgo,
+            
         };
 
         var user2 = new User
@@ -65,7 +66,8 @@ public static class DbSeeder
             PasswordHash = BCryptHelper.Encode("123"),
             Role = RoleMapper.MapRoleToRoleNumber(SD.Role_User),
             IsVerified = true,
-            CreatedAt = tenDaysAgo
+            CreatedAt = tenDaysAgo,
+           
         };
 
         context.Users.AddRange(admin, user1, user2);
@@ -74,9 +76,9 @@ public static class DbSeeder
         // ================= USER DETAIL =================
 
         context.UserDetails.AddRange(
-            new UserDetail { UserId = admin.Id, FullName = "Admin", Age = 30, Rating = 5 },
-            new UserDetail { UserId = user1.Id, FullName = "User One", Age = 25, Rating = 4.5 },
-            new UserDetail { UserId = user2.Id, FullName = "User Two", Age = 24, Rating = 4.2 }
+            new UserDetail { UserId = admin.Id, FullName = "Admin", Age = 30, Rating = 5, Description = "Platform Administrator with expertise in system security and user management." },
+            new UserDetail { UserId = user1.Id, FullName = "User One", Age = 25, Rating = 4.5, Description = "Passionate full-stack developer with a focus on .NET and React technologies." },
+            new UserDetail { UserId = user2.Id, FullName = "User Two", Age = 24, Rating = 4.2, Description = "UI/UX Designer who loves creating beautiful and intuitive user interfaces." }
         );
 
         // Need to fetch JobTypes and Categories since they might have been seeded previously

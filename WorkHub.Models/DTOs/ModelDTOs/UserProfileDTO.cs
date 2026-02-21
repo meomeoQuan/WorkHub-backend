@@ -19,6 +19,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? Bio { get; set; }
         public string? Title { get; set; } // Mapped from JobPreference or new field if needed, using JobPreference for now based on context
         public string? About { get; set; } // Often same as Bio
+        public string? Description { get; set; }
         public string? CvUrl { get; set; }
         
         // Company Info (for Recruiters/Companies)

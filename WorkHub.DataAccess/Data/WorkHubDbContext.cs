@@ -174,6 +174,9 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.Requirements)
                 .HasColumnType("nvarchar(max)");
 
+            entity.Property(e => e.Benefits)
+                .HasColumnType("nvarchar(max)");
+
             entity.Property(e => e.WorkTime)
                 .HasMaxLength(255);
 
@@ -243,6 +246,7 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.JobPreference).HasMaxLength(255);
             entity.Property(e => e.Location).HasMaxLength(255);
             entity.Property(e => e.Major).HasMaxLength(255);
+            entity.Property(e => e.Description).HasColumnType("nvarchar(max)");
 
             entity.HasOne(d => d.User).WithOne(p => p.UserDetail)
                 .HasForeignKey<UserDetail>(d => d.UserId)

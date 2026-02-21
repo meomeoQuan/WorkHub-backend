@@ -39,5 +39,6 @@ public partial class UserDetail
 
     public int? FoundedYear { get; set; }
 
+    public string? Description { get; set; }
     public virtual User User { get; set; } = null!;
 }

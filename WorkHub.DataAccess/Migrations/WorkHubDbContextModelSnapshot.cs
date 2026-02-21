@@ -407,6 +407,9 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EducationLevel")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
