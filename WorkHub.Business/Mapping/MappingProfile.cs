@@ -24,11 +24,15 @@ namespace WorkHub.Business.Mapping
         {
             // 🔥 THIS IS WHAT YOU MISSED
             CreateMap<Recruitment, RecruitmentOverviewInfoDTO>()
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+                .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
 
             CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.Description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.Schedule, o => o.MapFrom(s => s.WorkTime))
@@ -88,6 +92,7 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
@@ -145,6 +150,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.CompanySize, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.CompanySize : null))
                 .ForMember(d => d.FoundedYear, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.FoundedYear : null))
                 .ForMember(d => d.Industry, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.IndustryFocus : null))
+                .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.GoogleMapsEmbedUrl : null))
                 // Collections
                 .ForMember(d => d.Experiences, o => o.MapFrom(s => s.UserExperiences))
                 .ForMember(d => d.Educations, o => o.MapFrom(s => s.UserEducations))
@@ -169,6 +175,7 @@ namespace WorkHub.Business.Mapping
                  .ForMember(d => d.JobPreference, o => o.MapFrom(s => s.Title))
                  .ForMember(d => d.IndustryFocus, o => o.MapFrom(s => s.Industry))
                  .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
+                 .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.GoogleMapsEmbedUrl))
                  .ForMember(d => d.Skills, o => o.MapFrom(s => string.Join(",", s.Skills)));
 
 

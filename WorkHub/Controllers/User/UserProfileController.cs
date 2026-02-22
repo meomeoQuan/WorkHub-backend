@@ -25,12 +25,9 @@ namespace WorkHub.Controllers.User
             _mapper = mapper;
         }
 
-        [Authorize]
-        [HttpGet("show-profile")]
-        public async Task<IActionResult> ShowProfile()
+        [HttpGet("show-profile/{userId}")]
+        public async Task<IActionResult> ShowProfile(int userId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
                 includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
@@ -234,6 +231,7 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<List<JobDTO>>.Ok(result, "User jobs retrieved successfully"));
         }
 
+
         [Authorize]
         [HttpGet("all-user-posts")]
         public async Task<IActionResult> GetAllUserPosts()
@@ -251,6 +249,54 @@ namespace WorkHub.Controllers.User
             var result = _mapper.Map<List<JobPostDTO>>(posts);
 
             return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "User posts retrieved successfully"));
+        }
+
+        [HttpGet("public-profile/{userId}")]
+        public async Task<IActionResult> GetPublicProfile(int userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
+            );
+
+            if (user == null)
+            {
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
+            }
+
+            var userProfileDTO = _mapper.Map<UserProfileDTO>(user);
+
+            return Ok(ApiResponse<UserProfileDTO>.Ok(userProfileDTO, "Public profile retrieved successfully"));
+        }
+
+        [HttpGet("public-user-jobs/{userId}")]
+        public async Task<IActionResult> GetPublicUserJobs(int userId)
+        {
+            var jobs = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(
+                r => r.UserId == userId,
+                includeProperties: "JobType,Category"
+            );
+
+            var result = _mapper.Map<List<JobDTO>>(jobs);
+
+            return Ok(ApiResponse<List<JobDTO>>.Ok(result, "Public user jobs retrieved successfully"));
+        }
+
+        [HttpGet("public-user-posts/{userId}")]
+        public async Task<IActionResult> GetPublicUserPosts(int userId)
+        {
+            var posts = await _unitOfWork.PostRepository.GetAllAsync(
+                p => p.UserId == userId,
+                includeProperties: SD.Join_User + ","
+                    + SD.Collection_Join_Comments + ","
+                    + SD.Collection_Join_PostLikes + ","
+                    + SD.Collection_Join_Recruitments + ".JobType," 
+                    + SD.Collection_Join_Recruitments + ".Category"
+            );
+
+            var result = _mapper.Map<List<JobPostDTO>>(posts);
+
+            return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Public user posts retrieved successfully"));
         }
     }
 }
