@@ -9,6 +9,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
     public class RecruitmentDetailInfoDTO
     {
         public int Id { get; set; }
+        public int UserId { get; set; }
         public string JobName { get; set; } = null!;
         public string JobType { get; set; } = null!;
         public string? Location { get; set; }

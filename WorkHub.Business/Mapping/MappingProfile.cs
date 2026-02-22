@@ -29,6 +29,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
 
             CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.Description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.Schedule, o => o.MapFrom(s => s.WorkTime))
