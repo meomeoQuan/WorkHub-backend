@@ -27,10 +27,6 @@ public partial class Recruitment
     public string? Benefits { get; set; }
     public string? WorkTime { get; set; }
 
-    public string? ExperienceLevel { get; set; }
-    public string? WorkSetting { get; set; }
-    public string? CompanySize { get; set; }
-
     public DateTime? CreatedAt { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } 

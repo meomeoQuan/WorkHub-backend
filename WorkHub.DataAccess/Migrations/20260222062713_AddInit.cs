@@ -127,7 +127,8 @@ namespace WorkHub.DataAccess.Migrations
                     Website = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FoundedYear = table.Column<int>(type: "int", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GoogleMapsEmbedUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -321,7 +322,7 @@ namespace WorkHub.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: true),
                     JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     JobTypeId = table.Column<int>(type: "int", nullable: false),
@@ -331,9 +332,6 @@ namespace WorkHub.DataAccess.Migrations
                     Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Benefits = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    ExperienceLevel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkSetting = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CompanySize = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
                 },
                 constraints: table =>
@@ -356,7 +354,7 @@ namespace WorkHub.DataAccess.Migrations
                         column: x => x.PostId,
                         principalTable: "Post",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Recruitment_Users_UserId",
                         column: x => x.UserId,

@@ -180,15 +180,6 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.WorkTime)
                 .HasMaxLength(255);
 
-            entity.Property(e => e.ExperienceLevel)
-                .HasColumnType("nvarchar(max)");
-
-            entity.Property(e => e.WorkSetting)
-                .HasColumnType("nvarchar(max)");
-
-            entity.Property(e => e.CompanySize)
-                .HasColumnType("nvarchar(max)");
-
             // KEEP user link BUT REMOVE cascade
             entity.HasOne(d => d.User)
                 .WithMany(p => p.Recruitments)

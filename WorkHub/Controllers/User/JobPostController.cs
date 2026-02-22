@@ -56,10 +56,7 @@ namespace WorkHub.Controllers.User
             string? location,
             string? salaryRange,
             string? postedDate,
-            string? experienceLevel,
             string? category,
-            string? workSetting,
-            string? companySize,
             int pageIndex = 1,
             int pageSize = 10)
         {
@@ -87,24 +84,9 @@ namespace WorkHub.Controllers.User
                 queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Location.Contains(location)));
             }
 
-            if (!string.IsNullOrWhiteSpace(experienceLevel) && !experienceLevel.Equals("all", StringComparison.OrdinalIgnoreCase))
-            {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.ExperienceLevel == experienceLevel));
-            }
-
             if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
                 queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category.Name == category));
-            }
-
-            if (!string.IsNullOrWhiteSpace(workSetting) && !workSetting.Equals("all", StringComparison.OrdinalIgnoreCase))
-            {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.WorkSetting == workSetting));
-            }
-
-            if (!string.IsNullOrWhiteSpace(companySize) && !companySize.Equals("all", StringComparison.OrdinalIgnoreCase))
-            {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.CompanySize == companySize));
             }
 
             if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))
