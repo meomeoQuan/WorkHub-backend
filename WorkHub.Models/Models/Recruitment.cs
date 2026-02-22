@@ -9,7 +9,7 @@ public partial class Recruitment
     public int Id { get; set; }
 
     public int UserId { get; set; }
-    public int PostId { get; set; }
+    public int? PostId { get; set; }
 
     public string? JobName { get; set; }
 
@@ -26,10 +26,6 @@ public partial class Recruitment
     public string? Requirements { get; set; }
     public string? Benefits { get; set; }
     public string? WorkTime { get; set; }
-
-    public string? ExperienceLevel { get; set; }
-    public string? WorkSetting { get; set; }
-    public string? CompanySize { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

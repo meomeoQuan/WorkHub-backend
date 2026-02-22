@@ -260,16 +260,10 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CompanySize")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("(sysdatetime())");
-
-                    b.Property<string>("ExperienceLevel")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("JobName")
                         .HasMaxLength(255)
@@ -282,7 +276,7 @@ namespace WorkHub.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("PostId")
+                    b.Property<int?>("PostId")
                         .HasColumnType("int");
 
                     b.Property<string>("Requirements")
@@ -298,9 +292,6 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("WorkSetting")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkTime")
                         .HasMaxLength(255)
@@ -747,8 +738,7 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasOne("WorkHub.Models.Models.Post", "Post")
                         .WithMany("Recruitments")
                         .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("WorkHub.Models.Models.User", "User")
                         .WithMany("Recruitments")

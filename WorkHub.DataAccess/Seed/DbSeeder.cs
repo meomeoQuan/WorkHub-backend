@@ -106,9 +106,6 @@ public static class DbSeeder
             Salary = "$800",
             Location = "Ha Noi",
             Status = "Open",
-            ExperienceLevel = "Entry",
-            WorkSetting = "Onsite",
-            CompanySize = "Medium",
             Requirements = "Basic knowledge of C#, .NET Core, and Entity Framework Core. Understanding of OOP principles and RESTful API development. Familiar with SQL Server and Git. Willing to learn, good problem-solving skills, and ability to work in a team.",
             WorkTime = "Full-time position, Monday to Friday (8:30 AM – 5:30 PM). Occasionally required to support deployment or testing outside normal hours.",
             Benefits = "Competitive salary, annual performance review, social insurance, lunch allowance, professional training programs, and clear career path to Mid-level Developer."
@@ -124,9 +121,6 @@ public static class DbSeeder
             Salary = "$500",
             Location = "Sai Gon",
             Status = "Open",
-            ExperienceLevel = "Mid",
-            WorkSetting = "Remote",
-            CompanySize = "Startup",
             Requirements = "Strong experience with React.js, JavaScript (ES6+), HTML5, and CSS3. Familiar with RESTful APIs, state management (Redux or Context API), and responsive design. Experience working in Agile/Scrum teams and using Git for version control.",
             WorkTime = "Flexible working hours (4–6 hours per day), Monday to Friday. Must attend weekly online sprint meetings and deliver assigned tasks on time.",
             Benefits = "Remote-first environment, performance-based bonus, fast promotion opportunities, startup culture, and access to premium online learning platforms."

@@ -25,7 +25,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobDTOs
         public string? Benefits { get; set; }
 
         // Optional images
-        public List<IFormFile>? JobImages { get; set; }
+        //public List<IFormFile>? JobImages { get; set; }
     }
 
 }
