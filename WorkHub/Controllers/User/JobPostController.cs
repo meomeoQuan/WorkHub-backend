@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs;
@@ -10,7 +12,6 @@ using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
-using System.Linq.Expressions;
 
 namespace WorkHub.Controllers.User
 {
@@ -308,7 +309,7 @@ namespace WorkHub.Controllers.User
                 return Ok(ApiResponse<object>.Ok(responseData, "Jobs retrieved successfully"));
             }
 
-            return BadRequest(ApiResponse<object>.BadRequest(null, "Jobs not found !"));
+            return Ok(ApiResponse<object>.Ok(null, "The user has no jobs"));
         }
 
 

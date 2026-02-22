@@ -25,13 +25,14 @@ namespace WorkHub.Controllers.User
             _mapper = mapper;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetApplications([FromQuery] ApplicationFilterDTO filter)
         {
             try
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-                Expression<Func<Application, bool>> filterExpression = a => a.Recruitment.UserId == userId;
+                Expression<Func<Application, bool>> filterExpression = a => a.Recruitment.UserId == userId && a.UserId != userId;
 
                 // 1. Filter by Status
                 if (!string.IsNullOrEmpty(filter.Status) && filter.Status != "All Status")
@@ -56,7 +57,7 @@ namespace WorkHub.Controllers.User
                 // Explicitly include User, UserDetail (for Avatar), and Recruitment (for Job Title)
                 var applications = await _unitOfWork.ApplicationRepository.GetAllAsync(
                     filter: filterExpression,
-                    includeProperties: "User,User.UserDetail,Recruitment"
+                    includeProperties: "User,User.UserDetail,User.UserEducations,Recruitment"
                 );
 
                 var applicationDTOs = _mapper.Map<IEnumerable<ApplicationDTO>>(applications);
@@ -69,18 +70,21 @@ namespace WorkHub.Controllers.User
             }
         }
 
+        [Authorize]
         [HttpGet("summary")]
         public async Task<IActionResult> GetApplicationSummary()
         {
             try
             {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
                 var summary = new ApplicationSummaryDTO
                 {
-                    TotalApplications = await _unitOfWork.ApplicationRepository.CountAsync(),
-                    New = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Status == ApplicationStatus.New),
-                    Reviewing = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Status == ApplicationStatus.Reviewing),
-                    Shortlisted = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Status == ApplicationStatus.Shortlisted),
-                    Interviewed = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Status == ApplicationStatus.Interviewed)
+                    TotalApplications = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId),
+                    New = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.New),
+                    Reviewing = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Reviewing),
+                    Shortlisted = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Shortlisted),
+                    Interviewed = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Interviewed)
                 };
 
                 return Ok(ApiResponse<ApplicationSummaryDTO>.Ok(summary, "Application summary retrieved successfully"));
@@ -130,6 +134,7 @@ namespace WorkHub.Controllers.User
         }
     }
 }
+
 
     // Helper extension methods for Expression combining if not already present in Utility
 
