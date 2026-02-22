@@ -9,7 +9,7 @@ public partial class Recruitment
     public int Id { get; set; }
 
     public int UserId { get; set; }
-    public int PostId { get; set; }
+    public int? PostId { get; set; }
 
     public string? JobName { get; set; }
 

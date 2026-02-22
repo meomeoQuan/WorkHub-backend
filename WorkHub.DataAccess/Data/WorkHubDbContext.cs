@@ -199,7 +199,8 @@ public partial class WorkHubDbContext : DbContext
             entity.HasOne(r => r.Post)
                 .WithMany(p => p.Recruitments)
                 .HasForeignKey(r => r.PostId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(r => r.Category)
       .WithMany(c => c.Recruitments)
