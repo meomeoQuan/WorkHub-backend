@@ -25,12 +25,9 @@ namespace WorkHub.Controllers.User
             _mapper = mapper;
         }
 
-        [Authorize]
-        [HttpGet("show-profile")]
-        public async Task<IActionResult> ShowProfile()
+        [HttpGet("show-profile/{userId}")]
+        public async Task<IActionResult> ShowProfile(int userId)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
                 includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
