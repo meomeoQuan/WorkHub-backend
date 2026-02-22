@@ -29,6 +29,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
         // Engagement
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
+        public bool IsLiked { get; set; }
     }
 
 }
