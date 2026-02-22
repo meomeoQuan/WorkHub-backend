@@ -59,49 +59,11 @@ namespace WorkHub.Controllers.User
                 return NotFound(ApiResponse<object>.BadRequest(null, "User not found"));
             }
 
-            // 1. Handle Image Uploads
-            string? firstImagePath = null;
-            if (createJobRequest.JobImages != null && createJobRequest.JobImages.Count > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "jobs");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                foreach (var file in createJobRequest.JobImages)
-                {
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-                    var filePath = Path.Combine(uploadsFolder, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    if (firstImagePath == null)
-                    {
-                        firstImagePath = $"/uploads/jobs/{fileName}";
-                    }
-                }
-            }
-
-            // 2. Create and Save Post (Required for Recruitment)
-            var post = new Post
-            {
-                UserId = userId,
-                Content = createJobRequest.JobDescription,
-                CreatedAt = DateTime.Now,
-                PostImageUrl = firstImagePath
-            };
-
-            _unitOfWork.PostRepository.Add(post);
-            await _unitOfWork.SaveAsync(); // Save to generate Post.Id
+            
 
             // 3. Map DTO to Recruitment and Link to Post
             var recruitment = _mapper.Map<Recruitment>(createJobRequest);
             recruitment.UserId = userId;
-            recruitment.PostId = post.Id;
             recruitment.Status = "Open";
             recruitment.CreatedAt = DateTime.Now;
 
