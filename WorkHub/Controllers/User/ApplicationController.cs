@@ -83,8 +83,8 @@ namespace WorkHub.Controllers.User
                     TotalApplications = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId),
                     New = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.New),
                     Reviewing = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Reviewing),
-                    Shortlisted = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Shortlisted),
-                    Interviewed = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Interviewed)
+                    Accepted = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Accepted),
+                    Rejected = await _unitOfWork.ApplicationRepository.CountAsync(a => a.Recruitment.UserId == userId && a.UserId != userId && a.Status == ApplicationStatus.Rejected)
                 };
 
                 return Ok(ApiResponse<ApplicationSummaryDTO>.Ok(summary, "Application summary retrieved successfully"));
@@ -124,8 +124,6 @@ namespace WorkHub.Controllers.User
             {
                 ApplicationStatus.New,
                 ApplicationStatus.Reviewing,
-                ApplicationStatus.Shortlisted,
-                ApplicationStatus.Interviewed,
                 ApplicationStatus.Rejected,
                 ApplicationStatus.Accepted
             };

@@ -42,9 +42,7 @@ namespace WorkHub.Controllers.User
                 {
                     TotalApplications = applications.Count(),
                     Pending = applications.Count(a => a.Status == ApplicationStatus.New),
-                    UnderReview = applications.Count(a => a.Status == ApplicationStatus.Reviewing || 
-                                                      a.Status == ApplicationStatus.Shortlisted || 
-                                                      a.Status == ApplicationStatus.Interviewed),
+                    UnderReview = applications.Count(a => a.Status == ApplicationStatus.Reviewing),
                     Accepted = applications.Count(a => a.Status == ApplicationStatus.Accepted),
                     Rejected = applications.Count(a => a.Status == ApplicationStatus.Rejected)
                 };
@@ -84,9 +82,7 @@ namespace WorkHub.Controllers.User
                     }
                     else if (filter.Status == "Under Review")
                     {
-                         filterExpression = filterExpression.And(a => a.Status == ApplicationStatus.Reviewing || 
-                                                                      a.Status == ApplicationStatus.Shortlisted || 
-                                                                      a.Status == ApplicationStatus.Interviewed);
+                         filterExpression = filterExpression.And(a => a.Status == ApplicationStatus.Reviewing);
                     }
                     else if (filter.Status == "Accepted")
                     {
