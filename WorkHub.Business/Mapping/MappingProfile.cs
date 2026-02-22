@@ -186,6 +186,8 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.ApplicantName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.ApplicantEmail, o => o.MapFrom(s => s.User.Email))
                 .ForMember(d => d.ApplicantAvatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
+                .ForMember(d => d.ApplicantLocation, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Location : null))
+                .ForMember(d => d.ApplicantSchool, o => o.MapFrom(s => s.User.UserEducations != null && s.User.UserEducations.Any() ? s.User.UserEducations.FirstOrDefault().School : null))
                 .ForMember(d => d.JobTitle, o => o.MapFrom(s => s.Recruitment.JobName))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
                 .ForMember(d => d.AppliedDate, o => o.MapFrom(s => s.CreatedAt));

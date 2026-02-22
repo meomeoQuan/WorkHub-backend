@@ -11,6 +11,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs.ApplicationDTOs
         public string ApplicantAvatar { get; set; }
         public string JobTitle { get; set; }
         public string Status { get; set; }
+        public string? ApplicantLocation { get; set; }
+        public string? ApplicantSchool { get; set; }
         public DateTime? AppliedDate { get; set; }
     }
 }
