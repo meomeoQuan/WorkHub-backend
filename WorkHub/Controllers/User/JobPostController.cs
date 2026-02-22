@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
@@ -44,6 +43,21 @@ namespace WorkHub.Controllers.User
             );
 
             var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
+
+            // Set IsLiked status if user is authenticated
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null)
+            {
+                var userId = int.Parse(userIdClaim.Value);
+                foreach (var post in result)
+                {
+                    var originalPost = jobPosts.FirstOrDefault(p => p.Id == post.PostId);
+                    if (originalPost != null)
+                    {
+                        post.IsLiked = originalPost.PostLikes.Any(l => l.UserId == userId);
+                    }
+                }
+            }
 
             var response = ApiResponse<List<JobPostDTO>>.Ok(result, "All Post retrieved successfully");
 
@@ -315,7 +329,6 @@ namespace WorkHub.Controllers.User
 
         [Authorize]
         [HttpPost("create-post")]
-        [Authorize]
         public async Task<IActionResult> CreatePost(CreatePostDTO dto)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -384,7 +397,7 @@ namespace WorkHub.Controllers.User
                 _unitOfWork.PostLikeRepository.Remove(existingLike);
                 await _unitOfWork.SaveAsync();
 
-                return Ok(ApiResponse<object>.Ok(null, "Unliked"));
+                return Ok(ApiResponse<int>.Ok(await _unitOfWork.PostLikeRepository.CountAsync(x => x.PostId == dto.PostId), "Unliked"));
             }
 
             // LIKE
@@ -397,7 +410,7 @@ namespace WorkHub.Controllers.User
              _unitOfWork.PostLikeRepository.Add(newLike);
             await _unitOfWork.SaveAsync();
 
-            return Ok(ApiResponse<object>.Ok(null, "Liked"));
+            return Ok(ApiResponse<int>.Ok(await _unitOfWork.PostLikeRepository.CountAsync(x => x.PostId == dto.PostId), "Liked"));
         }
 
         [Authorize]
@@ -469,6 +482,22 @@ namespace WorkHub.Controllers.User
             await _unitOfWork.SaveAsync();
 
             return Ok(ApiResponse<object>.Ok(null, "Followed"));
+        }
+
+        [Authorize]
+        [HttpGet("following-count")]
+        public async Task<IActionResult> GetFollowingCount()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var count = await _unitOfWork.userFollowRepository.CountAsync(x => x.FollowerId == userId);
+            return Ok(ApiResponse<int>.Ok(count, "Following count retrieved successfully"));
+        }
+
+        [HttpGet("like-count/{postId}")]
+        public async Task<IActionResult> GetLikeCount(int postId)
+        {
+            var count = await _unitOfWork.PostLikeRepository.CountAsync(x => x.PostId == postId);
+            return Ok(ApiResponse<int>.Ok(count, "Like count retrieved successfully"));
         }
 
      

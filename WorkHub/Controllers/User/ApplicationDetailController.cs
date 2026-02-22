@@ -50,6 +50,12 @@ namespace WorkHub.Controllers.User
                     return Forbid();
                 }
 
+                if (application.Status != ApplicationStatus.Accepted && application.Status != ApplicationStatus.Rejected)
+                {
+                    application.Status = ApplicationStatus.Reviewing;
+                    await _unitOfWork.SaveAsync();
+                }
+
                 var applicationDetailDTO = _mapper.Map<ApplicationDetailDTO>(application);
 
                 return Ok(ApiResponse<ApplicationDetailDTO>.Ok(applicationDetailDTO, "Application details retrieved successfully"));
@@ -86,8 +92,6 @@ namespace WorkHub.Controllers.User
                 { 
                     ApplicationStatus.New, 
                     ApplicationStatus.Reviewing, 
-                    ApplicationStatus.Shortlisted, 
-                    ApplicationStatus.Interviewed, 
                     ApplicationStatus.Accepted, 
                     ApplicationStatus.Rejected 
                 };

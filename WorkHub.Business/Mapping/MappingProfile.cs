@@ -233,8 +233,6 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Status, o => o.MapFrom(s =>
                     s.Status == ApplicationStatus.New ? "Pending" :
                     s.Status == ApplicationStatus.Reviewing ? "Under Review" :
-                    s.Status == ApplicationStatus.Shortlisted ? "Under Review" : 
-                    s.Status == ApplicationStatus.Interviewed ? "Under Review" : 
                     s.Status)); // Fallback or Accepted/Rejected
 
             //=================== Schedule MAPPING =================
