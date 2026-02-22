@@ -24,6 +24,9 @@ namespace WorkHub.Business.Mapping
         {
             // 🔥 THIS IS WHAT YOU MISSED
             CreateMap<Recruitment, RecruitmentOverviewInfoDTO>()
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+                .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
@@ -89,6 +92,7 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.FullName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
