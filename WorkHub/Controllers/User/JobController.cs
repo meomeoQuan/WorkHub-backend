@@ -59,24 +59,53 @@ namespace WorkHub.Controllers.User
                 return NotFound(ApiResponse<object>.BadRequest(null, "User not found"));
             }
 
-            // 1. Create and Save Post (Required for Recruitment)
+            // 1. Handle Image Uploads
+            string? firstImagePath = null;
+            if (createJobRequest.JobImages != null && createJobRequest.JobImages.Count > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "jobs");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                foreach (var file in createJobRequest.JobImages)
+                {
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    if (firstImagePath == null)
+                    {
+                        firstImagePath = $"/uploads/jobs/{fileName}";
+                    }
+                }
+            }
+
+            // 2. Create and Save Post (Required for Recruitment)
             var post = new Post
             {
                 UserId = userId,
                 Content = createJobRequest.JobDescription,
                 CreatedAt = DateTime.Now,
-                PostImageUrl = null // TODO: Handle Image Upload if needed
+                PostImageUrl = firstImagePath
             };
 
             _unitOfWork.PostRepository.Add(post);
             await _unitOfWork.SaveAsync(); // Save to generate Post.Id
 
-            // 2. Map DTO to Recruitment and Link to Post
+            // 3. Map DTO to Recruitment and Link to Post
             var recruitment = _mapper.Map<Recruitment>(createJobRequest);
             recruitment.UserId = userId;
-            recruitment.PostId = post.Id; // Link to the newly created Post
+            recruitment.PostId = post.Id;
+            recruitment.Status = "Open";
+            recruitment.CreatedAt = DateTime.Now;
 
-            // Manual Category Mapping (Handle "IT" string or "1" int string)
+            // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))
             {
                 if (int.TryParse(createJobRequest.Category, out int catId))
@@ -85,7 +114,6 @@ namespace WorkHub.Controllers.User
                 }
                 else
                 {
-                    // Look up by Name
                     var category = await _unitOfWork.JobCategoryRepo.GetAsync(c => c.Name == createJobRequest.Category);
                     if (category != null)
                     {
@@ -93,16 +121,12 @@ namespace WorkHub.Controllers.User
                     }
                     else
                     {
-                         // Handle case where category name not found (Optional: Create or Default)
-                         // For now, let it fail FK if 0 or maybe set to a default if exists.
-                         // But better to just log or let it be 0 and catch FK error.
-                         // Or return BadRequest
-                         return BadRequest(ApiResponse<object>.BadRequest(null, $"Category '{createJobRequest.Category}' not found."));
+                        return BadRequest(ApiResponse<object>.BadRequest(null, $"Category '{createJobRequest.Category}' not found."));
                     }
                 }
             }
 
-             _unitOfWork.RecruitmentInfoRepo.Add(recruitment);
+            _unitOfWork.RecruitmentInfoRepo.Add(recruitment);
             await _unitOfWork.SaveAsync();
 
             return Ok(ApiResponse<object>.Ok(null, "Create job successfully"));
