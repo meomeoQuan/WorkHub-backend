@@ -325,6 +325,10 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(s => s.IsActive)
                 .HasDefaultValue(false);
 
+            entity.Property(s => s.Plan)
+                .HasMaxLength(20)
+                .HasDefaultValue("free");
+
             entity.HasIndex(s => s.UserId)
          .IsUnique();   // 🔥 ensures ONE subscription per user
 

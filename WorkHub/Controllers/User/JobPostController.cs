@@ -273,7 +273,7 @@ namespace WorkHub.Controllers.User
         {
             var comments = await _unitOfWork.CommentRepository.GetAllAsync(
                 c => c.PostId == allCommentRequest.PostId,
-                includeProperties: SD.Join_User
+                includeProperties: SD.Join_User + "," + SD.Join_User + "." + SD.Join_UserDetail
             );
 
             var flat = _mapper.Map<List<CommentDTO>>(comments);

@@ -94,7 +94,7 @@ namespace WorkHub.Controllers.User
 
                 var response = new
                 {
-                    checkoutUrl = paymentLink, // ❗ you forgot .checkoutUrl
+                    checkoutUrl = paymentLink.CheckoutUrl,
                     orderCode = orderCode
                 };
 
@@ -158,12 +158,45 @@ namespace WorkHub.Controllers.User
             order.Status = SD.OrderStatus_Paid;
             order.PaidAt = DateTime.UtcNow;
 
+            // Determine plan from amount
+            string plan = order.Amount switch
+            {
+                1000 => "silver",
+                2000 => "gold",
+                _ => "free"
+            };
+
+            // Create or update subscription
+            var subscription = await _unitOfWork.UserSubscriptionRepository.GetAsync(
+                s => s.UserId == order.UserId
+            );
+
+            if (subscription == null)
+            {
+                _unitOfWork.UserSubscriptionRepository.Add(new UserSubscription
+                {
+                    UserId = order.UserId,
+                    Plan = plan,
+                    StartAt = DateTime.UtcNow,
+                    EndAt = DateTime.UtcNow.AddMonths(1),
+                    IsActive = true
+                });
+            }
+            else
+            {
+                subscription.Plan = plan;
+                subscription.StartAt = DateTime.UtcNow;
+                subscription.EndAt = DateTime.UtcNow.AddMonths(1);
+                subscription.IsActive = true;
+            }
+
             await _unitOfWork.SaveAsync();
 
             var response = new
             {
                 orderCode = order.OrderCode,
                 amount = order.Amount,
+                plan = plan,
                 userEmail = order.User.Email
             };
 
