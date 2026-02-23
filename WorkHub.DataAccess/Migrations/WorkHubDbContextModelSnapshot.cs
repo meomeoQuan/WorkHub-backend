@@ -598,6 +598,13 @@ namespace WorkHub.DataAccess.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("free");
+
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
 

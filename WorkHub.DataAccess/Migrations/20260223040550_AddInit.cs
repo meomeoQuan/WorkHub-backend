@@ -246,7 +246,8 @@ namespace WorkHub.DataAccess.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     StartAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Plan = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "free")
                 },
                 constraints: table =>
                 {

@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260222062713_AddInit")]
+    [Migration("20260223040550_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -600,6 +600,13 @@ namespace WorkHub.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
+
+                    b.Property<string>("Plan")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("free");
 
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");

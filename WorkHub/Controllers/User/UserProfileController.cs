@@ -30,7 +30,7 @@ namespace WorkHub.Controllers.User
         {
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
-                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
+                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules,Subscription"
             );
 
             if (user == null)
@@ -51,7 +51,7 @@ namespace WorkHub.Controllers.User
 
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
-                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
+                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules,Subscription"
             );
 
             if (user == null)
@@ -256,7 +256,7 @@ namespace WorkHub.Controllers.User
         {
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
-                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules"
+                includeProperties: "UserDetail,UserExperiences,UserEducations,UserSchedules,Subscription"
             );
 
             if (user == null)

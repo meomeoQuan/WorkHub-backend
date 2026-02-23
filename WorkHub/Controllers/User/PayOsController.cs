@@ -78,6 +78,11 @@ namespace WorkHub.Controllers.User
 
             try
             {
+                if (req.Items == null || !req.Items.Any())
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, "Items list cannot be empty"));
+                }
+
                 var paymentLink = await _client.PaymentRequests.CreateAsync(paymentRequest);
 
                  _unitOfWork.OrderRepository.Add(new Order
@@ -94,7 +99,7 @@ namespace WorkHub.Controllers.User
 
                 var response = new
                 {
-                    checkoutUrl = paymentLink, // ❗ you forgot .checkoutUrl
+                    checkoutUrl = paymentLink.CheckoutUrl, 
                     orderCode = orderCode
                 };
 
@@ -102,7 +107,8 @@ namespace WorkHub.Controllers.User
             }
             catch(Exception ex)
             {
-                return StatusCode(500, ApiResponse<object>.Error(500, "Error creating payment link", ex.Message));
+                // Return full exception details for debugging
+                return StatusCode(500, ApiResponse<object>.Error(500, $"PayOS Error: {ex.Message}", ex.ToString()));
             }
         
         }
@@ -158,19 +164,74 @@ namespace WorkHub.Controllers.User
             order.Status = SD.OrderStatus_Paid;
             order.PaidAt = DateTime.UtcNow;
 
+            // Determine plan from amount
+            string plan = order.Amount switch
+            {
+                1000 => "silver",
+                2000 => "gold",
+                _ => "free"
+            };
+
+            // Create or update subscription
+            var subscription = await _unitOfWork.UserSubscriptionRepository.GetAsync(
+                s => s.UserId == order.UserId
+            );
+
+            if (subscription == null)
+            {
+                _unitOfWork.UserSubscriptionRepository.Add(new UserSubscription
+                {
+                    UserId = order.UserId,
+                    Plan = plan,
+                    StartAt = DateTime.UtcNow,
+                    EndAt = DateTime.UtcNow.AddMonths(1),
+                    IsActive = true
+                });
+            }
+            else
+            {
+                subscription.Plan = plan;
+                subscription.StartAt = DateTime.UtcNow;
+                subscription.EndAt = DateTime.UtcNow.AddMonths(1);
+                subscription.IsActive = true;
+            }
+
             await _unitOfWork.SaveAsync();
 
             var response = new
             {
                 orderCode = order.OrderCode,
                 amount = order.Amount,
+                plan = plan,
                 userEmail = order.User.Email
             };
 
             return Ok(ApiResponse<object>.Ok(response, "Payment Successful"));
         }
 
+        [HttpGet("get-subscription")]
+        [Authorize]
+        public async Task<IActionResult> GetSubscription()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
+            var subscription = await _unitOfWork.UserSubscriptionRepository.GetAsync(
+                s => s.UserId == userId
+            );
+
+            if (subscription == null)
+            {
+                return Ok(ApiResponse<object>.Ok(new { plan = "free" }, "No subscription found, returning free plan"));
+            }
+
+            return Ok(ApiResponse<object>.Ok(new
+            {
+                plan = subscription.Plan,
+                isActive = subscription.IsActive,
+                startAt = subscription.StartAt,
+                endAt = subscription.EndAt
+            }, "Subscription retrieved successfully"));
+        }
 
 
     }

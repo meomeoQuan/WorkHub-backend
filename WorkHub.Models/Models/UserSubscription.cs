@@ -18,6 +18,8 @@ namespace WorkHub.Models.Models
         public DateTime EndAt { get; set; }
 
         public bool IsActive { get; set; }
+
+        public string Plan { get; set; } = "free";
     }
 
 }
