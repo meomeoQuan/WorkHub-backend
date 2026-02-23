@@ -182,9 +182,9 @@ namespace WorkHub.Controllers.User
 
 
 
-        [HttpPost("single-post")]
+        [HttpGet("single-post")]
         [Authorize]
-        public async Task<IActionResult> GetCommentByPost(SinglePostRequestDTO singlePostRequest)
+        public async Task<IActionResult> GetSinglePost([FromQuery] SinglePostRequestDTO singlePostRequest)
         {
             
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -267,8 +267,9 @@ namespace WorkHub.Controllers.User
         //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
 
         //     }
+        [Authorize]
         [HttpGet("all-comments-post")]
-        public async Task<IActionResult> GetCommentByPost([FromQuery] AllCommentRequestDTO allCommentRequest)
+        public async Task<IActionResult> GetAllComments([FromQuery] AllCommentRequestDTO allCommentRequest)
         {
             var comments = await _unitOfWork.CommentRepository.GetAllAsync(
                 c => c.PostId == allCommentRequest.PostId,
