@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using System;
+using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -63,8 +64,8 @@ namespace WorkHub.Controllers.User
                 BuyerPhone = user.Phone,
 
                 Description = "Thanh toán đơn hàng",
-                CancelUrl = payosConfig["CancelUrl"],
-                ReturnUrl = payosConfig["ReturnUrl"],
+                CancelUrl = payosConfig["CancelUrl"] ?? Environment.GetEnvironmentVariable("PAYOS_CANCEL_URL"),
+                ReturnUrl = payosConfig["ReturnUrl"] ?? Environment.GetEnvironmentVariable("PAYOS_RETURN_URL"),
 
                 ExpiredAt = req.ExpiredAt?.ToUnixTimeSeconds(),
 
