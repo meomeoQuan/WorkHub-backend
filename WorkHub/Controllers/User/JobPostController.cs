@@ -267,9 +267,8 @@ namespace WorkHub.Controllers.User
         //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
 
         //     }
-        [Authorize]
         [HttpGet("all-comments-post")]
-        public async Task<IActionResult> GetCommentByPost(AllCommentRequestDTO allCommentRequest)
+        public async Task<IActionResult> GetCommentByPost([FromQuery] AllCommentRequestDTO allCommentRequest)
         {
             var comments = await _unitOfWork.CommentRepository.GetAllAsync(
                 c => c.PostId == allCommentRequest.PostId,
@@ -299,6 +298,7 @@ namespace WorkHub.Controllers.User
                     Id = x.Id,
                     UserName = x.UserName,
                     Content = x.Content,
+                    UserUrl = x.UserUrl,
                     CreatedAt = x.CreatedAt,
                     Replies = BuildTree(comments, x.Id)
                 })

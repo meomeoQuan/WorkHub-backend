@@ -11,6 +11,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
         public int Id { get; set; }
         public string UserName { get; set; }
         public string? Content { get; set; }
+        public string? UserUrl { get; set; }
         public DateTime? CreatedAt { get; set; }
 
         public List<CommentTreeDTO> Replies { get; set; } = new();

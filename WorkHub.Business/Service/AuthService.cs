@@ -101,7 +101,10 @@ namespace WorkHub.Business.Service
 
         public async Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO request)
         {
-            var user = await _unitOfWork.UserRepository.GetAsync(c => c.Email.ToLower() == request.Email.ToLower());
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                c => c.Email.ToLower() == request.Email.ToLower(),
+                includeProperties: "Subscription"
+            );
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
 
@@ -129,7 +132,8 @@ namespace WorkHub.Business.Service
 
             // 2️⃣ Find user by email
             var user = await _unitOfWork.UserRepository
-                .GetAsync(u => u.Email.ToLower() == googleUser.Email.ToLower());
+                .GetAsync(u => u.Email.ToLower() == googleUser.Email.ToLower(),
+                includeProperties: "Subscription");
 
             // 3️⃣ Auto-register if not exists
             if (user == null)

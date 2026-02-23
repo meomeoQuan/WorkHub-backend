@@ -34,5 +34,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs
 
         public string? Provider { get; set; }
 
+        public string? PaymentPlan { get; set; }
+
     }
 }
