@@ -12,8 +12,9 @@ namespace WorkHub.Business.Service.IService
     {
         Task<UserDTO?> RegisterAsync(RegisterRequestDTO RegisterRequest);
         Task<LoginResponseDTO?> LoginAsync(LoginRequestDTO loginRequest);
-
-        Task<LoginResponseDTO?> GoogleLoginAsync(string authCode);
+        Task<(LoginResponseDTO loginData, string refreshToken)> LoginWithRefreshAsync(LoginRequestDTO request);
+        Task<(LoginResponseDTO loginData, string refreshToken)> GoogleLoginWithRefreshAsync(string authCode);
+        Task<(LoginResponseDTO loginData, string refreshToken)> RefreshTokenAsync(string expiredAccessToken, string refreshToken);
 
         Task ResendEmailConfirmationAsync(EmailResendConfirmationDTO email);
 

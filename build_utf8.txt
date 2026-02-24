@@ -1,0 +1,14 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WorkHub.Utility -> C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Utility\bin\Debug\net8.0\WorkHub.Utility.dll
+  WorkHub.Models -> C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Models\bin\Debug\net8.0\WorkHub.Models.dll
+  WorkHub.DataAccess -> C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.DataAccess\bin\Debug\net8.0\WorkHub.DataAccess.dll
+C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Business\Service\AuthService.cs(199,46): error CS0103: The name 'ClaimTypes' does not exist in the current context [C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Business\WorkHub.Business.csproj]
+
+Build FAILED.
+
+C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Business\Service\AuthService.cs(199,46): error CS0103: The name 'ClaimTypes' does not exist in the current context [C:\Users\OS\Documents\WorkHub_all\WorkHub\WorkHub.Business\WorkHub.Business.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:03.11

@@ -63,28 +63,28 @@ namespace WorkHub.Controllers
         {
             try
             {
-
                 if (loginRequestDTO == null)
                 {
                     return BadRequest(ApiResponse<object>.BadRequest("login data is required"));
                 }
-                var loginData = await _authService.LoginAsync(loginRequestDTO);
+
+                var (loginData, refreshToken) = await _authService.LoginWithRefreshAsync(loginRequestDTO);
 
                 if (loginData == null)
                 {
                     return BadRequest(ApiResponse<object>.BadRequest("Login failed !"));
                 }
 
-                var response = ApiResponse<object>.Ok(loginData, "Login successful");
-                return Ok(response);
+                SetRefreshTokenCookie(refreshToken);
 
+                var response = ApiResponse<LoginResponseDTO>.Ok(loginData, "Login successful");
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 var errorResponse = ApiResponse<object>.Error(500, "An error occurred during login", ex.Message);
                 return StatusCode(500, errorResponse);
             }
-
         }
 
       
@@ -96,36 +96,65 @@ namespace WorkHub.Controllers
             {
                 if (string.IsNullOrWhiteSpace(authCode))
                 {
-                    return BadRequest(
-                        ApiResponse<object>.BadRequest("Authorization code is required")
-                    );
+                    return BadRequest(ApiResponse<object>.BadRequest("Authorization code is required"));
                 }
 
-                var loginData = await _authService.GoogleLoginAsync(authCode);
+                var (loginData, refreshToken) = await _authService.GoogleLoginWithRefreshAsync(authCode);
 
                 if (loginData == null)
                 {
-                    return BadRequest(
-                        ApiResponse<object>.BadRequest("Google login failed")
-                    );
+                    return BadRequest(ApiResponse<object>.BadRequest("Google login failed"));
                 }
 
-                var response =
-                    ApiResponse<LoginResponseDTO>.CreatedAt(loginData, "Login successful");
+                SetRefreshTokenCookie(refreshToken);
 
+                var response = ApiResponse<LoginResponseDTO>.CreatedAt(loginData, "Login successful");
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                var errorResponse =
-                    ApiResponse<object>.Error(
-                        500,
-                        "An error occurred during Google login",
-                        ex.Message
-                    );
-
+                var errorResponse = ApiResponse<object>.Error(500, "An error occurred during Google login", ex.Message);
                 return StatusCode(500, errorResponse);
             }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] TokenRequestDTO request)
+        {
+            try
+            {
+                var refreshToken = Request.Cookies["refreshToken"];
+                if (string.IsNullOrEmpty(refreshToken))
+                {
+                    return Unauthorized(ApiResponse<object>.Error(401, "Refresh token is missing. Please log in again."));
+                }
+
+                var (loginData, newRefreshToken) = await _authService.RefreshTokenAsync(request.AccessToken, refreshToken);
+
+                SetRefreshTokenCookie(newRefreshToken);
+
+                return Ok(ApiResponse<LoginResponseDTO>.Ok(loginData, "Token refreshed successfully"));
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ApiResponse<object>.Error(401, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Token refresh failed", ex.Message));
+            }
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true, 
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
 
         [HttpPost("verify-email")]

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Claims;
 using WorkHub.Business.Service.IService;
 using WorkHub.DataAccess.Repository.IRepository;
 using WorkHub.Models.DTOs.AuthDTOs;
@@ -64,7 +65,7 @@ namespace WorkHub.Business.Service
                 TokenExpiry = DateTime.UtcNow.AddHours(24),
                 UserDetail = new UserDetail
                 {
-                    Rating = 5,
+                    Rating = 4,
                     
                 }
 
@@ -125,17 +126,41 @@ namespace WorkHub.Business.Service
             };
         }
 
-        public async Task<LoginResponseDTO?> GoogleLoginAsync(string authCode)
+        public async Task<(LoginResponseDTO loginData, string refreshToken)> LoginWithRefreshAsync(LoginRequestDTO request)
         {
-            // 1️⃣ Verify auth code with Google (exchange + validate)
-            var googleUser = await _googleAuthService.VerifyAuthCodeAsync(authCode);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                c => c.Email.ToLower() == request.Email.ToLower(),
+                includeProperties: "Subscription"
+            );
+            if (user == null || !BCryptHelper.Decode(request.Password, user.PasswordHash))
+                throw new UnauthorizedAccessException("Invalid email or password");
 
-            // 2️⃣ Find user by email
-            var user = await _unitOfWork.UserRepository
-                .GetAsync(u => u.Email.ToLower() == googleUser.Email.ToLower(),
+            if (user.IsVerified == false)
+                throw new UnauthorizedAccessException("Account has not been verified");
+
+            var accessToken = _jwtService.GenerateToken(user);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+
+            user.RefreshTokenHash = _jwtService.HashRefreshToken(refreshToken);
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            return (new LoginResponseDTO
+            {
+                Token = accessToken,
+                UserDTO = _mapper.Map<UserDTO>(user)
+            }, refreshToken);
+        }
+
+        public async Task<(LoginResponseDTO loginData, string refreshToken)> GoogleLoginWithRefreshAsync(string authCode)
+        {
+            var googleUser = await _googleAuthService.VerifyAuthCodeAsync(authCode);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Email.ToLower() == googleUser.Email.ToLower(),
                 includeProperties: "Subscription");
 
-            // 3️⃣ Auto-register if not exists
             if (user == null)
             {
                 user = new User
@@ -147,26 +172,71 @@ namespace WorkHub.Business.Service
                     ProviderId = googleUser.GoogleId,
                     IsVerified = true,
                     CreatedAt = DateTime.UtcNow,
-                    UserDetail = new UserDetail
-                    {
-                        Rating = 5
-                    }
+                    UserDetail = new UserDetail { Rating = 4 }
                 };
-
                 _unitOfWork.UserRepository.Add(user);
-                await _unitOfWork.SaveAsync();
             }
 
-            // 4️⃣ Generate JWT
-            var jwtToken = _jwtService.GenerateToken(user);
+            var accessToken = _jwtService.GenerateToken(user);
+            var refreshToken = _jwtService.GenerateRefreshToken();
 
-            // 5️⃣ Return response
-            return new LoginResponseDTO
+            user.RefreshTokenHash = _jwtService.HashRefreshToken(refreshToken);
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            return (new LoginResponseDTO
             {
-                Token = jwtToken,
+                Token = accessToken,
                 UserDTO = _mapper.Map<UserDTO>(user)
-            };
+            }, refreshToken);
         }
+
+        public async Task<(LoginResponseDTO loginData, string refreshToken)> RefreshTokenAsync(string expiredAccessToken, string refreshToken)
+        {
+            // 1. Extract principal from expired token (signature validated, expiry ignored)
+            var principal = _jwtService.GetPrincipalFromExpiredToken(expiredAccessToken);
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("Invalid access token");
+
+            // 2. Retrieve user
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == int.Parse(userId),
+                includeProperties: "Subscription");
+
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found");
+
+            // 3. Hash incoming refresh token and compare
+            var incomingHash = _jwtService.HashRefreshToken(refreshToken);
+            if (user.RefreshTokenHash != incomingHash)
+                throw new UnauthorizedAccessException("Invalid refresh token");
+
+            // 4. Validate expiry
+            if (user.RefreshTokenExpiry < DateTime.UtcNow)
+                throw new UnauthorizedAccessException("Refresh token expired");
+
+            // 5. Generate new tokens (Rotation)
+            var newAccessToken = _jwtService.GenerateToken(user);
+            var newRefreshToken = _jwtService.GenerateRefreshToken();
+
+            // 6. Update DB with new hashed token
+            user.RefreshTokenHash = _jwtService.HashRefreshToken(newRefreshToken);
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveAsync();
+
+            return (new LoginResponseDTO
+            {
+                Token = newAccessToken,
+                UserDTO = _mapper.Map<UserDTO>(user)
+            }, newRefreshToken);
+        }
+
 
         public async Task ResendEmailConfirmationAsync(EmailResendConfirmationDTO email)
         {

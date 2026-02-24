@@ -58,4 +58,6 @@ public partial class User
     public virtual ICollection<UserExperience> UserExperiences { get; set; } = new List<UserExperience>();
 
     public virtual ICollection<UserEducation> UserEducations { get; set; } = new List<UserEducation>();
+    public string? RefreshTokenHash { get; set; }
+    public DateTime? RefreshTokenExpiry { get; set; }
 }
