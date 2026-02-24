@@ -65,7 +65,7 @@ namespace WorkHub.Business.Service
                 TokenExpiry = DateTime.UtcNow.AddHours(24),
                 UserDetail = new UserDetail
                 {
-                    Rating = 5,
+                    Rating = 4,
                     
                 }
 
@@ -172,7 +172,7 @@ namespace WorkHub.Business.Service
                     ProviderId = googleUser.GoogleId,
                     IsVerified = true,
                     CreatedAt = DateTime.UtcNow,
-                    UserDetail = new UserDetail { Rating = 5 }
+                    UserDetail = new UserDetail { Rating = 4 }
                 };
                 _unitOfWork.UserRepository.Add(user);
             }
