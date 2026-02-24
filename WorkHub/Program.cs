@@ -82,13 +82,13 @@ var builder = WebApplication.CreateBuilder(args);
     // AutoMapper ✅ PLACE IT HERE
     builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-    // CORS
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policy =>
-            policy.AllowAnyOrigin()
+            policy.WithOrigins("http://localhost:3000", "https://workhub-frontend.vercel.app") // Add your Vercel domain here
                   .AllowAnyHeader()
-                  .AllowAnyMethod());
+                  .AllowAnyMethod()
+                  .AllowCredentials());
     });
 
     // DbContext (SQL Server)
