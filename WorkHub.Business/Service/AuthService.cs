@@ -195,6 +195,7 @@ namespace WorkHub.Business.Service
 
         public async Task<(LoginResponseDTO loginData, string refreshToken)> RefreshTokenAsync(string expiredAccessToken, string refreshToken)
         {
+            //Sliding expiration there are 2 types asbolute expiration and sliding expiration
             // 1. Extract principal from expired token (signature validated, expiry ignored)
             var principal = _jwtService.GetPrincipalFromExpiredToken(expiredAccessToken);
             var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
