@@ -129,6 +129,21 @@ namespace WorkHub.Controllers.User
 
             var result = _mapper.Map<List<JobPostDTO>>(jobPosts);
 
+            // Set IsLiked status if user is authenticated
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null)
+            {
+                var userId = int.Parse(userIdClaim.Value);
+                foreach (var post in result)
+                {
+                    var originalPost = jobPosts.FirstOrDefault(p => p.Id == post.PostId);
+                    if (originalPost != null)
+                    {
+                        post.IsLiked = originalPost.PostLikes.Any(l => l.UserId == userId);
+                    }
+                }
+            }
+
             return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Search results retrieved successfully"));
         }
 
@@ -183,17 +198,18 @@ namespace WorkHub.Controllers.User
 
 
         [HttpGet("single-post")]
-        [Authorize]
         public async Task<IActionResult> GetSinglePost([FromQuery] SinglePostRequestDTO singlePostRequest)
         {
-            
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            int? userId = userIdClaim != null ? int.Parse(userIdClaim.Value) : null;
 
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
-
-            if(user == null)
+            if (userId != null)
             {
-                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+                var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+                if (user == null)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("User unauthorized!"));
+                }
             }
               
 
@@ -210,6 +226,11 @@ namespace WorkHub.Controllers.User
                 return NotFound(ApiResponse<object>.NotFound("Post not found !"));
 
             var result = _mapper.Map<JobPostDTO>(post);
+
+            if (userId != null)
+            {
+                result.IsLiked = post.PostLikes.Any(l => l.UserId == userId);
+            }
 
             var responseData = new
             {
@@ -267,7 +288,6 @@ namespace WorkHub.Controllers.User
         //         return Ok(ApiResponse<object>.Ok(responseData, "All Comments retrieved successfully"));
 
         //     }
-        [Authorize]
         [HttpGet("all-comments-post")]
         public async Task<IActionResult> GetAllComments([FromQuery] AllCommentRequestDTO allCommentRequest)
         {
