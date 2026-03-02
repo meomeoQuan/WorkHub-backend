@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260223040550_AddInit")]
+    [Migration("20260302075440_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -360,6 +360,12 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("ProviderId")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshTokenHash")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Role")
                         .ValueGeneratedOnAdd()
