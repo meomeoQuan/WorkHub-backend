@@ -389,13 +389,91 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<object>.Ok(null, "Post created successfully"));
         }
 
+        [Authorize]
+        [HttpDelete("delete-post/{id}")]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
 
+            var post = await _unitOfWork.PostRepository.GetAsync(p => p.Id == id);
 
+            if (post == null)
+            {
+                return NotFound(ApiResponse<object>.BadRequest("Post not found"));
+            }
 
+            if (post.UserId != userId)
+            {
+                return Forbid();
+            }
 
+            // Unlink recruitments
+            var recruitments = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.PostId == id);
+            foreach (var r in recruitments)
+            {
+                r.PostId = null;
+            }
 
+            _unitOfWork.PostRepository.Remove(post);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Post deleted successfully"));
+        }
 
         [Authorize]
+        [HttpPut("update-post/{id}")]
+        public async Task<IActionResult> UpdatePost(int id, UpdatePostDTO dto)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
+
+            var post = await _unitOfWork.PostRepository.GetAsync(p => p.Id == id);
+
+            if (post == null)
+            {
+                return NotFound(ApiResponse<object>.BadRequest("Post not found"));
+            }
+
+            if (post.UserId != userId)
+            {
+                return Forbid();
+            }
+
+            post.Content = dto.Content;
+            if (!string.IsNullOrEmpty(dto.PostImageUrl))
+            {
+                post.PostImageUrl = dto.PostImageUrl;
+            }
+
+            // Update recruitment links
+            // 1. Unlink current
+            var currentRecruitments = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.PostId == id);
+            foreach (var r in currentRecruitments)
+            {
+                r.PostId = null;
+            }
+
+            // 2. Link new ones
+            if (dto.RecruitmentIds?.Any() == true)
+            {
+                var newRecruitments = await _unitOfWork.RecruitmentInfoRepo
+                    .GetAllAsync(r => dto.RecruitmentIds.Contains(r.Id));
+
+                foreach (var r in newRecruitments)
+                {
+                    r.PostId = id;
+                }
+            }
+
+            _unitOfWork.PostRepository.Update(post);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Post updated successfully"));
+        }
+
         [HttpPost("toggle-like")]
         public async Task<IActionResult> ToggleLike(ToggleLikeDTO dto)
         {
