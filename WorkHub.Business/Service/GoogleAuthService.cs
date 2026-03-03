@@ -20,14 +20,22 @@ namespace WorkHub.Business.Service
 
         public async Task<GoogleUserInfoDTO> VerifyAuthCodeAsync(string authCode)
         {
+            var clientId = _config["Authentication:Google:ClientId"]?.Trim();
+            var clientSecret = _config["Authentication:Google:ClientSecret"]?.Trim();
+
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                throw new Exception("Google Authentication configuration (ClientId or ClientSecret) is missing or empty.");
+            }
+
             // 1️⃣ Exchange auth code → tokens
             var tokenResponse = await _httpClient.PostAsync(
                 "https://oauth2.googleapis.com/token",
                 new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                 { "code", authCode },
-                { "client_id", _config["Authentication:Google:ClientId"]!.Trim() },
-                { "client_secret", _config["Authentication:Google:ClientSecret"]!.Trim() },
+                { "client_id", clientId },
+                { "client_secret", clientSecret },
                 { "redirect_uri", "postmessage" }, // 🔥 REQUIRED for SPA
                 { "grant_type", "authorization_code" }
                 })
@@ -37,7 +45,7 @@ namespace WorkHub.Business.Service
 
             if (!tokenResponse.IsSuccessStatusCode)
             {
-                throw new Exception($"Google token error: {error}");
+                throw new Exception($"Google token exchange failed: {tokenResponse.StatusCode} - {error}");
             }
 
 
@@ -49,7 +57,7 @@ namespace WorkHub.Business.Service
                 tokenData.id_token,
                 new GoogleJsonWebSignature.ValidationSettings
                 {
-                    Audience = new[] { _config["Authentication:Google:ClientId"]! }
+                    Audience = new[] { clientId! }
                 }
             );
 

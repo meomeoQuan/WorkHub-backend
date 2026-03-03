@@ -83,6 +83,346 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Remote"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "An Giang"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Ba Ria - Vung Tau"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Bac Lieu"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Bac Giang"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Bac Kan"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Bac Ninh"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Ben Tre"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Binh Duong"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Binh Dinh"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Binh Phuoc"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Binh Thuan"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Ca Mau"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Cao Bang"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Can Tho"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Da Nang"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Name = "Dak Lak"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Name = "Dak Nong"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Name = "Dien Bien"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Name = "Dong Nai"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Name = "Dong Thap"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Name = "Gia Lai"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Name = "Ha Giang"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Name = "Ha Nam"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Name = "Ha Noi"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Name = "Ha Tinh"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Name = "Hai Duong"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Name = "Hai Phong"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Name = "Hau Giang"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Name = "Hoa Binh"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Name = "Hung Yen"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Name = "Khanh Hoa"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Name = "Kien Giang"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Name = "Kon Tum"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Name = "Lai Chau"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Name = "Lang Son"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Name = "Lao Cai"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Name = "Lam Dong"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Name = "Long An"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Name = "Nam Dinh"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Name = "Nghe An"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Name = "Ninh Binh"
+                        },
+                        new
+                        {
+                            Id = 43,
+                            Name = "Ninh Thuan"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Name = "Phu Tho"
+                        },
+                        new
+                        {
+                            Id = 45,
+                            Name = "Phu Yen"
+                        },
+                        new
+                        {
+                            Id = 46,
+                            Name = "Quang Binh"
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Name = "Quang Nam"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Name = "Quang Ngai"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Name = "Quang Ninh"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Name = "Quang Tri"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Name = "Soc Trang"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Name = "Son La"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            Name = "Tay Ninh"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            Name = "Thai Binh"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            Name = "Thai Nguyen"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            Name = "Thanh Hoa"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            Name = "Thua Thien Hue"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            Name = "Tien Giang"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            Name = "Tra Vinh"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            Name = "Tuyen Quang"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            Name = "Vinh Long"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            Name = "Vinh Phuc"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            Name = "Yen Bai"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            Name = "Ho Chi Minh City"
+                        });
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -260,6 +600,9 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -301,6 +644,8 @@ namespace WorkHub.DataAccess.Migrations
                         .HasName("PK__Recruitm__3214EC079D1054A4");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("CityId");
 
                     b.HasIndex("JobTypeId");
 
@@ -742,6 +1087,10 @@ namespace WorkHub.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WorkHub.Models.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
                     b.HasOne("WorkHub.Models.Models.JobType", "JobType")
                         .WithMany("Recruitments")
                         .HasForeignKey("JobTypeId")
@@ -760,6 +1109,8 @@ namespace WorkHub.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+
+                    b.Navigation("City");
 
                     b.Navigation("JobType");
 

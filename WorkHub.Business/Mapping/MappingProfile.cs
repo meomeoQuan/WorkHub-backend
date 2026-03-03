@@ -29,7 +29,8 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
-                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
+                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location));
 
             CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
                 .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
@@ -42,6 +43,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
                 .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
                 .ForMember(d => d.CompanyBio, o => o.MapFrom(s => s.User.UserDetail.Bio))
                 .ForMember(d => d.CompanyDescription, o => o.MapFrom(s => s.User.UserDetail.Description))
                 .ForMember(d => d.CompanyLocation, o => o.MapFrom(s => s.User.UserDetail.Location))
@@ -55,6 +57,7 @@ namespace WorkHub.Business.Mapping
             CreateMap<CreateJobRequestDTO, Recruitment>()
                 .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobTitle))
                 .ForMember(d => d.Salary, o => o.MapFrom(s => s.SalaryRange))
+                .ForMember(d => d.CityId, o => o.Ignore())
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.Location))
                 .ForMember(d => d.CategoryId, o => o.Ignore()) // Handle manually in Controller
                 .ForMember(d => d.Category, o => o.Ignore()) // Ignore Nav Prop
@@ -88,7 +91,8 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<Recruitment, JobDTO>()
              .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
-             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name));
+             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
+             .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location));
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
@@ -124,6 +128,7 @@ namespace WorkHub.Business.Mapping
 
             CreateMap<JobType, JobTypeDTO>();
             CreateMap<Category, CategoryDTO>();
+            CreateMap<City, CityDTO>();
 
             //=================== User Profile MAPPING =================
             CreateMap<UserExperience, UserExperienceDTO>().ReverseMap();

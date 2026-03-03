@@ -15,9 +15,11 @@ public partial class Recruitment
 
     public int CategoryId { get; set; }
     public int JobTypeId { get; set; }
+    public int? CityId { get; set; }
 
     public Category Category { get; set; } = null!;
     public JobType JobType { get; set; } = null!;
+    public City? City { get; set; }
 
     public string? Location { get; set; }
     public string? Salary { get; set; }

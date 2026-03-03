@@ -46,6 +46,16 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<object>.Ok(result, "retrieve Jobcategory success"));
         }
 
+        [HttpGet("get-cities")]
+        public async Task<IActionResult> GetCities()
+        {
+            var cities = await _unitOfWork.CityRepo.GetAllAsync();
+
+            var result = _mapper.Map<List<CityDTO>>(cities.OrderBy(c => c.Id == 1 ? 0 : 1).ThenBy(c => c.Name));
+
+            return Ok(ApiResponse<object>.Ok(result, "retrieve Cities success"));
+        }
+
         [Authorize]
         [HttpPost("create-job")]
         public async Task<IActionResult> CreateJob([FromForm] CreateJobRequestDTO createJobRequest)
@@ -85,6 +95,16 @@ namespace WorkHub.Controllers.User
                     {
                         return BadRequest(ApiResponse<object>.BadRequest(null, $"Category '{createJobRequest.Category}' not found."));
                     }
+                }
+            }
+
+            // Manual City Mapping
+            if (!string.IsNullOrEmpty(createJobRequest.Location))
+            {
+                var city = await _unitOfWork.CityRepo.GetAsync(c => c.Name == createJobRequest.Location);
+                if (city != null)
+                {
+                    recruitment.CityId = city.Id;
                 }
             }
 

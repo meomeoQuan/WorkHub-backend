@@ -27,6 +27,7 @@ namespace WorkHub.DataAccess.Repository
             UserSubscriptionRepository = new UserSubscriptionRepository(_db);
             JobCategoryRepo = new CategoryRepository(_db);
             JobTypeRepo = new JobTypeRepository(_db);
+            CityRepo = new CityRepository(_db);
 
             UserExperienceRepository = new Repository<UserExperience>(_db);
             UserEducationRepository = new Repository<UserEducation>(_db);
@@ -54,6 +55,7 @@ namespace WorkHub.DataAccess.Repository
         public IJobTypeRepository JobTypeRepo { get; private set; }
 
         public ICategoryRepository JobCategoryRepo { get; private set; }
+        public ICityRepository CityRepo { get; private set; }
 
         public IRepository<UserExperience> UserExperienceRepository { get; private set; }
         public IRepository<UserEducation> UserEducationRepository { get; private set; }
