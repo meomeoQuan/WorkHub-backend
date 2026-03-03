@@ -196,13 +196,11 @@ namespace WorkHub.Controllers.User
                 var plan = user.Subscription?.Plan ?? SD.Plan_Free;
                 if (plan == SD.Plan_Free)
                 {
-                    var currentMonth = DateTime.Now.Month;
-                    var currentYear = DateTime.Now.Year;
+                    var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
 
                     var applyCount = await _unitOfWork.ApplicationRepository.CountAsync(a => 
                         a.UserId == userId && 
-                        a.CreatedAt.Month == currentMonth && 
-                        a.CreatedAt.Year == currentYear
+                        a.CreatedAt >= cycleStart
                     );
 
                     if (applyCount >= SD.Free_Apply_Limit)

@@ -168,8 +168,8 @@ namespace WorkHub.Controllers.User
             // Determine plan from amount
             string plan = order.Amount switch
             {
-                1000 => "silver",
-                2000 => "gold",
+                2000 => "silver",
+                3000 => "gold",
                 _ => "free"
             };
 

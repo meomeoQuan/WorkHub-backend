@@ -76,13 +76,11 @@ namespace WorkHub.Controllers.User
             var plan = user.Subscription?.Plan ?? SD.Plan_Free;
             if (plan != SD.Plan_Gold)
             {
-                var currentMonth = DateTime.Now.Month;
-                var currentYear = DateTime.Now.Year;
+                var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
                 
                 var postCount = await _unitOfWork.RecruitmentInfoRepo.CountAsync(r => 
                     r.UserId == userId && 
-                    r.CreatedAt.Value.Month == currentMonth && 
-                    r.CreatedAt.Value.Year == currentYear
+                    r.CreatedAt >= cycleStart
                 );
 
                 if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
