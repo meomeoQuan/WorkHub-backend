@@ -175,6 +175,7 @@ namespace WorkHub.Business.Service
                     UserDetail = new UserDetail { Rating = 4 }
                 };
                 _unitOfWork.UserRepository.Add(user);
+                await _unitOfWork.SaveAsync();
             }
 
             var accessToken = _jwtService.GenerateToken(user);

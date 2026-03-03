@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace WorkHub.DataAccess.Migrations
 {
     /// <inheritdoc />
@@ -22,6 +24,19 @@ namespace WorkHub.DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -329,6 +344,7 @@ namespace WorkHub.DataAccess.Migrations
                     JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     JobTypeId = table.Column<int>(type: "int", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
@@ -346,6 +362,11 @@ namespace WorkHub.DataAccess.Migrations
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Cities_CityId",
+                        column: x => x.CityId,
+                        principalTable: "Cities",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Recruitment_JobTypes_JobTypeId",
                         column: x => x.JobTypeId,
@@ -418,6 +439,77 @@ namespace WorkHub.DataAccess.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.InsertData(
+                table: "Cities",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Remote" },
+                    { 2, "An Giang" },
+                    { 3, "Ba Ria - Vung Tau" },
+                    { 4, "Bac Lieu" },
+                    { 5, "Bac Giang" },
+                    { 6, "Bac Kan" },
+                    { 7, "Bac Ninh" },
+                    { 8, "Ben Tre" },
+                    { 9, "Binh Duong" },
+                    { 10, "Binh Dinh" },
+                    { 11, "Binh Phuoc" },
+                    { 12, "Binh Thuan" },
+                    { 13, "Ca Mau" },
+                    { 14, "Cao Bang" },
+                    { 15, "Can Tho" },
+                    { 16, "Da Nang" },
+                    { 17, "Dak Lak" },
+                    { 18, "Dak Nong" },
+                    { 19, "Dien Bien" },
+                    { 20, "Dong Nai" },
+                    { 21, "Dong Thap" },
+                    { 22, "Gia Lai" },
+                    { 23, "Ha Giang" },
+                    { 24, "Ha Nam" },
+                    { 25, "Ha Noi" },
+                    { 26, "Ha Tinh" },
+                    { 27, "Hai Duong" },
+                    { 28, "Hai Phong" },
+                    { 29, "Hau Giang" },
+                    { 30, "Hoa Binh" },
+                    { 31, "Hung Yen" },
+                    { 32, "Khanh Hoa" },
+                    { 33, "Kien Giang" },
+                    { 34, "Kon Tum" },
+                    { 35, "Lai Chau" },
+                    { 36, "Lang Son" },
+                    { 37, "Lao Cai" },
+                    { 38, "Lam Dong" },
+                    { 39, "Long An" },
+                    { 40, "Nam Dinh" },
+                    { 41, "Nghe An" },
+                    { 42, "Ninh Binh" },
+                    { 43, "Ninh Thuan" },
+                    { 44, "Phu Tho" },
+                    { 45, "Phu Yen" },
+                    { 46, "Quang Binh" },
+                    { 47, "Quang Nam" },
+                    { 48, "Quang Ngai" },
+                    { 49, "Quang Ninh" },
+                    { 50, "Quang Tri" },
+                    { 51, "Soc Trang" },
+                    { 52, "Son La" },
+                    { 53, "Tay Ninh" },
+                    { 54, "Thai Binh" },
+                    { 55, "Thai Nguyen" },
+                    { 56, "Thanh Hoa" },
+                    { 57, "Thua Thien Hue" },
+                    { 58, "Tien Giang" },
+                    { 59, "Tra Vinh" },
+                    { 60, "Tuyen Quang" },
+                    { 61, "Vinh Long" },
+                    { 62, "Vinh Phuc" },
+                    { 63, "Yen Bai" },
+                    { 64, "Ho Chi Minh City" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Application_RecruitmentId",
                 table: "Application",
@@ -473,6 +565,11 @@ namespace WorkHub.DataAccess.Migrations
                 name: "IX_Recruitment_CategoryId",
                 table: "Recruitment",
                 column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Recruitment_CityId",
+                table: "Recruitment",
+                column: "CityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Recruitment_JobTypeId",
@@ -569,6 +666,9 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Cities");
 
             migrationBuilder.DropTable(
                 name: "JobTypes");

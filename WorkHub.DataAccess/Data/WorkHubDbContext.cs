@@ -45,6 +45,7 @@ public partial class WorkHubDbContext : DbContext
     public virtual DbSet<JobType> JobTypes { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<City> Cities { get; set; }
 
 
 
@@ -201,6 +202,10 @@ public partial class WorkHubDbContext : DbContext
                   .WithMany(j => j.Recruitments)
                   .HasForeignKey(r => r.JobTypeId);
 
+            entity.HasOne(r => r.City)
+                  .WithMany()
+                  .HasForeignKey(r => r.CityId);
+
         });
 
 
@@ -338,6 +343,80 @@ public partial class WorkHubDbContext : DbContext
                   .OnDelete(DeleteBehavior.NoAction);
 
 
+        });
+
+
+        modelBuilder.Entity<City>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+
+            entity.HasData(
+                new City { Id = 1, Name = "Remote" },
+                new City { Id = 2, Name = "An Giang" },
+                new City { Id = 3, Name = "Ba Ria - Vung Tau" },
+                new City { Id = 4, Name = "Bac Lieu" },
+                new City { Id = 5, Name = "Bac Giang" },
+                new City { Id = 6, Name = "Bac Kan" },
+                new City { Id = 7, Name = "Bac Ninh" },
+                new City { Id = 8, Name = "Ben Tre" },
+                new City { Id = 9, Name = "Binh Duong" },
+                new City { Id = 10, Name = "Binh Dinh" },
+                new City { Id = 11, Name = "Binh Phuoc" },
+                new City { Id = 12, Name = "Binh Thuan" },
+                new City { Id = 13, Name = "Ca Mau" },
+                new City { Id = 14, Name = "Cao Bang" },
+                new City { Id = 15, Name = "Can Tho" },
+                new City { Id = 16, Name = "Da Nang" },
+                new City { Id = 17, Name = "Dak Lak" },
+                new City { Id = 18, Name = "Dak Nong" },
+                new City { Id = 19, Name = "Dien Bien" },
+                new City { Id = 20, Name = "Dong Nai" },
+                new City { Id = 21, Name = "Dong Thap" },
+                new City { Id = 22, Name = "Gia Lai" },
+                new City { Id = 23, Name = "Ha Giang" },
+                new City { Id = 24, Name = "Ha Nam" },
+                new City { Id = 25, Name = "Ha Noi" },
+                new City { Id = 26, Name = "Ha Tinh" },
+                new City { Id = 27, Name = "Hai Duong" },
+                new City { Id = 28, Name = "Hai Phong" },
+                new City { Id = 29, Name = "Hau Giang" },
+                new City { Id = 30, Name = "Hoa Binh" },
+                new City { Id = 31, Name = "Hung Yen" },
+                new City { Id = 32, Name = "Khanh Hoa" },
+                new City { Id = 33, Name = "Kien Giang" },
+                new City { Id = 34, Name = "Kon Tum" },
+                new City { Id = 35, Name = "Lai Chau" },
+                new City { Id = 36, Name = "Lang Son" },
+                new City { Id = 37, Name = "Lao Cai" },
+                new City { Id = 38, Name = "Lam Dong" },
+                new City { Id = 39, Name = "Long An" },
+                new City { Id = 40, Name = "Nam Dinh" },
+                new City { Id = 41, Name = "Nghe An" },
+                new City { Id = 42, Name = "Ninh Binh" },
+                new City { Id = 43, Name = "Ninh Thuan" },
+                new City { Id = 44, Name = "Phu Tho" },
+                new City { Id = 45, Name = "Phu Yen" },
+                new City { Id = 46, Name = "Quang Binh" },
+                new City { Id = 47, Name = "Quang Nam" },
+                new City { Id = 48, Name = "Quang Ngai" },
+                new City { Id = 49, Name = "Quang Ninh" },
+                new City { Id = 50, Name = "Quang Tri" },
+                new City { Id = 51, Name = "Soc Trang" },
+                new City { Id = 52, Name = "Son La" },
+                new City { Id = 53, Name = "Tay Ninh" },
+                new City { Id = 54, Name = "Thai Binh" },
+                new City { Id = 55, Name = "Thai Nguyen" },
+                new City { Id = 56, Name = "Thanh Hoa" },
+                new City { Id = 57, Name = "Thua Thien Hue" },
+                new City { Id = 58, Name = "Tien Giang" },
+                new City { Id = 59, Name = "Tra Vinh" },
+                new City { Id = 60, Name = "Tuyen Quang" },
+                new City { Id = 61, Name = "Vinh Long" },
+                new City { Id = 62, Name = "Vinh Phuc" },
+                new City { Id = 63, Name = "Yen Bai" },
+                new City { Id = 64, Name = "Ho Chi Minh City" }
+            );
         });
 
 
