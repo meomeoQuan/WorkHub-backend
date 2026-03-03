@@ -187,7 +187,30 @@ namespace WorkHub.Controllers.User
                     cvUrl = $"{baseUrl}/uploads/cvs/{fileName}";
                 }
 
-                var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId, includeProperties: SD.Join_UserDetail);
+                var user = await _unitOfWork.UserRepository.GetAsync(
+                    u => u.Id == userId, 
+                    includeProperties: $"{SD.Join_UserDetail},{SD.Join_Subscription}"
+                );
+
+                // Enforce Application Limits for Free Plan
+                var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+                if (plan == SD.Plan_Free)
+                {
+                    var currentMonth = DateTime.Now.Month;
+                    var currentYear = DateTime.Now.Year;
+
+                    var applyCount = await _unitOfWork.ApplicationRepository.CountAsync(a => 
+                        a.UserId == userId && 
+                        a.CreatedAt.Month == currentMonth && 
+                        a.CreatedAt.Year == currentYear
+                    );
+
+                    if (applyCount >= SD.Free_Apply_Limit)
+                    {
+                        return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn ứng tuyển của gói Miễn Phí ({SD.Free_Apply_Limit} lượt/tháng). Vui lòng nâng cấp để ứng tuyển không giới hạn."));
+                    }
+                }
+
                 bool profileUpdated = false;
 
                 // Update Phone if missing

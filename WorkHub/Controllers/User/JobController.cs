@@ -62,11 +62,38 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId, 
+                includeProperties: SD.Join_Subscription
+            );
 
             if (user == null)
             {
                 return NotFound(ApiResponse<object>.BadRequest(null, "User not found"));
+            }
+
+            // Enforce Subscription Limits
+            var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+            if (plan != SD.Plan_Gold)
+            {
+                var currentMonth = DateTime.Now.Month;
+                var currentYear = DateTime.Now.Year;
+                
+                var postCount = await _unitOfWork.RecruitmentInfoRepo.CountAsync(r => 
+                    r.UserId == userId && 
+                    r.CreatedAt.Value.Month == currentMonth && 
+                    r.CreatedAt.Value.Year == currentYear
+                );
+
+                if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Miễn Phí ({SD.Free_Post_Limit} bài/tháng). Vui lòng nâng cấp để tiếp tục."));
+                }
+                
+                if (plan == SD.Plan_Silver && postCount >= SD.Silver_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Silver ({SD.Silver_Post_Limit} bài/tháng). Vui lòng nâng cấp lên Gold để đăng không giới hạn."));
+                }
             }
 
             

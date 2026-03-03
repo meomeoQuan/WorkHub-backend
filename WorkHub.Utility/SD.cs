@@ -65,5 +65,15 @@ namespace WorkHub.Utility
         public const string Collection_Join_Orders = "Orders";
 
 
+        //============================ PLAN NAMES ==================================
+        public const string Plan_Free = "free";
+        public const string Plan_Silver = "silver";
+        public const string Plan_Gold = "gold";
+
+        //============================ PLAN LIMITS ==================================
+        public const int Free_Post_Limit = 5;
+        public const int Free_Apply_Limit = 5;
+        public const int Silver_Post_Limit = 20;
+
     }
 }
