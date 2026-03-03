@@ -135,6 +135,8 @@ namespace WorkHub.Controllers.User
                     a => a.UserId == userId && a.RecruitmentId == applicationDTO.RecruitmentId
                 );
 
+
+
                 // 0. Check if Recruitment exists
                 var recruitment = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id == applicationDTO.RecruitmentId);
                 if (recruitment == null)
@@ -183,6 +185,16 @@ namespace WorkHub.Controllers.User
                     var request = HttpContext.Request;
                     var baseUrl = $"{request.Scheme}://{request.Host}";
                     cvUrl = $"{baseUrl}/uploads/cvs/{fileName}";
+                }
+
+                var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId, includeProperties: SD.Join_UserDetail);
+
+                if(user.Phone == null || user.UserDetail.EducationLevel == null)
+                {
+                    user.Phone = applicationDTO.Phone;
+                    user.UserDetail.EducationLevel = applicationDTO.Education;
+
+                    await _unitOfWork.SaveAsync();
                 }
 
                 // 3. Create Application Entity
