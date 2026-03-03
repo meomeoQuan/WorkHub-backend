@@ -188,12 +188,24 @@ namespace WorkHub.Controllers.User
                 }
 
                 var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId, includeProperties: SD.Join_UserDetail);
+                bool profileUpdated = false;
 
-                if(user.Phone == null || user.UserDetail.EducationLevel == null)
+                // Update Phone if missing
+                if (string.IsNullOrEmpty(user.Phone) && !string.IsNullOrEmpty(applicationDTO.Phone))
                 {
                     user.Phone = applicationDTO.Phone;
-                    user.UserDetail.EducationLevel = applicationDTO.Education;
+                    profileUpdated = true;
+                }
 
+                // Update Education if missing
+                if (user.UserDetail != null && string.IsNullOrEmpty(user.UserDetail.EducationLevel) && !string.IsNullOrEmpty(applicationDTO.Education))
+                {
+                    user.UserDetail.EducationLevel = applicationDTO.Education;
+                    profileUpdated = true;
+                }
+
+                if (profileUpdated)
+                {
                     await _unitOfWork.SaveAsync();
                 }
 
