@@ -165,6 +165,18 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.Salary)
                 .HasMaxLength(100);
 
+            entity.Property(e => e.MinSalary)
+                .HasColumnType("decimal(18,2)");
+
+            entity.Property(e => e.MaxSalary)
+                .HasColumnType("decimal(18,2)");
+
+            entity.Property(e => e.SalaryCurrency)
+                .HasMaxLength(20);
+
+            entity.Property(e => e.SalaryCycle)
+                .HasMaxLength(50);
+
             entity.Property(e => e.Status)
                 .HasMaxLength(50);
 

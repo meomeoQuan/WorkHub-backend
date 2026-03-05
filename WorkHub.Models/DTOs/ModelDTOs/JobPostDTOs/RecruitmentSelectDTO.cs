@@ -13,6 +13,10 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
         public string? JobType { get; set; }
         public string? Location { get; set; }
         public string? Salary { get; set; }
+        public decimal MinSalary { get; set; }
+        public decimal? MaxSalary { get; set; }
+        public string? SalaryCurrency { get; set; }
+        public string? SalaryCycle { get; set; }
         public string? Status { get; set; }
 
         public string? UserAvatar { get; set; }

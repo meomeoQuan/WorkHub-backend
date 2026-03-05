@@ -70,6 +70,10 @@ namespace WorkHub.Controllers.User
             string? jobType,
             string? location,
             string? salaryRange,
+            decimal? minSalary,
+            decimal? maxSalary,
+            string? salaryCurrency,
+            string? salaryCycle,
             string? postedDate,
             string? category,
             int pageIndex = 1,
@@ -102,6 +106,24 @@ namespace WorkHub.Controllers.User
             if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
                 queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category.Name == category));
+            }
+
+            // Structured Salary Filtering
+            if (minSalary.HasValue)
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary >= minSalary.Value));
+            }
+            if (maxSalary.HasValue)
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary <= maxSalary.Value));
+            }
+            if (!string.IsNullOrWhiteSpace(salaryCurrency) && !salaryCurrency.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCurrency == salaryCurrency));
+            }
+            if (!string.IsNullOrWhiteSpace(salaryCycle) && !salaryCycle.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCycle == salaryCycle));
             }
 
             if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))

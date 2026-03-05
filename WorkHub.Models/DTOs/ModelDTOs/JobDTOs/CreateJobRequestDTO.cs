@@ -15,6 +15,10 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobDTOs
         public string? Category { get; set; }
         public int JobType { get; set; }              // enum
         public string? WorkTime { get; set; }
+        public decimal MinSalary { get; set; }
+        public decimal? MaxSalary { get; set; }
+        public string? SalaryCurrency { get; set; }
+        public string? SalaryCycle { get; set; }
         public string? SalaryRange { get; set; }
 
         // ===== Description =====

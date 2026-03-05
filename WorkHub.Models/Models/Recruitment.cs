@@ -23,6 +23,10 @@ public partial class Recruitment
 
     public string? Location { get; set; }
     public string? Salary { get; set; }
+    public decimal MinSalary { get; set; }
+    public decimal? MaxSalary { get; set; }
+    public string? SalaryCurrency { get; set; } // VND, USD
+    public string? SalaryCycle { get; set; }   // Hour, Day, Month, Year
     public string? Status { get; set; }
 
     public string? Requirements { get; set; }

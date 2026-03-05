@@ -30,7 +30,11 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
-                .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location));
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
+                .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
+                .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
+                .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
+                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
 
             CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
                 .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
@@ -48,11 +52,19 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.CompanyDescription, o => o.MapFrom(s => s.User.UserDetail.Description))
                 .ForMember(d => d.CompanyLocation, o => o.MapFrom(s => s.User.UserDetail.Location))
                 .ForMember(d => d.CompanyRating, o => o.MapFrom(s => s.User.UserDetail.Rating))
-                .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail.IndustryFocus));
+                .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail.IndustryFocus))
+                .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
+                .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
+                .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
+                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
 
             CreateMap<Recruitment, RecruitmentSelectDTO>()
-             .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
-                .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl));
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.UserAvatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
+                .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
+                .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
+                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
 
             CreateMap<CreateJobRequestDTO, Recruitment>()
                 .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobTitle))
@@ -66,12 +78,14 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
                 .ForMember(d => d.JobTypeId, o => o.MapFrom(s => s.JobType)) // Map to FK
                 .ForMember(d => d.JobType, o => o.Ignore()) // Ignore Nav Prop
+                .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
+                .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
+                .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
+                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle))
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
                 .ForMember(d => d.UserId, o => o.Ignore())
                 .ForMember(d => d.PostId, o => o.Ignore());
-
-
 
             //=================== Auth MAPPING =================
             CreateMap<User, UserDTO>()
@@ -92,7 +106,11 @@ namespace WorkHub.Business.Mapping
             CreateMap<Recruitment, JobDTO>()
              .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
              .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
-             .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location));
+             .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
+             .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
+             .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
+             .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
+             .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
