@@ -9,6 +9,7 @@ using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
+using WorkHub.Utility;
 
 namespace WorkHub.Controllers.User
 {
@@ -62,11 +63,37 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId, 
+                includeProperties: SD.Join_Subscription
+            );
 
             if (user == null)
             {
                 return NotFound(ApiResponse<object>.BadRequest(null, "User not found"));
+            }
+
+            // Enforce Subscription Limits
+            var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+            if (plan != SD.Plan_Gold)
+            {
+
+                var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
+                
+                var postCount = await _unitOfWork.RecruitmentInfoRepo.CountAsync(r => 
+                    r.UserId == userId && 
+                    r.CreatedAt >= cycleStart
+                );
+
+                if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Miễn Phí ({SD.Free_Post_Limit} bài/tháng). Vui lòng nâng cấp để tiếp tục."));
+                }
+                
+                if (plan == SD.Plan_Silver && postCount >= SD.Silver_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Silver ({SD.Silver_Post_Limit} bài/tháng). Vui lòng nâng cấp lên Gold để đăng không giới hạn."));
+                }
             }
 
             
@@ -75,7 +102,7 @@ namespace WorkHub.Controllers.User
             var recruitment = _mapper.Map<Recruitment>(createJobRequest);
             recruitment.UserId = userId;
             recruitment.Status = "Open";
-            recruitment.CreatedAt = DateTime.Now;
+            recruitment.CreatedAt = DateTime.UtcNow;
 
             // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))

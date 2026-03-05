@@ -298,5 +298,32 @@ namespace WorkHub.Controllers.User
 
             return Ok(ApiResponse<List<JobPostDTO>>.Ok(result, "Public user posts retrieved successfully"));
         }
+        [Authorize]
+        [HttpPost("report-user/{userId}")]
+        public async Task<IActionResult> ReportUser(int userId)
+        {
+            var targetUser = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: "UserDetail"
+            );
+
+            if (targetUser == null)
+            {
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
+            }
+
+            if (targetUser.UserDetail == null)
+            {
+                targetUser.UserDetail = new UserDetail { UserId = userId, Rating = 4.0 }; // Default rating if null
+                _unitOfWork.UserDetailRepository.Add(targetUser.UserDetail);
+            }
+
+            // Penalize rating by 1 star
+            targetUser.UserDetail.Rating = Math.Max(0.0, (targetUser.UserDetail.Rating ?? 4.0) - 0.25);
+
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "User reported. Rating penalized."));
+        }
     }
 }

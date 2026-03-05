@@ -135,6 +135,8 @@ namespace WorkHub.Controllers.User
                     a => a.UserId == userId && a.RecruitmentId == applicationDTO.RecruitmentId
                 );
 
+
+
                 // 0. Check if Recruitment exists
                 var recruitment = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id == applicationDTO.RecruitmentId);
                 if (recruitment == null)
@@ -185,6 +187,49 @@ namespace WorkHub.Controllers.User
                     cvUrl = $"{baseUrl}/uploads/cvs/{fileName}";
                 }
 
+                var user = await _unitOfWork.UserRepository.GetAsync(
+                    u => u.Id == userId, 
+                    includeProperties: $"{SD.Join_UserDetail},{SD.Join_Subscription}"
+                );
+
+                // Enforce Application Limits for Free Plan
+                var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+                if (plan == SD.Plan_Free)
+                {
+                    var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
+
+                    var applyCount = await _unitOfWork.ApplicationRepository.CountAsync(a => 
+                        a.UserId == userId && 
+                        a.CreatedAt >= cycleStart
+                    );
+
+                    if (applyCount >= SD.Free_Apply_Limit)
+                    {
+                        return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn ứng tuyển của gói Miễn Phí ({SD.Free_Apply_Limit} lượt/tháng). Vui lòng nâng cấp để ứng tuyển không giới hạn."));
+                    }
+                }
+
+                bool profileUpdated = false;
+
+                // Update Phone if missing
+                if (string.IsNullOrEmpty(user.Phone) && !string.IsNullOrEmpty(applicationDTO.Phone))
+                {
+                    user.Phone = applicationDTO.Phone;
+                    profileUpdated = true;
+                }
+
+                // Update Education if missing
+                if (user.UserDetail != null && string.IsNullOrEmpty(user.UserDetail.EducationLevel) && !string.IsNullOrEmpty(applicationDTO.Education))
+                {
+                    user.UserDetail.EducationLevel = applicationDTO.Education;
+                    profileUpdated = true;
+                }
+
+                if (profileUpdated)
+                {
+                    await _unitOfWork.SaveAsync();
+                }
+
                 // 3. Create Application Entity
                 var application = new Application
                 {
@@ -193,7 +238,7 @@ namespace WorkHub.Controllers.User
                     Status = ApplicationStatus.New, // "Pending" for applicant
                     CoverLetter = applicationDTO.CoverLetter,
                     CvUrl = cvUrl,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _unitOfWork.ApplicationRepository.Add(application);

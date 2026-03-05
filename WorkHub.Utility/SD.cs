@@ -65,5 +65,39 @@ namespace WorkHub.Utility
         public const string Collection_Join_Orders = "Orders";
 
 
+        //============================ PLAN NAMES ==================================
+        public const string Plan_Free = "free";
+        public const string Plan_Silver = "silver";
+        public const string Plan_Gold = "gold";
+
+        //============================ PLAN LIMITS ==================================
+        public const int Free_Post_Limit = 5;
+        public const int Free_Apply_Limit = 5;
+        public const int Silver_Post_Limit = 20;
+
+        //============================ HELPER METHODS ==================================
+        /// <summary>
+        /// Calculates the start of the current 1-month rolling cycle.
+        /// All dates (baseDate and return value) are in UTC.
+        /// </summary>
+        public static DateTime CalculateCycleStart(DateTime? baseDate)
+        {
+            var now = DateTime.UtcNow;
+            if (!baseDate.HasValue) return now.AddMonths(-1);
+
+            // Calculate the start of the current cycle
+            // Example: baseDate = Jan 15, now = Mar 10
+            // Cycle 1: Jan 15 - Feb 15
+            // Cycle 2: Feb 15 - Mar 15
+            // Result for now (Mar 10) = Feb 15
+
+            var cycleDate = baseDate.Value;
+            while (cycleDate.AddMonths(1) <= now)
+            {
+                cycleDate = cycleDate.AddMonths(1);
+            }
+            return cycleDate;
+        }
+
     }
 }
