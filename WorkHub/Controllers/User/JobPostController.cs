@@ -107,9 +107,10 @@ namespace WorkHub.Controllers.User
             if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))
             {
                 DateTime cutoff = DateTime.UtcNow;
-                if (postedDate == "24h") cutoff = cutoff.AddDays(-1);
-                else if (postedDate == "7d") cutoff = cutoff.AddDays(-7);
-                else if (postedDate == "30d") cutoff = cutoff.AddDays(-30);
+                if (postedDate == "1d") cutoff = cutoff.AddDays(-1);
+                else if (postedDate == "1w") cutoff = cutoff.AddDays(-7);
+                else if (postedDate == "1m") cutoff = cutoff.AddDays(-30);
+                else if (postedDate == "1y") cutoff = cutoff.AddYears(-1);
 
                 queryFilter = queryFilter.And(p => p.CreatedAt >= cutoff);
             }
@@ -385,7 +386,6 @@ namespace WorkHub.Controllers.User
 
                 await _unitOfWork.SaveAsync();
             }
-
             return Ok(ApiResponse<object>.Ok(null, "Post created successfully"));
         }
 
