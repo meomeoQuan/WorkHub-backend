@@ -238,7 +238,7 @@ namespace WorkHub.Controllers.User
                     Status = ApplicationStatus.New, // "Pending" for applicant
                     CoverLetter = applicationDTO.CoverLetter,
                     CvUrl = cvUrl,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _unitOfWork.ApplicationRepository.Add(application);

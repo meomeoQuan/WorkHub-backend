@@ -9,6 +9,7 @@ using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
+using WorkHub.Utility;
 
 namespace WorkHub.Controllers.User
 {
@@ -76,6 +77,7 @@ namespace WorkHub.Controllers.User
             var plan = user.Subscription?.Plan ?? SD.Plan_Free;
             if (plan != SD.Plan_Gold)
             {
+
                 var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
                 
                 var postCount = await _unitOfWork.RecruitmentInfoRepo.CountAsync(r => 
@@ -100,7 +102,7 @@ namespace WorkHub.Controllers.User
             var recruitment = _mapper.Map<Recruitment>(createJobRequest);
             recruitment.UserId = userId;
             recruitment.Status = "Open";
-            recruitment.CreatedAt = DateTime.Now;
+            recruitment.CreatedAt = DateTime.UtcNow;
 
             // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))

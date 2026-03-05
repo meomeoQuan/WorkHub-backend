@@ -76,6 +76,10 @@ namespace WorkHub.Utility
         public const int Silver_Post_Limit = 20;
 
         //============================ HELPER METHODS ==================================
+        /// <summary>
+        /// Calculates the start of the current 1-month rolling cycle.
+        /// All dates (baseDate and return value) are in UTC.
+        /// </summary>
         public static DateTime CalculateCycleStart(DateTime? baseDate)
         {
             var now = DateTime.UtcNow;
