@@ -18,5 +18,9 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
         public string? SalaryCycle { get; set; }
         public string JobType { get; set; }
         public string? Category { get; set; }
+        public string? Description { get; set; }
+        public string? Requirements { get; set; }
+        public string? Benefits { get; set; }
+        public string? WorkTime { get; set; }
     }
 }

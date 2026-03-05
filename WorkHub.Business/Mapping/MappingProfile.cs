@@ -76,7 +76,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
                 .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
-                .ForMember(d => d.JobTypeId, o => o.MapFrom(s => s.JobType)) // Map to FK
+                .ForMember(d => d.JobTypeId, o => o.Ignore()) // Handle manually in Controller
                 .ForMember(d => d.JobType, o => o.Ignore()) // Ignore Nav Prop
                 .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
                 .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
@@ -104,13 +104,17 @@ namespace WorkHub.Business.Mapping
             //=================== Jobs Page MAPPING =================
 
             CreateMap<Recruitment, JobDTO>()
-             .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
-             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
+             .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType != null ? s.JobType.Name : null))
+             .ForMember(d => d.Category, o => o.MapFrom(s => s.Category != null ? s.Category.Name : null))
              .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
              .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
              .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
              .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
-             .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
+             .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle))
+             .ForMember(d => d.Description, o => o.MapFrom(s => s.Post != null ? s.Post.Content : null))
+             .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
+             .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
+             .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime));
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))

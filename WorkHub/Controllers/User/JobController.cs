@@ -104,6 +104,18 @@ namespace WorkHub.Controllers.User
             recruitment.Status = "Open";
             recruitment.CreatedAt = DateTime.UtcNow;
 
+            // Create the Post first
+            var post = new Post
+            {
+                UserId = userId,
+                Content = createJobRequest.Description,
+                CreatedAt = DateTime.UtcNow
+            };
+            _unitOfWork.PostRepository.Add(post);
+            await _unitOfWork.SaveAsync(); // Get the Post ID
+
+            recruitment.PostId = post.Id;
+
             // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))
             {
@@ -125,6 +137,20 @@ namespace WorkHub.Controllers.User
                 }
             }
 
+            // Manual JobType Mapping
+            if (!string.IsNullOrEmpty(createJobRequest.JobType))
+            {
+                if (int.TryParse(createJobRequest.JobType, out int typeId))
+                {
+                    recruitment.JobTypeId = typeId;
+                }
+                else
+                {
+                    var jobType = await _unitOfWork.JobTypeRepo.GetAsync(t => t.Name == createJobRequest.JobType);
+                    if (jobType != null) recruitment.JobTypeId = jobType.Id;
+                }
+            }
+
             // Manual City Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Location))
             {
@@ -141,5 +167,108 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<object>.Ok(null, "Create job successfully"));
         }
 
+        [Authorize]
+        [HttpGet("get-job/{id}")]
+        public async Task<IActionResult> GetJob(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var job = await _unitOfWork.RecruitmentInfoRepo.GetAsync(
+                r => r.Id == id && r.UserId == userId,
+                includeProperties: "JobType,Category,City,Post"
+            );
+
+            if (job == null)
+            {
+                return NotFound(ApiResponse<object>.NotFound("Job not found or unauthorized"));
+            }
+
+            var result = _mapper.Map<JobDTO>(job);
+            return Ok(ApiResponse<object>.Ok(result, "Job retrieved successfully"));
+        }
+
+        [Authorize]
+        [HttpPut("update-job/{id}")]
+        public async Task<IActionResult> UpdateJob(int id, [FromForm] CreateJobRequestDTO updateJobRequest)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var existingJob = await _unitOfWork.RecruitmentInfoRepo.GetAsync(
+                r => r.Id == id && r.UserId == userId,
+                includeProperties: "Post"
+            );
+
+            if (existingJob == null)
+            {
+                return NotFound(ApiResponse<object>.NotFound("Job not found or unauthorized"));
+            }
+
+            // Map updates
+            _mapper.Map(updateJobRequest, existingJob);
+            
+            // Manual Category Mapping (similar to Create)
+            if (!string.IsNullOrEmpty(updateJobRequest.Category))
+            {
+                if (int.TryParse(updateJobRequest.Category, out int catId))
+                {
+                    existingJob.CategoryId = catId;
+                }
+                else
+                {
+                    var category = await _unitOfWork.JobCategoryRepo.GetAsync(c => c.Name == updateJobRequest.Category);
+                    if (category != null) existingJob.CategoryId = category.Id;
+                }
+            }
+
+            // Manual JobType Mapping
+            if (!string.IsNullOrEmpty(updateJobRequest.JobType))
+            {
+                if (int.TryParse(updateJobRequest.JobType, out int typeId))
+                {
+                    existingJob.JobTypeId = typeId;
+                }
+                else
+                {
+                    var jobType = await _unitOfWork.JobTypeRepo.GetAsync(t => t.Name == updateJobRequest.JobType);
+                    if (jobType != null) existingJob.JobTypeId = jobType.Id;
+                }
+            }
+
+            // Manual City Mapping
+            if (!string.IsNullOrEmpty(updateJobRequest.Location))
+            {
+                var city = await _unitOfWork.CityRepo.GetAsync(c => c.Name == updateJobRequest.Location);
+                if (city != null) existingJob.CityId = city.Id;
+            }
+
+            // Manual Description (Post Content) Mapping
+            if (existingJob.Post != null && !string.IsNullOrEmpty(updateJobRequest.Description))
+            {
+                existingJob.Post.Content = updateJobRequest.Description;
+            }
+
+            _unitOfWork.RecruitmentInfoRepo.Update(existingJob);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Update job successfully"));
+        }
+
+        [Authorize]
+        [HttpDelete("delete-job/{id}")]
+        public async Task<IActionResult> DeleteJob(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var job = await _unitOfWork.RecruitmentInfoRepo.GetAsync(r => r.Id == id && r.UserId == userId);
+
+            if (job == null)
+            {
+                return NotFound(ApiResponse<object>.NotFound("Job not found or unauthorized"));
+            }
+
+            // Also remove from any posts it's attached to (handled by DB or explicit unlink)
+            // If Recruitment has PostId, it will be removed
+            _unitOfWork.RecruitmentInfoRepo.Remove(job);
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(null, "Delete job successfully"));
+        }
     }
 }
