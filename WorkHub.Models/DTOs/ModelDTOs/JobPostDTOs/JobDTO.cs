@@ -22,5 +22,6 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
         public string? Requirements { get; set; }
         public string? Benefits { get; set; }
         public string? WorkTime { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

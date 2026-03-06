@@ -64,7 +64,8 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
                 .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
                 .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
-                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle));
+                .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle))
+                .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.CreatedAt));
 
             CreateMap<CreateJobRequestDTO, Recruitment>()
                 .ForMember(d => d.JobName, o => o.MapFrom(s => s.JobTitle))
@@ -96,6 +97,7 @@ namespace WorkHub.Business.Mapping
             //=================== Home MAPPING =================
 
             CreateMap<User, UserFeatureDTO>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName))
             .ForMember(d => d.ratingCount, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Rating : 0))
             .ForMember(d => d.ActiveJob, o => o.MapFrom(s => s.Recruitments.Count));
@@ -114,7 +116,8 @@ namespace WorkHub.Business.Mapping
              .ForMember(d => d.Description, o => o.MapFrom(s => s.Post != null ? s.Post.Content : null))
              .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
              .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
-             .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime));
+             .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
+             .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.CreatedAt));
 
             CreateMap<Post, JobPostDTO>()
                 .ForMember(d => d.PostId, o => o.MapFrom(s => s.Id))
