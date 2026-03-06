@@ -340,6 +340,7 @@ namespace WorkHub.Controllers.User
                 .Select(x => new CommentTreeDTO
                 {
                     Id = x.Id,
+                    UserId = x.UserId,
                     UserName = x.UserName,
                     Content = x.Content,
                     UserUrl = x.UserUrl,
@@ -561,31 +562,73 @@ namespace WorkHub.Controllers.User
         }
 
         [Authorize]
-        [HttpPost("add-comment")]
-        public async Task<IActionResult> AddComment(AddCommentDTO dto)
+    [HttpPost("add-comment")]
+    public async Task<IActionResult> AddComment(AddCommentDTO dto)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+
+        if (user == null)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
-
-            if (user == null)
-            {
-                return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
-            }
-
-            var comment = new Comment
-            {
-                PostId = dto.PostId,
-                Content = dto.Content,
-                ParentCommentId = dto.ParentCommentId, // NULL = root, ID = reply
-                UserId = userId
-            };
-
-             _unitOfWork.CommentRepository.Add(comment);
-            await _unitOfWork.SaveAsync();
-
-            return Ok(ApiResponse<object>.Ok(null, "Comment added"));
+            return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
         }
+
+        var comment = new Comment
+        {
+            PostId = dto.PostId,
+            Content = dto.Content,
+            ParentCommentId = dto.ParentCommentId, // NULL = root, ID = reply
+            UserId = userId
+        };
+
+         _unitOfWork.CommentRepository.Add(comment);
+        await _unitOfWork.SaveAsync();
+
+        return Ok(ApiResponse<object>.Ok(null, "Comment added"));
+    }
+
+    [Authorize]
+    [HttpPut("update-comment/{id}")]
+    public async Task<IActionResult> UpdateComment(int id, [FromBody] UpdateCommentDTO dto)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var comment = await _unitOfWork.CommentRepository.GetAsync(c => c.Id == id);
+
+        if (comment == null)
+            return NotFound(ApiResponse<object>.NotFound("Comment not found"));
+
+        if (comment.UserId != userId)
+            return BadRequest(ApiResponse<object>.BadRequest("You can only edit your own comments"));
+
+        comment.Content = dto.Content;
+        await _unitOfWork.SaveAsync();
+
+        return Ok(ApiResponse<object>.Ok(null, "Comment updated"));
+    }
+
+    [Authorize]
+    [HttpDelete("delete-comment/{id}")]
+    public async Task<IActionResult> DeleteComment(int id)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var comment = await _unitOfWork.CommentRepository.GetAsync(c => c.Id == id);
+
+        if (comment == null)
+            return NotFound(ApiResponse<object>.NotFound("Comment not found"));
+
+        // Allow owner or admin to delete
+        var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
+        var adminRole = RoleMapper.MapRoleToRoleNumber(SD.Role_Admin);
+        
+        if (comment.UserId != userId && (user == null || user.Role != adminRole))
+            return BadRequest(ApiResponse<object>.BadRequest("You can only delete your own comments"));
+
+        _unitOfWork.CommentRepository.Remove(comment);
+        await _unitOfWork.SaveAsync();
+
+        return Ok(ApiResponse<object>.Ok(null, "Comment deleted"));
+    }
 
 
         [Authorize]
