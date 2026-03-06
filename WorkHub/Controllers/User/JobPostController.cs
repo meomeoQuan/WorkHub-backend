@@ -70,6 +70,10 @@ namespace WorkHub.Controllers.User
             string? jobType,
             string? location,
             string? salaryRange,
+            decimal? minSalary,
+            decimal? maxSalary,
+            string? salaryCurrency,
+            string? salaryCycle,
             string? postedDate,
             string? category,
             int pageIndex = 1,
@@ -102,6 +106,24 @@ namespace WorkHub.Controllers.User
             if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
                 queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category.Name == category));
+            }
+
+            // Structured Salary Filtering
+            if (minSalary.HasValue)
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary >= minSalary.Value));
+            }
+            if (maxSalary.HasValue)
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary <= maxSalary.Value));
+            }
+            if (!string.IsNullOrWhiteSpace(salaryCurrency) && !salaryCurrency.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCurrency == salaryCurrency));
+            }
+            if (!string.IsNullOrWhiteSpace(salaryCycle) && !salaryCycle.Equals("all", StringComparison.OrdinalIgnoreCase))
+            {
+                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCycle == salaryCycle));
             }
 
             if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))
@@ -355,11 +377,37 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
-
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: SD.Join_Subscription
+            );
+            
             if (user == null)
             {
                 return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
+
+            // Enforce Subscription Limits
+            var subscription = user.Subscription;
+            var plan = (subscription != null && subscription.IsActive) ? subscription.Plan : SD.Plan_Free;
+            if (plan != SD.Plan_Gold)
+            {
+                var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
+
+                var postCount = await _unitOfWork.PostRepository.CountAsync(r =>
+                    r.UserId == userId &&
+                    r.CreatedAt >= cycleStart
+                );
+
+                if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Miễn Phí. Làm ơn hãy nâng cấp gói của bạn !"));
+                }
+
+                if (plan == SD.Plan_Silver && postCount >= SD.Silver_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Bạc. Làm ơn hãy nâng cấp gói của bạn !"));
+                }
             }
 
             var post = new Post

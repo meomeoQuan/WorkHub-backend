@@ -85,18 +85,26 @@ namespace WorkHub.Utility
             var now = DateTime.UtcNow;
             if (!baseDate.HasValue) return now.AddMonths(-1);
 
-            // Calculate the start of the current cycle
-            // Example: baseDate = Jan 15, now = Mar 10
-            // Cycle 1: Jan 15 - Feb 15
-            // Cycle 2: Feb 15 - Mar 15
-            // Result for now (Mar 10) = Feb 15
+            var cycleStart = baseDate.Value;
 
-            var cycleDate = baseDate.Value;
-            while (cycleDate.AddMonths(1) <= now)
+            if (cycleStart <= now)
             {
-                cycleDate = cycleDate.AddMonths(1);
+                // Advance forward until the NEXT cycle would start after 'now'
+                while (cycleStart.AddMonths(1) <= now)
+                {
+                    cycleStart = cycleStart.AddMonths(1);
+                }
             }
-            return cycleDate;
+            else
+            {
+                // Roll back until cycleStart is in the past or exactly now
+                while (cycleStart > now)
+                {
+                    cycleStart = cycleStart.AddMonths(-1);
+                }
+            }
+
+            return cycleStart;
         }
 
     }
