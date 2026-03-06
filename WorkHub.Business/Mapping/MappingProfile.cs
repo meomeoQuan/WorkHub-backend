@@ -96,6 +96,7 @@ namespace WorkHub.Business.Mapping
             //=================== Home MAPPING =================
 
             CreateMap<User, UserFeatureDTO>()
+            .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
             .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName))
             .ForMember(d => d.ratingCount, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Rating : 0))
             .ForMember(d => d.ActiveJob, o => o.MapFrom(s => s.Recruitments.Count));

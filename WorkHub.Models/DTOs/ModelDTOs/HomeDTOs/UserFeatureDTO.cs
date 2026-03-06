@@ -8,6 +8,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.HomeDTOs
 {
     public class UserFeatureDTO
     {
+        public int Id { get; set; }
         public string FullName { get; set; } = null!;
         public double ? ratingCount { get; set; }
 
