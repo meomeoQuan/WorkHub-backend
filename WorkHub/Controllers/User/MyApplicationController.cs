@@ -193,7 +193,8 @@ namespace WorkHub.Controllers.User
                 );
 
                 // Enforce Application Limits for Free Plan
-                var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+                var subscription = user.Subscription;
+                var plan = (subscription != null && subscription.IsActive) ? subscription.Plan : SD.Plan_Free;
                 if (plan == SD.Plan_Free)
                 {
                     var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
@@ -205,7 +206,7 @@ namespace WorkHub.Controllers.User
 
                     if (applyCount >= SD.Free_Apply_Limit)
                     {
-                        return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn ứng tuyển của gói Miễn Phí ({SD.Free_Apply_Limit} lượt/tháng). Vui lòng nâng cấp để ứng tuyển không giới hạn."));
+                        return BadRequest(ApiResponse<object>.BadRequest("you are exceed amount your plan , please upgrade plan ."));
                     }
                 }
 

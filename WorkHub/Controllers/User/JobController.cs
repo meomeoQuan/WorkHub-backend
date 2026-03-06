@@ -70,11 +70,12 @@ namespace WorkHub.Controllers.User
 
             if (user == null)
             {
-                return NotFound(ApiResponse<object>.BadRequest(null, "User not found"));
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
             }
 
             // Enforce Subscription Limits
-            var plan = user.Subscription?.Plan ?? SD.Plan_Free;
+            var subscription = user.Subscription;
+            var plan = (subscription != null && subscription.IsActive) ? subscription.Plan : SD.Plan_Free;
             if (plan != SD.Plan_Gold)
             {
 
@@ -87,12 +88,12 @@ namespace WorkHub.Controllers.User
 
                 if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
                 {
-                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Miễn Phí ({SD.Free_Post_Limit} bài/tháng). Vui lòng nâng cấp để tiếp tục."));
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Miễn Phí. Làm ơn hãy nâng cấp gói của bạn !"));
                 }
                 
                 if (plan == SD.Plan_Silver && postCount >= SD.Silver_Post_Limit)
                 {
-                    return BadRequest(ApiResponse<object>.BadRequest(null, $"Bạn đã đạt giới hạn đăng bài của gói Silver ({SD.Silver_Post_Limit} bài/tháng). Vui lòng nâng cấp lên Gold để đăng không giới hạn."));
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Bạc. Làm ơn hãy nâng cấp gói của bạn !"));
                 }
             }
 
