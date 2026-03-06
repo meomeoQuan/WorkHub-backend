@@ -81,7 +81,7 @@ namespace WorkHub.Controllers.User
 
                 var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
                 
-                var postCount = await _unitOfWork.RecruitmentInfoRepo.CountAsync(r => 
+                var postCount = await _unitOfWork.PostRepository.CountAsync(r => 
                     r.UserId == userId && 
                     r.CreatedAt >= cycleStart
                 );

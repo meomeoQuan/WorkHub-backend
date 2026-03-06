@@ -377,11 +377,37 @@ namespace WorkHub.Controllers.User
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-            var user = await _unitOfWork.UserRepository.GetAsync(u => u.Id == userId);
-
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: SD.Join_Subscription
+            );
+            
             if (user == null)
             {
                 return BadRequest(ApiResponse<object>.BadRequest("User unauthorize !"));
+            }
+
+            // Enforce Subscription Limits
+            var subscription = user.Subscription;
+            var plan = (subscription != null && subscription.IsActive) ? subscription.Plan : SD.Plan_Free;
+            if (plan != SD.Plan_Gold)
+            {
+                var cycleStart = SD.CalculateCycleStart(user.Subscription?.StartAt ?? user.CreatedAt);
+
+                var postCount = await _unitOfWork.PostRepository.CountAsync(r =>
+                    r.UserId == userId &&
+                    r.CreatedAt >= cycleStart
+                );
+
+                if (plan == SD.Plan_Free && postCount >= SD.Free_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Miễn Phí. Làm ơn hãy nâng cấp gói của bạn !"));
+                }
+
+                if (plan == SD.Plan_Silver && postCount >= SD.Silver_Post_Limit)
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Bạn đã đạt giới hạn đăng bài của gói Bạc. Làm ơn hãy nâng cấp gói của bạn !"));
+                }
             }
 
             var post = new Post
