@@ -29,13 +29,15 @@ namespace WorkHub.Business.Service
         private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IConfiguration _configuration;
 
         public AuthService(IUnitOfWork unitOfWork,
                             JwtService jwtService,
                             IGoogleAuthService googleAuthService,
                             IMapper mapper,
                             IEmailService emailService,
-                            IWebHostEnvironment webHostEnvironment)
+                            IWebHostEnvironment webHostEnvironment,
+                            IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
@@ -43,6 +45,7 @@ namespace WorkHub.Business.Service
             _mapper = mapper;
             _emailService = emailService;
             _webHostEnvironment = webHostEnvironment;
+            _configuration = configuration;
         }
 
         public async Task<UserDTO?> RegisterAsync(RegisterRequestDTO request)
@@ -75,7 +78,8 @@ namespace WorkHub.Business.Service
             _unitOfWork.UserRepository.Add(user);
             await _unitOfWork.SaveAsync();
 
-            var verifyLink = $"http://localhost:3000/verify-email?token={token}";
+            var frontendUrl = _configuration["FrontendBaseUrl"] ?? "http://localhost:3000";
+            var verifyLink = $"{frontendUrl}/verify-email?token={token}";
 
             var path = Path.Combine(
                     _webHostEnvironment.ContentRootPath,
@@ -257,7 +261,8 @@ namespace WorkHub.Business.Service
             _unitOfWork.UserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            var verifyLink = $"http://localhost:3000/verify-email?token={token}";
+            var frontendUrl = _configuration["FrontendBaseUrl"] ?? "http://localhost:3000";
+            var verifyLink = $"{frontendUrl}/verify-email?token={token}";
 
             var path = Path.Combine(
                     _webHostEnvironment.ContentRootPath,
@@ -293,7 +298,8 @@ namespace WorkHub.Business.Service
             _unitOfWork.UserRepository.Update(user);
             await _unitOfWork.SaveAsync();
 
-            var verifyLink = $"http://localhost:3000/reset-password?token={token}";
+            var frontendUrl = _configuration["FrontendBaseUrl"] ?? "http://localhost:3000";
+            var verifyLink = $"{frontendUrl}/reset-password?token={token}";
 
             var path = Path.Combine(
                     _webHostEnvironment.ContentRootPath,

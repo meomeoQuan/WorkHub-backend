@@ -35,5 +35,8 @@
     <ProjectReference Include="..\WorkHub.DataAccess\WorkHub.DataAccess.csproj" />
     <ProjectReference Include="..\WorkHub.Utility\WorkHub.Utility.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Templates\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>
