@@ -586,6 +586,21 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("PostLike", (string)null);
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.PostRecruitment", b =>
+                {
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecruitmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PostId", "RecruitmentId");
+
+                    b.HasIndex("RecruitmentId");
+
+                    b.ToTable("PostRecruitment", (string)null);
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.Property<int>("Id")
@@ -625,9 +640,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<decimal>("MinSalary")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("PostId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Requirements")
                         .HasColumnType("nvarchar(max)");
 
@@ -662,8 +674,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("JobTypeId");
-
-                    b.HasIndex("PostId");
 
                     b.HasIndex(new[] { "UserId" }, "IX_Recruitment_UserId");
 
@@ -1093,6 +1103,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.PostRecruitment", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.Post", "Post")
+                        .WithMany("PostRecruitments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.Recruitment", "Recruitment")
+                        .WithMany("PostRecruitments")
+                        .HasForeignKey("RecruitmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("Recruitment");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.Category", "Category")
@@ -1111,11 +1140,6 @@ namespace WorkHub.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkHub.Models.Models.Post", "Post")
-                        .WithMany("Recruitments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("WorkHub.Models.Models.User", "User")
                         .WithMany("Recruitments")
                         .HasForeignKey("UserId")
@@ -1127,8 +1151,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("City");
 
                     b.Navigation("JobType");
-
-                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });
@@ -1233,12 +1255,14 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Navigation("PostLikes");
 
-                    b.Navigation("Recruitments");
+                    b.Navigation("PostRecruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.Navigation("Applications");
+
+                    b.Navigation("PostRecruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.User", b =>

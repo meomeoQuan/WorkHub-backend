@@ -27,7 +27,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
-                .ForMember(d => d.description, o => o.MapFrom(s => s.Post.Content))
+                .ForMember(d => d.description, o => o.MapFrom(s => s.PostRecruitments.FirstOrDefault() != null ? s.PostRecruitments.FirstOrDefault().Post.Content : null))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
                 .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
@@ -39,7 +39,7 @@ namespace WorkHub.Business.Mapping
             CreateMap<Recruitment, RecruitmentDetailInfoDTO>()
                 .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
-                .ForMember(d => d.Description, o => o.MapFrom(s => s.Post.Content))
+                .ForMember(d => d.Description, o => o.MapFrom(s => s.PostRecruitments.FirstOrDefault() != null ? s.PostRecruitments.FirstOrDefault().Post.Content : null))
                 .ForMember(d => d.Schedule, o => o.MapFrom(s => s.WorkTime))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status == "Active"))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
@@ -85,8 +85,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle))
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.Id, o => o.Ignore())
-                .ForMember(d => d.UserId, o => o.Ignore())
-                .ForMember(d => d.PostId, o => o.Ignore());
+                .ForMember(d => d.UserId, o => o.Ignore());
 
             //=================== Auth MAPPING =================
             CreateMap<User, UserDTO>()
@@ -113,7 +112,7 @@ namespace WorkHub.Business.Mapping
              .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
              .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
              .ForMember(d => d.SalaryCycle, o => o.MapFrom(s => s.SalaryCycle))
-             .ForMember(d => d.Description, o => o.MapFrom(s => s.Post != null ? s.Post.Content : null))
+             .ForMember(d => d.Description, o => o.MapFrom(s => s.PostRecruitments.FirstOrDefault() != null ? s.PostRecruitments.FirstOrDefault().Post.Content : null))
              .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
              .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
              .ForMember(d => d.WorkTime, o => o.MapFrom(s => s.WorkTime))
@@ -128,7 +127,7 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.PostImage, o => o.MapFrom(s => s.PostImageUrl))
                 .ForMember(d => d.LikeCount, o => o.MapFrom(s => s.PostLikes.Count))
                 .ForMember(d => d.CommentCount, o => o.MapFrom(s => s.Comments.Count))
-                .ForMember(d => d.Jobs, o => o.MapFrom(s => s.Recruitments));
+                .ForMember(d => d.Jobs, o => o.MapFrom(s => s.PostRecruitments.Select(pr => pr.Recruitment)));
 
 
 

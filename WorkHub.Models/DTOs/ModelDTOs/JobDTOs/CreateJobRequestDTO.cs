@@ -30,6 +30,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobDTOs
 
         // Optional images
         //public List<IFormFile>? JobImages { get; set; }
+
+        public bool CreatePost { get; set; } = false; // Post is optional, default to false
     }
 
 }

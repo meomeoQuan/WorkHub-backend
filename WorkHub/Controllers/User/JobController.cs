@@ -105,17 +105,30 @@ namespace WorkHub.Controllers.User
             recruitment.Status = "Open";
             recruitment.CreatedAt = DateTime.UtcNow;
 
-            // Create the Post first
-            var post = new Post
+            if (createJobRequest.CreatePost)
             {
-                UserId = userId,
-                Content = createJobRequest.Description,
-                CreatedAt = DateTime.UtcNow
-            };
-            _unitOfWork.PostRepository.Add(post);
-            await _unitOfWork.SaveAsync(); // Get the Post ID
+                // Create the Post first
+                var post = new Post
+                {
+                    UserId = userId,
+                    Content = createJobRequest.Description,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _unitOfWork.PostRepository.Add(post);
+                await _unitOfWork.SaveAsync(); // Get the Post ID
 
-            recruitment.PostId = post.Id;
+                // Link via join table - use navigation properties to handle IDs automatically
+                _unitOfWork.PostRecruitmentRepository.Add(new PostRecruitment 
+                { 
+                    Post = post, 
+                    Recruitment = recruitment 
+                });
+            }
+            else
+            {
+                // Just add the recruitment without a post link
+                _unitOfWork.RecruitmentInfoRepo.Add(recruitment);
+            }
 
             // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))
@@ -175,7 +188,7 @@ namespace WorkHub.Controllers.User
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var job = await _unitOfWork.RecruitmentInfoRepo.GetAsync(
                 r => r.Id == id && r.UserId == userId,
-                includeProperties: "JobType,Category,City,Post"
+                includeProperties: "JobType,Category,City," + SD.Collection_Join_PostRecruitments + ".Post"
             );
 
             if (job == null)
@@ -194,7 +207,7 @@ namespace WorkHub.Controllers.User
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var existingJob = await _unitOfWork.RecruitmentInfoRepo.GetAsync(
                 r => r.Id == id && r.UserId == userId,
-                includeProperties: "Post"
+                includeProperties: SD.Collection_Join_PostRecruitments + ".Post"
             );
 
             if (existingJob == null)
@@ -240,10 +253,11 @@ namespace WorkHub.Controllers.User
                 if (city != null) existingJob.CityId = city.Id;
             }
 
-            // Manual Description (Post Content) Mapping
-            if (existingJob.Post != null && !string.IsNullOrEmpty(updateJobRequest.Description))
+            // Manual Description (Post Content) Mapping - update the first linked post
+            var firstPost = existingJob.PostRecruitments.FirstOrDefault()?.Post;
+            if (firstPost != null && !string.IsNullOrEmpty(updateJobRequest.Description))
             {
-                existingJob.Post.Content = updateJobRequest.Description;
+                firstPost.Content = updateJobRequest.Description;
             }
 
             _unitOfWork.RecruitmentInfoRepo.Update(existingJob);

@@ -99,7 +99,6 @@ public static class DbSeeder
         var rec1 = new Recruitment
         {
             UserId = user1.Id,
-            PostId = post1.Id,
             JobName = "Junior .NET Developer",
             CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = fullTimeEntity?.Id ?? 1,
@@ -114,7 +113,6 @@ public static class DbSeeder
         var rec2 = new Recruitment
         {
             UserId = user2.Id,
-            PostId = post2.Id,
             JobName = "Frontend Developer",
             CategoryId = catITEntity?.Id ?? 1,
             JobTypeId = partTimeEntity?.Id ?? 1,
@@ -127,6 +125,13 @@ public static class DbSeeder
         };
 
         context.Recruitments.AddRange(rec1, rec2);
+        context.SaveChanges();
+
+        // ================= POST RECRUITMENT (JOIN TABLE) =================
+        context.PostRecruitments.AddRange(
+            new PostRecruitment { PostId = post1.Id, RecruitmentId = rec1.Id },
+            new PostRecruitment { PostId = post2.Id, RecruitmentId = rec2.Id }
+        );
         context.SaveChanges();
 
         // ================= APPLICATION =================

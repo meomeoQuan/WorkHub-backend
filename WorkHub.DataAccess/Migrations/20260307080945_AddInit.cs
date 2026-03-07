@@ -123,6 +123,56 @@ namespace WorkHub.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Recruitment",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    JobTypeId = table.Column<int>(type: "int", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: true),
+                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    MinSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    MaxSalary = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    SalaryCurrency = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    SalaryCycle = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Benefits = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__Recruitm__3214EC079D1054A4", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Cities_CityId",
+                        column: x => x.CityId,
+                        principalTable: "Cities",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Recruitment_JobTypes_JobTypeId",
+                        column: x => x.JobTypeId,
+                        principalTable: "JobTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Recruitment_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserDetail",
                 columns: table => new
                 {
@@ -334,83 +384,6 @@ namespace WorkHub.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Recruitment",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    PostId = table.Column<int>(type: "int", nullable: true),
-                    JobName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    JobTypeId = table.Column<int>(type: "int", nullable: false),
-                    CityId = table.Column<int>(type: "int", nullable: true),
-                    Location = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    Salary = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Benefits = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WorkTime = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__Recruitm__3214EC079D1054A4", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Recruitment_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Recruitment_Cities_CityId",
-                        column: x => x.CityId,
-                        principalTable: "Cities",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Recruitment_JobTypes_JobTypeId",
-                        column: x => x.JobTypeId,
-                        principalTable: "JobTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Recruitment_Post_PostId",
-                        column: x => x.PostId,
-                        principalTable: "Post",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Recruitment_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CommentLikes",
-                columns: table => new
-                {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    CommentId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CommentLikes", x => new { x.UserId, x.CommentId });
-                    table.ForeignKey(
-                        name: "FK_CommentLikes_Comment_CommentId",
-                        column: x => x.CommentId,
-                        principalTable: "Comment",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_CommentLikes_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Application",
                 columns: table => new
                 {
@@ -437,6 +410,54 @@ namespace WorkHub.DataAccess.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PostRecruitment",
+                columns: table => new
+                {
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    RecruitmentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostRecruitment", x => new { x.PostId, x.RecruitmentId });
+                    table.ForeignKey(
+                        name: "FK_PostRecruitment_Post_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PostRecruitment_Recruitment_RecruitmentId",
+                        column: x => x.RecruitmentId,
+                        principalTable: "Recruitment",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CommentLikes",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CommentId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommentLikes", x => new { x.UserId, x.CommentId });
+                    table.ForeignKey(
+                        name: "FK_CommentLikes_Comment_CommentId",
+                        column: x => x.CommentId,
+                        principalTable: "Comment",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_CommentLikes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -562,6 +583,11 @@ namespace WorkHub.DataAccess.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PostRecruitment_RecruitmentId",
+                table: "PostRecruitment",
+                column: "RecruitmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Recruitment_CategoryId",
                 table: "Recruitment",
                 column: "CategoryId");
@@ -575,11 +601,6 @@ namespace WorkHub.DataAccess.Migrations
                 name: "IX_Recruitment_JobTypeId",
                 table: "Recruitment",
                 column: "JobTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Recruitment_PostId",
-                table: "Recruitment",
-                column: "PostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Recruitment_UserId",
@@ -641,6 +662,9 @@ namespace WorkHub.DataAccess.Migrations
                 name: "PostLike");
 
             migrationBuilder.DropTable(
+                name: "PostRecruitment");
+
+            migrationBuilder.DropTable(
                 name: "UserDetail");
 
             migrationBuilder.DropTable(
@@ -659,10 +683,13 @@ namespace WorkHub.DataAccess.Migrations
                 name: "UserSubscriptions");
 
             migrationBuilder.DropTable(
+                name: "Comment");
+
+            migrationBuilder.DropTable(
                 name: "Recruitment");
 
             migrationBuilder.DropTable(
-                name: "Comment");
+                name: "Post");
 
             migrationBuilder.DropTable(
                 name: "Categories");
@@ -672,9 +699,6 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "JobTypes");
-
-            migrationBuilder.DropTable(
-                name: "Post");
 
             migrationBuilder.DropTable(
                 name: "Users");

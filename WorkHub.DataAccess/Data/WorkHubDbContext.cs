@@ -32,6 +32,7 @@ public partial class WorkHubDbContext : DbContext
 
     public virtual DbSet<UserSubscription> UserSubscriptions { get; set; }
     public virtual DbSet<CommentLikes> CommentLikes { get; set; }
+    public virtual DbSet<PostRecruitment> PostRecruitments { get; set; }
 
     public virtual DbSet<UserExperience> UserExperiences { get; set; }
     public virtual DbSet<UserEducation> UserEducations { get; set; }
@@ -199,12 +200,10 @@ public partial class WorkHubDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // MAIN relationship (Post owns Recruitment)
-            entity.HasOne(r => r.Post)
-                .WithMany(p => p.Recruitments)
-                .HasForeignKey(r => r.PostId)
-                .IsRequired(false)
-                .OnDelete(DeleteBehavior.SetNull);
+            // MAIN relationship (Many-to-Many via PostRecruitment)
+            entity.HasMany(r => r.PostRecruitments)
+                .WithOne(pr => pr.Recruitment)
+                .HasForeignKey(pr => pr.RecruitmentId);
 
             entity.HasOne(r => r.Category)
       .WithMany(c => c.Recruitments)
@@ -218,6 +217,23 @@ public partial class WorkHubDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(r => r.CityId);
 
+        });
+
+        modelBuilder.Entity<PostRecruitment>(entity =>
+        {
+            entity.HasKey(pr => new { pr.PostId, pr.RecruitmentId });
+
+            entity.ToTable("PostRecruitment");
+
+            entity.HasOne(pr => pr.Post)
+                .WithMany(p => p.PostRecruitments)
+                .HasForeignKey(pr => pr.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pr => pr.Recruitment)
+                .WithMany(r => r.PostRecruitments)
+                .HasForeignKey(pr => pr.RecruitmentId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
 

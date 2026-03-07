@@ -16,6 +16,7 @@ namespace WorkHub.DataAccess.Repository.IRepository
         public IUserDetailRepository UserDetailRepository { get; }
 
         public IPostRepository PostRepository { get; }
+        public IPostRecruitmentRepository PostRecruitmentRepository { get; }
 
         public ICommentRepository CommentRepository { get; }
 

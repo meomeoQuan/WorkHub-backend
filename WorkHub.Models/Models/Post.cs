@@ -20,7 +20,7 @@ public partial class Post
 
     public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
 
-    public virtual ICollection<Recruitment> Recruitments { get; set; } = new List<Recruitment>();   // 👈 ADD THIS
+    public virtual ICollection<PostRecruitment> PostRecruitments { get; set; } = new List<PostRecruitment>();
 
 
     public virtual User User { get; set; } = null!;

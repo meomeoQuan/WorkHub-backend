@@ -36,8 +36,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
-                + SD.Collection_Join_Recruitments + ".JobType," 
-                + SD.Collection_Join_Recruitments + ".Category",
+                + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType," 
+                + SD.Collection_Join_PostRecruitments + ".Recruitment.Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -87,43 +87,43 @@ namespace WorkHub.Controllers.User
                 var s = searchQuery.ToLower();
                 queryFilter = queryFilter.And(p => p.Content.ToLower().Contains(s) ||
                                                    p.User.FullName.ToLower().Contains(s) ||
-                                                   p.Recruitments.Any(r => r.JobName.ToLower().Contains(s) || r.Location.ToLower().Contains(s)));
+                                                   p.PostRecruitments.Any(pr => pr.Recruitment.JobName.ToLower().Contains(s) || pr.Recruitment.Location.ToLower().Contains(s)));
             }
 
             if (!string.IsNullOrWhiteSpace(jobType) && !jobType.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
                  queryFilter = queryFilter.And(p =>
-                 p.Recruitments.Any(r => r.JobType.Name == jobType)
+                 p.PostRecruitments.Any(pr => pr.Recruitment.JobType.Name == jobType)
  );
 
             }
 
             if (!string.IsNullOrWhiteSpace(location) && !location.Equals("all-cities", StringComparison.OrdinalIgnoreCase))
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Location.Contains(location)));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.Location.Contains(location)));
             }
 
             if (!string.IsNullOrWhiteSpace(category) && !category.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.Category.Name == category));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.Category.Name == category));
             }
 
             // Structured Salary Filtering
             if (minSalary.HasValue)
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary >= minSalary.Value));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.MinSalary >= minSalary.Value));
             }
             if (maxSalary.HasValue)
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.MinSalary <= maxSalary.Value));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.MinSalary <= maxSalary.Value));
             }
             if (!string.IsNullOrWhiteSpace(salaryCurrency) && !salaryCurrency.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCurrency == salaryCurrency));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.SalaryCurrency == salaryCurrency));
             }
             if (!string.IsNullOrWhiteSpace(salaryCycle) && !salaryCycle.Equals("all", StringComparison.OrdinalIgnoreCase))
             {
-                queryFilter = queryFilter.And(p => p.Recruitments.Any(r => r.SalaryCycle == salaryCycle));
+                queryFilter = queryFilter.And(p => p.PostRecruitments.Any(pr => pr.Recruitment.SalaryCycle == salaryCycle));
             }
 
             if (!string.IsNullOrWhiteSpace(postedDate) && !postedDate.Equals("anytime", StringComparison.OrdinalIgnoreCase))
@@ -144,8 +144,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
-                + SD.Collection_Join_Recruitments + ".JobType,"
-                + SD.Collection_Join_Recruitments + ".Category",
+                + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
+                + SD.Collection_Join_PostRecruitments + ".Recruitment.Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -206,8 +206,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                     + SD.Collection_Join_Comments + ","
                     + SD.Collection_Join_PostLikes + ","
-                    + SD.Collection_Join_Recruitments + ".JobType,"
-                    + SD.Collection_Join_Recruitments + ".Category",
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.Category",
                 orderBy: p => p.CreatedAt,
                 descending: true
             );
@@ -241,8 +241,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                                 + SD.Collection_Join_Comments + ","
                                 + SD.Collection_Join_PostLikes + ","
-                                + SD.Collection_Join_Recruitments + ".JobType,"
-                                + SD.Collection_Join_Recruitments + ".Category"
+                                + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
+                                + SD.Collection_Join_PostRecruitments + ".Recruitment.Category"
             );
 
             if (post == null)
@@ -428,9 +428,9 @@ namespace WorkHub.Controllers.User
                 var recruitments = await _unitOfWork.RecruitmentInfoRepo
                     .GetAllAsync(r => dto.RecruitmentIds.Contains(r.Id));
 
-                foreach (var r in recruitments)
+                foreach (var rId in dto.RecruitmentIds)
                 {
-                    r.PostId = post.Id;   // ✅ LINK TO POST
+                    post.PostRecruitments.Add(new PostRecruitment { PostId = post.Id, RecruitmentId = rId });
                 }
 
                 await _unitOfWork.SaveAsync();
@@ -458,12 +458,8 @@ namespace WorkHub.Controllers.User
                 return Forbid();
             }
 
-            // Unlink recruitments
-            var recruitments = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.PostId == id);
-            foreach (var r in recruitments)
-            {
-                r.PostId = null;
-            }
+            // Unlink recruitments (cascade delete will handle this, but manual clearing is fine)
+            post.PostRecruitments.Clear();
 
             _unitOfWork.PostRepository.Remove(post);
             await _unitOfWork.SaveAsync();
@@ -499,21 +495,19 @@ namespace WorkHub.Controllers.User
 
             // Update recruitment links
             // 1. Unlink current
-            var currentRecruitments = await _unitOfWork.RecruitmentInfoRepo.GetAllAsync(r => r.PostId == id);
-            foreach (var r in currentRecruitments)
+            // 1. Unlink current
+            var currentLinks = await _unitOfWork.PostRecruitmentRepository.GetAllAsync(r => r.PostId == id);
+            foreach (var link in currentLinks)
             {
-                r.PostId = null;
+                _unitOfWork.PostRecruitmentRepository.Remove(link);
             }
 
             // 2. Link new ones
             if (dto.RecruitmentIds?.Any() == true)
             {
-                var newRecruitments = await _unitOfWork.RecruitmentInfoRepo
-                    .GetAllAsync(r => dto.RecruitmentIds.Contains(r.Id));
-
-                foreach (var r in newRecruitments)
+                foreach (var rId in dto.RecruitmentIds)
                 {
-                    r.PostId = id;
+                    post.PostRecruitments.Add(new PostRecruitment { PostId = id, RecruitmentId = rId });
                 }
             }
 

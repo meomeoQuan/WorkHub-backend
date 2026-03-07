@@ -57,6 +57,7 @@ namespace WorkHub.Utility
         public const string Collection_Join_Applications = "Applications";
         public const string Collection_Join_Posts = "Posts";
         public const string Collection_Join_Recruitments = "Recruitments";
+        public const string Collection_Join_PostRecruitments = "PostRecruitments";
         public const string Collection_Join_UserFollowFollowers = "UserFollowFollowers";
         public const string Collection_Join_UserFollowFollowings = "UserFollowFollowings";
         public const string Collection_Join_UserSchedules = "UserSchedules";
