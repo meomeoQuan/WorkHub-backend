@@ -242,8 +242,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                     + SD.Collection_Join_Comments + ","
                     + SD.Collection_Join_PostLikes + ","
-                    + SD.Collection_Join_Recruitments + ".JobType," 
-                    + SD.Collection_Join_Recruitments + ".Category"
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType," 
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.Category"
             );
 
             var result = _mapper.Map<List<JobPostDTO>>(posts);
@@ -290,8 +290,8 @@ namespace WorkHub.Controllers.User
                 includeProperties: SD.Join_User + ","
                     + SD.Collection_Join_Comments + ","
                     + SD.Collection_Join_PostLikes + ","
-                    + SD.Collection_Join_Recruitments + ".JobType," 
-                    + SD.Collection_Join_Recruitments + ".Category"
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType," 
+                    + SD.Collection_Join_PostRecruitments + ".Recruitment.Category"
             );
 
             var result = _mapper.Map<List<JobPostDTO>>(posts);

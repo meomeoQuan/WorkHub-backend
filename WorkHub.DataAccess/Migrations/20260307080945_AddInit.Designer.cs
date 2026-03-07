@@ -12,7 +12,7 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260303094527_AddInit")]
+    [Migration("20260307080945_AddInit")]
     partial class AddInit
     {
         /// <inheritdoc />
@@ -589,6 +589,21 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("PostLike", (string)null);
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.PostRecruitment", b =>
+                {
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecruitmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PostId", "RecruitmentId");
+
+                    b.HasIndex("RecruitmentId");
+
+                    b.ToTable("PostRecruitment", (string)null);
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.Property<int>("Id")
@@ -622,8 +637,11 @@ namespace WorkHub.DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int?>("PostId")
-                        .HasColumnType("int");
+                    b.Property<decimal?>("MaxSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinSalary")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Requirements")
                         .HasColumnType("nvarchar(max)");
@@ -631,6 +649,14 @@ namespace WorkHub.DataAccess.Migrations
                     b.Property<string>("Salary")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SalaryCurrency")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SalaryCycle")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
@@ -651,8 +677,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("JobTypeId");
-
-                    b.HasIndex("PostId");
 
                     b.HasIndex(new[] { "UserId" }, "IX_Recruitment_UserId");
 
@@ -1082,6 +1106,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.PostRecruitment", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.Post", "Post")
+                        .WithMany("PostRecruitments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.Recruitment", "Recruitment")
+                        .WithMany("PostRecruitments")
+                        .HasForeignKey("RecruitmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("Recruitment");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.Category", "Category")
@@ -1100,11 +1143,6 @@ namespace WorkHub.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkHub.Models.Models.Post", "Post")
-                        .WithMany("Recruitments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("WorkHub.Models.Models.User", "User")
                         .WithMany("Recruitments")
                         .HasForeignKey("UserId")
@@ -1116,8 +1154,6 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("City");
 
                     b.Navigation("JobType");
-
-                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });
@@ -1222,12 +1258,14 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Navigation("PostLikes");
 
-                    b.Navigation("Recruitments");
+                    b.Navigation("PostRecruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.Recruitment", b =>
                 {
                     b.Navigation("Applications");
+
+                    b.Navigation("PostRecruitments");
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.User", b =>

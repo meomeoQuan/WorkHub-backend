@@ -20,6 +20,7 @@ namespace WorkHub.DataAccess.Repository
             UserRepository = new UserRepository(_db);
             UserDetailRepository = new UserDetailRepository(_db);
             PostRepository =  new PostRepository(_db);
+            PostRecruitmentRepository = new PostRecruitmentRepository(_db);
             CommentRepository = new CommentRepository(_db);
             PostLikeRepository = new PostLikeRepository(_db);
             userFollowRepository = new UserFollowRepository(_db);
@@ -41,6 +42,7 @@ namespace WorkHub.DataAccess.Repository
         public IUserDetailRepository UserDetailRepository { get; private set; }
 
         public IPostRepository PostRepository { get; private set; }
+        public IPostRecruitmentRepository PostRecruitmentRepository { get; private set; }
 
         public ICommentRepository CommentRepository { get; private set; }
 
