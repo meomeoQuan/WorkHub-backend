@@ -105,22 +105,30 @@ namespace WorkHub.Controllers.User
             recruitment.Status = "Open";
             recruitment.CreatedAt = DateTime.UtcNow;
 
-            // Create the Post first
-            var post = new Post
+            if (createJobRequest.CreatePost)
             {
-                UserId = userId,
-                Content = createJobRequest.Description,
-                CreatedAt = DateTime.UtcNow
-            };
-            _unitOfWork.PostRepository.Add(post);
-            await _unitOfWork.SaveAsync(); // Get the Post ID
+                // Create the Post first
+                var post = new Post
+                {
+                    UserId = userId,
+                    Content = createJobRequest.Description,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _unitOfWork.PostRepository.Add(post);
+                await _unitOfWork.SaveAsync(); // Get the Post ID
 
-            // Link via join table - use navigation properties to handle IDs automatically
-            _unitOfWork.PostRecruitmentRepository.Add(new PostRecruitment 
-            { 
-                Post = post, 
-                Recruitment = recruitment 
-            });
+                // Link via join table - use navigation properties to handle IDs automatically
+                _unitOfWork.PostRecruitmentRepository.Add(new PostRecruitment 
+                { 
+                    Post = post, 
+                    Recruitment = recruitment 
+                });
+            }
+            else
+            {
+                // Just add the recruitment without a post link
+                _unitOfWork.RecruitmentInfoRepo.Add(recruitment);
+            }
 
             // Manual Category Mapping
             if (!string.IsNullOrEmpty(createJobRequest.Category))
