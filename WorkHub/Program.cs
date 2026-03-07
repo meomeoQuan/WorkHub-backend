@@ -87,9 +87,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.AddPolicy("AllowAll", policy =>
             policy.WithOrigins(
                     "http://localhost:3000",
-                    "https://workhub-frontend.vercel.app",
-                    "https://work-hub-frontend-meomeoguans-projects.vercel.app",
-                    "https://work-hub-frontend-4nt1vqj8g-meomeoguans-projects.vercel.app"
+                    "https://work-hub-frontend-six.vercel.app"
                 ) // Add your Vercel domain here
                   .AllowAnyHeader()
                   .AllowAnyMethod()
