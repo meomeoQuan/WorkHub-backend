@@ -51,7 +51,9 @@ namespace WorkHub.Controllers.User
             if (user == null)
                 return BadRequest(ApiResponse<object>.BadRequest(null, "User Unauthorize"));
 
-            var orderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            // Combine Unix timestamp with random digits to ensure uniqueness
+            var random = new Random();
+            var orderCode = long.Parse($"{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{random.Next(100, 999)}");
 
             var paymentRequest = new CreatePaymentLinkRequest
             {
@@ -108,7 +110,7 @@ namespace WorkHub.Controllers.User
             }
             catch(Exception ex)
             {
-                // Return full exception details for debugging
+                Console.WriteLine($"PayOS Error: {ex}");
                 return StatusCode(500, ApiResponse<object>.Error(500, $"PayOS Error: {ex.Message}", ex.ToString()));
             }
         
