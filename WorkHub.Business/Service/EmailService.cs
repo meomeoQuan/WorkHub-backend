@@ -59,12 +59,12 @@ namespace WorkHub.Business.Service
 
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
-            Console.WriteLine($"[EmailService] Connecting to SMTP {_configuration["EmailSettings:Host"]}:{_configuration["EmailSettings:Port"]}...");
+            Console.WriteLine($"[EmailService] Connecting to SMTP {_configuration["EmailSettings:Host"]}:465 (SSL)...");
 
             await smtp.ConnectAsync(
                 _configuration["EmailSettings:Host"],
-                int.Parse(_configuration["EmailSettings:Port"]!),
-                SecureSocketOptions.StartTls,
+                465,
+                SecureSocketOptions.SslOnConnect,
                 cts.Token
             );
 
