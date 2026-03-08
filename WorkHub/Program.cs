@@ -85,12 +85,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        policy.WithOrigins(
-                  "http://localhost:3000",
-                  "http://localhost:3001",
-                  "https://work-hub-frontend-bfb14wxhr-meomeoquans-projects.vercel.app",
-                  "https://workhub-frontend.vercel.app"
-              )
+        policy.SetIsOriginAllowed(origin =>
+              {
+                  var uri = new Uri(origin);
+                  return uri.Host == "localhost"
+                      || uri.Host.EndsWith(".vercel.app");
+              })
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
