@@ -55,20 +55,33 @@ namespace WorkHub.Business.Service
             email.Body = builder.ToMessageBody();
 
             using var smtp = new SmtpClient();
+            smtp.Timeout = 15000; // 15 second timeout
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+            Console.WriteLine($"[EmailService] Connecting to SMTP {_configuration["EmailSettings:Host"]}:{_configuration["EmailSettings:Port"]}...");
 
             await smtp.ConnectAsync(
                 _configuration["EmailSettings:Host"],
-                int.Parse(_configuration["EmailSettings:Port"]),
-                SecureSocketOptions.StartTls
+                int.Parse(_configuration["EmailSettings:Port"]!),
+                SecureSocketOptions.StartTls,
+                cts.Token
             );
+
+            Console.WriteLine("[EmailService] SMTP connected, authenticating...");
 
             await smtp.AuthenticateAsync(
                 _configuration["EmailSettings:Username"],
-                _configuration["EmailSettings:Password"]
+                _configuration["EmailSettings:Password"],
+                cts.Token
             );
 
-            await smtp.SendAsync(email);
-            await smtp.DisconnectAsync(true);
+            Console.WriteLine($"[EmailService] Sending email to {emailRequestDTO.To}...");
+
+            await smtp.SendAsync(email, cts.Token);
+            await smtp.DisconnectAsync(true, cts.Token);
+
+            Console.WriteLine("[EmailService] Email sent successfully!");
         }
 
 
