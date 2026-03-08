@@ -180,18 +180,25 @@ namespace WorkHub.Controllers
         [HttpPost("resend-email")]
         public async Task<IActionResult> ResendEmailConfirmation([FromBody] EmailResendConfirmationDTO request)
         {
-            if (string.IsNullOrWhiteSpace(request.Email))
+            try
             {
-                return BadRequest(
-                    ApiResponse<object>.BadRequest("Email is required")
+                if (string.IsNullOrWhiteSpace(request.Email))
+                {
+                    return BadRequest(
+                        ApiResponse<object>.BadRequest("Email is required")
+                    );
+                }
+
+                await _authService.ResendEmailConfirmationAsync(request);
+
+                return Ok(
+                    ApiResponse<object>.Ok(null, "Email sent successfully")
                 );
             }
-
-            await _authService.ResendEmailConfirmationAsync(request);
-
-            return Ok(
-                ApiResponse<object>.Ok(null, "Email sent successfully")
-            );
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to resend email", ex.Message));
+            }
         }
 
 
