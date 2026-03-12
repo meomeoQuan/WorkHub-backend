@@ -1,4 +1,5 @@
-﻿using System;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs
 
         public string? PostImageUrl { get; set; }
 
+        public IFormFile? PostImage { get; set; }
+
         public List<int>? RecruitmentIds { get; set; }
     }
-
 }

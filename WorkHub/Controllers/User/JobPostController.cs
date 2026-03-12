@@ -22,11 +22,13 @@ namespace WorkHub.Controllers.User
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public JobPostController(IUnitOfWork unitOfWork, IMapper mapper)
+        public JobPostController(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         [HttpGet("all-post")]
@@ -376,9 +378,11 @@ namespace WorkHub.Controllers.User
 
         [Authorize]
         [HttpPost("create-post")]
-        public async Task<IActionResult> CreatePost(CreatePostDTO dto)
+        public async Task<IActionResult> CreatePost([FromForm] CreatePostDTO dto)
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
+            var userId = int.Parse(userIdStr);
 
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == userId,
@@ -413,11 +417,21 @@ namespace WorkHub.Controllers.User
                 }
             }
 
+            var imageUrl = dto.PostImageUrl;
+            if (dto.PostImage != null && dto.PostImage.Length > 0)
+            {
+                var result = await _mediaService.UploadAsync(dto.PostImage, "posts");
+                if (result != null)
+                {
+                    imageUrl = result;
+                }
+            }
+
             var post = new Post
             {
                 UserId = userId,
                 Content = dto.Content,
-                PostImageUrl = dto.PostImageUrl,
+                PostImageUrl = imageUrl,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -494,19 +508,11 @@ namespace WorkHub.Controllers.User
             // Handle image upload
             if (dto.PostImage != null && dto.PostImage.Length > 0)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "posts");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PostImage.FileName)}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                var result = await _mediaService.UploadAsync(dto.PostImage, "posts");
+                if (result != null)
                 {
-                    await dto.PostImage.CopyToAsync(stream);
+                    post.PostImageUrl = result;
                 }
-
-                post.PostImageUrl = $"/uploads/posts/{fileName}";
             }
             else if (!string.IsNullOrEmpty(dto.PostImageUrl))
             {

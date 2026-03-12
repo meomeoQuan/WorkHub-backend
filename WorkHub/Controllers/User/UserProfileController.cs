@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +18,13 @@ namespace WorkHub.Controllers.User
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public UserProfileController(IUnitOfWork unitOfWork, IMapper mapper)
+        public UserProfileController(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         [HttpGet("show-profile/{userId}")]
@@ -191,23 +193,11 @@ namespace WorkHub.Controllers.User
                 _unitOfWork.UserDetailRepository.Add(user.UserDetail);
             }
 
-            // Create uploads directory if not exists
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+            // Upload to Cloudinary
+            var avatarUrl = await _mediaService.UploadAsync(file, "avatars");
+            if (string.IsNullOrEmpty(avatarUrl))
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to upload avatar to third-party storage"));
 
-            // Generate unique filename
-            var fileName = $"{userId}_{DateTime.UtcNow.Ticks}{Path.GetExtension(file.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            // Save file
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            // Update database
-            var avatarUrl = $"/uploads/avatars/{fileName}";
             user.UserDetail.AvatarUrl = avatarUrl;
             
             await _unitOfWork.SaveAsync();

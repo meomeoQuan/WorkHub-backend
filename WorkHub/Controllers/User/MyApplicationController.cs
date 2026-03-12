@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +20,13 @@ namespace WorkHub.Controllers.User
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediaService _mediaService;
 
-        public MyApplicationController(IUnitOfWork unitOfWork, IMapper mapper)
+        public MyApplicationController(IUnitOfWork unitOfWork, IMapper mapper, IMediaService mediaService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _mediaService = mediaService;
         }
 
         [HttpGet("my-application-summary")]
@@ -163,28 +165,12 @@ namespace WorkHub.Controllers.User
                         return BadRequest(ApiResponse<object>.BadRequest(null, "CV file size exceeds the 10MB limit."));
                     }
 
-                    // Define folder path: wwwroot/uploads/cvs
-                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
-                    if (!Directory.Exists(folderPath))
+                    // Upload to Cloudinary
+                    cvUrl = await _mediaService.UploadFileAsync(applicationDTO.CvFile, "cvs");
+                    if (string.IsNullOrEmpty(cvUrl))
                     {
-                        Directory.CreateDirectory(folderPath);
+                        return StatusCode(500, ApiResponse<object>.Error(500, "Failed to upload CV to third-party storage"));
                     }
-
-                    // Generate unique filename
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(applicationDTO.CvFile.FileName)}";
-                    var filePath = Path.Combine(folderPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await applicationDTO.CvFile.CopyToAsync(stream);
-                    }
-
-                    // Set URL (assuming static file serving is enabled for wwwroot)
-                    // URL format: /uploads/cvs/filename
-                    // In a real app, use a proper storage service URL or relative path helper
-                    var request = HttpContext.Request;
-                    var baseUrl = $"{request.Scheme}://{request.Host}";
-                    cvUrl = $"{baseUrl}/uploads/cvs/{fileName}";
                 }
 
                 var user = await _unitOfWork.UserRepository.GetAsync(
