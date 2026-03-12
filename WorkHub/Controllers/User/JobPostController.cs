@@ -39,6 +39,7 @@ namespace WorkHub.Controllers.User
                 pageIndex,
                 pageSize,
                 includeProperties: SD.Join_User + ","
+                + SD.Join_User + "." + SD.Join_UserDetail + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
                 + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType," 
@@ -147,6 +148,7 @@ namespace WorkHub.Controllers.User
                 pageSize,
                 queryFilter,
                 includeProperties: SD.Join_User + ","
+                + SD.Join_User + "." + SD.Join_UserDetail + ","
                 + SD.Collection_Join_Comments + ","
                 + SD.Collection_Join_PostLikes + ","
                 + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
@@ -209,6 +211,7 @@ namespace WorkHub.Controllers.User
                 pageSize,
                 p => followingIds.Contains(p.UserId),
                 includeProperties: SD.Join_User + ","
+                    + SD.Join_User + "." + SD.Join_UserDetail + ","
                     + SD.Collection_Join_Comments + ","
                     + SD.Collection_Join_PostLikes + ","
                     + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
@@ -244,6 +247,7 @@ namespace WorkHub.Controllers.User
             var post = await _unitOfWork.PostRepository.GetAsync(
                 c => c.Id == singlePostRequest.PostId,
                 includeProperties: SD.Join_User + ","
+                                + SD.Join_User + "." + SD.Join_UserDetail + ","
                                 + SD.Collection_Join_Comments + ","
                                 + SD.Collection_Join_PostLikes + ","
                                 + SD.Collection_Join_PostRecruitments + ".Recruitment.JobType,"
