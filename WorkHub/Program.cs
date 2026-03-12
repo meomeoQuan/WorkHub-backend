@@ -10,6 +10,7 @@ using WorkHub.DataAccess.Data;
 using WorkHub.DataAccess.Repository;
 using WorkHub.DataAccess.Repository.IRepository;
 using PayOS;
+using WorkHub.Models.DTOs;
 
 var builder = WebApplication.CreateBuilder(args);
 

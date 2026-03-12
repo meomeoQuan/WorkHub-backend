@@ -10,6 +10,7 @@ using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.MyApplicationDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
+using WorkHub.Business.Service.IService;
 using System.IO;
 
 namespace WorkHub.Controllers.User
