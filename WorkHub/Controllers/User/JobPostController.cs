@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using WorkHub.DataAccess.Repository.IRepository;
@@ -469,7 +471,7 @@ namespace WorkHub.Controllers.User
 
         [Authorize]
         [HttpPut("update-post/{id}")]
-        public async Task<IActionResult> UpdatePost(int id, UpdatePostDTO dto)
+        public async Task<IActionResult> UpdatePost(int id, [FromForm] UpdatePostDTO dto)
         {
             var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdStr)) return Unauthorized();
@@ -488,11 +490,32 @@ namespace WorkHub.Controllers.User
             }
 
             post.Content = dto.Content;
-            if (!string.IsNullOrEmpty(dto.PostImageUrl))
+            
+            // Handle image upload
+            if (dto.PostImage != null && dto.PostImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "posts");
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.PostImage.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.PostImage.CopyToAsync(stream);
+                }
+
+                post.PostImageUrl = $"/uploads/posts/{fileName}";
+            }
+            else if (!string.IsNullOrEmpty(dto.PostImageUrl))
             {
                 post.PostImageUrl = dto.PostImageUrl;
             }
-
+            else
+            {
+                post.PostImageUrl = null;
+            }
             // Update recruitment links
             // 1. Unlink current
             // 1. Unlink current
