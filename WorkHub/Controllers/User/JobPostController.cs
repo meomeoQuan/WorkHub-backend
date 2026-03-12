@@ -13,6 +13,7 @@ using WorkHub.Models.DTOs.ModelDTOs.HomeDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.JobPostDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
+using WorkHub.Business.Service.IService;
 
 namespace WorkHub.Controllers.User
 {
