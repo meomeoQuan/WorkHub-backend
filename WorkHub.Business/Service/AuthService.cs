@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Azure.Core;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Hosting;
@@ -109,7 +109,7 @@ namespace WorkHub.Business.Service
         {
             var user = await _unitOfWork.UserRepository.GetAsync(
                 c => c.Email.ToLower() == request.Email.ToLower(),
-                includeProperties: "Subscription"
+                includeProperties: "Subscription,UserDetail"
             );
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
@@ -135,7 +135,7 @@ namespace WorkHub.Business.Service
         {
             var user = await _unitOfWork.UserRepository.GetAsync(
                 c => c.Email.ToLower() == request.Email.ToLower(),
-                includeProperties: "Subscription"
+                includeProperties: "Subscription,UserDetail"
             );
             if (user == null || !BCryptHelper.Decode(request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid email or password");
@@ -164,7 +164,7 @@ namespace WorkHub.Business.Service
             var googleUser = await _googleAuthService.VerifyAuthCodeAsync(authCode);
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Email.ToLower() == googleUser.Email.ToLower(),
-                includeProperties: "Subscription");
+                includeProperties: "Subscription,UserDetail");
 
             if (user == null)
             {
@@ -212,7 +212,7 @@ namespace WorkHub.Business.Service
             // 2. Retrieve user
             var user = await _unitOfWork.UserRepository.GetAsync(
                 u => u.Id == int.Parse(userId),
-                includeProperties: "Subscription");
+                includeProperties: "Subscription,UserDetail");
 
             if (user == null)
                 throw new UnauthorizedAccessException("User not found");
