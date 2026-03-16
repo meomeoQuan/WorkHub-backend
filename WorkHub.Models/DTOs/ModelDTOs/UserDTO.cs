@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,6 +35,6 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? Provider { get; set; }
 
         public string? PaymentPlan { get; set; }
-
+        public string Status { get; set; } = "active";
     }
 }

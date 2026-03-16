@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using WorkHub.Models.Models;
@@ -252,9 +252,8 @@ public partial class WorkHubDbContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(50);
             entity.Property(e => e.Provider).HasMaxLength(100);
             entity.Property(e => e.ProviderId).HasMaxLength(255);
-            entity.Property(e => e.Role)
-            .HasDefaultValue(1);
-
+            entity.Property(e => e.Role).HasDefaultValue(1);
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("active");
         });
 
         modelBuilder.Entity<UserDetail>(entity =>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace WorkHub.Models.Models;
@@ -60,4 +60,5 @@ public partial class User
     public virtual ICollection<UserEducation> UserEducations { get; set; } = new List<UserEducation>();
     public string? RefreshTokenHash { get; set; }
     public DateTime? RefreshTokenExpiry { get; set; }
+    public string Status { get; set; } = "active";
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -107,6 +107,10 @@ namespace WorkHub.Utility
 
             return cycleStart;
         }
+
+        //=================== USER STATUS ==================
+        public const string UserStatus_Active = "active";
+        public const string UserStatus_Suspended = "suspended";
 
     }
 }
