@@ -50,25 +50,20 @@ namespace WorkHub.Business.Service
 
         public async Task<string?> UploadFileAsync(IFormFile file, string folder)
         {
-            var uploadResult = new RawUploadResult();
-
             if (file.Length > 0)
             {
                 using var stream = file.OpenReadStream();
-                var uploadParams = new RawUploadParams
+               
+                var result = await _cloudinary.UploadAsync(new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
                     Folder = folder
-                };
-                uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                });
+                
+                return result.Error != null ? null : result.SecureUrl.ToString();
             }
 
-            if (uploadResult.Error != null)
-            {
-                return null;
-            }
-
-            return uploadResult.SecureUrl.ToString();
+            return null;
         }
 
         public async Task<bool> DeleteAsync(string publicId)
