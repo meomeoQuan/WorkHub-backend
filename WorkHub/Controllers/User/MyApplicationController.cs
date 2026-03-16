@@ -218,6 +218,13 @@ namespace WorkHub.Controllers.User
                     profileUpdated = true;
                 }
 
+                // Sync CV to profile if user doesn't have one yet
+                if (!string.IsNullOrEmpty(cvUrl) && user.UserDetail != null && string.IsNullOrEmpty(user.UserDetail.CvUrl))
+                {
+                    user.UserDetail.CvUrl = cvUrl;
+                    profileUpdated = true;
+                }
+
                 if (profileUpdated)
                 {
                     await _unitOfWork.SaveAsync();
