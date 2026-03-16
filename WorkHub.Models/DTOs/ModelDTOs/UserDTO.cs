@@ -36,5 +36,6 @@ namespace WorkHub.Models.DTOs.ModelDTOs
 
         public string? PaymentPlan { get; set; }
         public string Status { get; set; } = "active";
+        public bool IsVerified { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,7 +91,8 @@ namespace WorkHub.Business.Mapping
             CreateMap<User, UserDTO>()
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Phone, o => o.MapFrom(s => s.Phone))
-                .ForMember(d => d.PaymentPlan, o => o.MapFrom(s => s.Subscription != null ? s.Subscription.Plan : "free"));
+                .ForMember(d => d.PaymentPlan, o => o.MapFrom(s => s.Subscription != null ? s.Subscription.Plan : "free"))
+                .ForMember(d => d.IsVerified, o => o.MapFrom(s => s.IsVerified ?? false));
 
             //=================== Home MAPPING =================
 

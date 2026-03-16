@@ -173,6 +173,11 @@ namespace WorkHub.Controllers.User
                         return StatusCode(500, ApiResponse<object>.Error(500, "Failed to upload CV to third-party storage"));
                     }
                 }
+                else if (!string.IsNullOrEmpty(applicationDTO.ProfileCvUrl))
+                {
+                    // Use the profile CV URL directly (already uploaded to Cloudinary)
+                    cvUrl = applicationDTO.ProfileCvUrl;
+                }
 
                 var user = await _unitOfWork.UserRepository.GetAsync(
                     u => u.Id == userId, 
@@ -210,6 +215,13 @@ namespace WorkHub.Controllers.User
                 if (user.UserDetail != null && string.IsNullOrEmpty(user.UserDetail.EducationLevel) && !string.IsNullOrEmpty(applicationDTO.Education))
                 {
                     user.UserDetail.EducationLevel = applicationDTO.Education;
+                    profileUpdated = true;
+                }
+
+                // Sync CV to profile if user doesn't have one yet
+                if (!string.IsNullOrEmpty(cvUrl) && user.UserDetail != null && string.IsNullOrEmpty(user.UserDetail.CvUrl))
+                {
+                    user.UserDetail.CvUrl = cvUrl;
                     profileUpdated = true;
                 }
 
