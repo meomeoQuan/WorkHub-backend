@@ -4,7 +4,6 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
-using MimeKit.Cryptography;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -114,6 +113,9 @@ namespace WorkHub.Business.Service
             if (user == null)
                 throw new UnauthorizedAccessException("Invalid email or password");
 
+            if (user.Status == SD.UserStatus_Suspended)
+                throw new UnauthorizedAccessException("Your account has been suspended by the administrator");
+
             if (user.IsVerified == false)
             {
                 throw new UnauthorizedAccessException("Account has not been verified");
@@ -139,6 +141,9 @@ namespace WorkHub.Business.Service
             );
             if (user == null || !BCryptHelper.Decode(request.Password, user.PasswordHash))
                 throw new UnauthorizedAccessException("Invalid email or password");
+
+            if (user.Status == SD.UserStatus_Suspended)
+                throw new UnauthorizedAccessException("Your account has been suspended by the administrator");
 
             if (user.IsVerified == false)
                 throw new UnauthorizedAccessException("Account has not been verified");
@@ -182,6 +187,10 @@ namespace WorkHub.Business.Service
                 _unitOfWork.UserRepository.Add(user);
                 await _unitOfWork.SaveAsync();
             }
+            else if (user.Status == SD.UserStatus_Suspended)
+            {
+                throw new UnauthorizedAccessException("Your account has been suspended by the administrator");
+            }
 
             var accessToken = _jwtService.GenerateToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
@@ -216,6 +225,9 @@ namespace WorkHub.Business.Service
 
             if (user == null)
                 throw new UnauthorizedAccessException("User not found");
+
+            if (user.Status == SD.UserStatus_Suspended)
+                throw new UnauthorizedAccessException("Your account has been suspended by the administrator");
 
             // 3. Hash incoming refresh token and compare
             var incomingHash = _jwtService.HashRefreshToken(refreshToken);
