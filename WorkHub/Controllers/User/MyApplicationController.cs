@@ -173,6 +173,11 @@ namespace WorkHub.Controllers.User
                         return StatusCode(500, ApiResponse<object>.Error(500, "Failed to upload CV to third-party storage"));
                     }
                 }
+                else if (!string.IsNullOrEmpty(applicationDTO.ProfileCvUrl))
+                {
+                    // Use the profile CV URL directly (already uploaded to Cloudinary)
+                    cvUrl = applicationDTO.ProfileCvUrl;
+                }
 
                 var user = await _unitOfWork.UserRepository.GetAsync(
                     u => u.Id == userId, 

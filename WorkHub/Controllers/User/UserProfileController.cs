@@ -206,6 +206,62 @@ namespace WorkHub.Controllers.User
             return Ok(ApiResponse<object>.Ok(new { avatarUrl }, "Avatar uploaded successfully"));
         }
 
+        [Authorize]
+        [HttpPost("upload-resume")]
+        public async Task<IActionResult> UploadResume(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(ApiResponse<object>.BadRequest("No file uploaded"));
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: "UserDetail"
+            );
+
+            if (user == null)
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
+
+            // Ensure UserDetail exists
+            if (user.UserDetail == null)
+            {
+                user.UserDetail = new UserDetail { UserId = userId };
+                _unitOfWork.UserDetailRepository.Add(user.UserDetail);
+            }
+
+            // Upload to Cloudinary (raw/auto for PDFs)
+            var cvUrl = await _mediaService.UploadFileAsync(file, "cvs");
+            if (string.IsNullOrEmpty(cvUrl))
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to upload resume to storage"));
+
+            user.UserDetail.CvUrl = cvUrl;
+            await _unitOfWork.SaveAsync();
+
+            return Ok(ApiResponse<object>.Ok(new { cvUrl, fileName = file.FileName }, "Resume uploaded successfully"));
+        }
+
+        [Authorize]
+        [HttpDelete("delete-resume")]
+        public async Task<IActionResult> DeleteResume()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var user = await _unitOfWork.UserRepository.GetAsync(
+                u => u.Id == userId,
+                includeProperties: "UserDetail"
+            );
+
+            if (user == null)
+                return NotFound(ApiResponse<object>.NotFound("User not found"));
+
+            if (user.UserDetail != null)
+            {
+                user.UserDetail.CvUrl = null;
+                await _unitOfWork.SaveAsync();
+            }
+
+            return Ok(ApiResponse<object>.Ok(null, "Resume removed successfully"));
+        }
+
 
         [Authorize]
         [HttpGet("all-user-jobs")]

@@ -17,5 +17,7 @@ namespace WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs
         public string? Phone { get; set; }
 
         public string? Education { get; set; }
+
+        public string? ProfileCvUrl { get; set; }
     }
 }
