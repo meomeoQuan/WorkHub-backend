@@ -15,6 +15,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public int Role { get; set; }
         public string? Provider { get; set; }
         public double Rating { get; set; }
+        public int TotalJobs { get; set; }
+        public int TotalPosts { get; set; }
 
         // Extended Profile Info (from UserDetail)
         public string? Bio { get; set; }

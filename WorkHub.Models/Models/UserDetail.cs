@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace WorkHub.Models.Models;
@@ -40,6 +40,8 @@ public partial class UserDetail
     public int? FoundedYear { get; set; }
 
     public string? Description { get; set; }
+    public int? TotalJobs { get; set; }
+    public int? TotalPosts { get; set; }
     public string? GoogleMapsEmbedUrl { get; set; }
     public virtual User User { get; set; } = null!;
 }

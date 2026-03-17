@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +10,7 @@ using WorkHub.Models.DTOs.ModelDTOs;
 using WorkHub.Models.DTOs.ModelDTOs.ApplicationDetailDTOs;
 using WorkHub.Utility;
 
-namespace WorkHub.Controllers.User
+namespace WorkHub.Controllers.Users
 {
     [Route("api/[controller]")]
     [ApiController]

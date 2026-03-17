@@ -15,7 +15,7 @@ using WorkHub.Models.Models;
 using WorkHub.Utility;
 using WorkHub.Business.Service.IService;
 
-namespace WorkHub.Controllers.User
+namespace WorkHub.Controllers.Users
 {
     [Route("api/[controller]")]
     [ApiController]

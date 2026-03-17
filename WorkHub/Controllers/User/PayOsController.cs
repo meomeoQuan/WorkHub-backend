@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +15,7 @@ using WorkHub.Models.Models;
 using WorkHub.Utility;
 
 
-namespace WorkHub.Controllers.User
+namespace WorkHub.Controllers.Users
 {
     [Route("api/[controller]")]
     [ApiController]
