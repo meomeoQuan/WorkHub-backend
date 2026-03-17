@@ -37,5 +37,10 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? PaymentPlan { get; set; }
         public string Status { get; set; } = "active";
         public bool IsVerified { get; set; }
+        public int? TotalJobs { get; set; }
+        public int? TotalPosts { get; set; }
+        public string? Bio { get; set; }
+        public string? School { get; set; }
+        public double Revenue { get; set; }
     }
 }

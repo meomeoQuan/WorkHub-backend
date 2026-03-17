@@ -32,6 +32,7 @@ namespace WorkHub.Controllers.Admin
                 var users = await _context.Users
                     .Include(u => u.UserDetail)
                     .Include(u => u.Subscription)
+                    .Include(u => u.Orders)
                     .ToListAsync();
 
                 var userDTOs = _mapper.Map<IEnumerable<UserDTO>>(users);
@@ -52,6 +53,7 @@ namespace WorkHub.Controllers.Admin
                 var user = await _context.Users
                     .Include(u => u.UserDetail)
                     .Include(u => u.Subscription)
+                    .Include(u => u.Orders)
                     .FirstOrDefaultAsync(u => u.Id == id);
 
                 if (user == null)
@@ -143,12 +145,22 @@ namespace WorkHub.Controllers.Admin
                 user.Email = dto.Email;
                 user.Role = dto.Role;
                 user.Status = dto.Status;
+                user.Phone = dto.PhoneNumber;
 
                 // Sync profile metrics to UserDetail if it exists
                 if (user.UserDetail == null)
                 {
                     user.UserDetail = new UserDetail { UserId = user.Id };
                 }
+                
+                user.UserDetail.Bio = dto.Bio;
+                user.UserDetail.Location = dto.Location;
+                user.UserDetail.School = dto.School;
+                user.UserDetail.IndustryFocus = dto.IndustryFocus;
+                user.UserDetail.Website = dto.Website;
+                user.UserDetail.CompanySize = dto.CompanySize;
+                user.UserDetail.FoundedYear = dto.FoundedYear;
+                user.UserDetail.GoogleMapsEmbedUrl = dto.GoogleMapsEmbedUrl;
                 
                 if (dto.TotalJobs.HasValue) user.UserDetail.TotalJobs = dto.TotalJobs.Value;
                 if (dto.TotalPosts.HasValue) user.UserDetail.TotalPosts = dto.TotalPosts.Value;
@@ -202,6 +214,154 @@ namespace WorkHub.Controllers.Admin
             catch (Exception ex)
             {
                 return StatusCode(500, ApiResponse<object>.Error(500, "Failed to create user", ex.Message));
+            }
+        }
+
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetDashboardStats()
+        {
+            try
+            {
+                var totalUsers = await _context.Users.CountAsync();
+                var totalJobs = await _context.Recruitments.CountAsync();
+                var totalRevenue = await _context.Orders.Where(o => o.Status == "Completed").SumAsync(o => o.Amount);
+                var premiumUsers = await _context.Users.CountAsync(u => u.Subscription != null && u.Subscription.Plan != "free");
+
+                // Daily revenue for last 7 days
+                var today = DateTime.UtcNow.Date;
+                var last7Days = Enumerable.Range(0, 7).Select(i => today.AddDays(-i)).Reverse().ToList();
+                
+                var dailyRevenue = await _context.Orders
+                    .Where(o => o.Status == "Completed" && o.CreatedAt >= today.AddDays(-6))
+                    .GroupBy(o => o.CreatedAt.Date)
+                    .Select(g => new { Day = g.Key, Revenue = g.Sum(o => o.Amount) })
+                    .ToListAsync();
+
+                var chartData = last7Days.Select(day => new DailyRevenueDTO
+                {
+                    Day = day.ToString("ddd"), // T2, T3...
+                    Revenue = dailyRevenue.FirstOrDefault(d => d.Day == day)?.Revenue ?? 0
+                }).ToList();
+
+                var stats = new DashboardStatsDTO
+                {
+                    TotalRevenue = totalRevenue,
+                    TotalUsers = totalUsers,
+                    TotalJobs = totalJobs,
+                    TotalPremiumUsers = premiumUsers,
+                    RevenueChartData = chartData,
+                    RevenueGrowthPercentage = 23, // Mocked for now
+                    UserGrowthCount = 145,
+                    JobGrowthCount = 12,
+                    PremiumGrowthPercentage = 17
+                };
+
+                return Ok(ApiResponse<DashboardStatsDTO>.Ok(stats, "Stats retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve stats", ex.Message));
+            }
+        }
+
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            try
+            {
+                var orders = await _context.Orders
+                    .Include(o => o.User)
+                    .ThenInclude(u => u.Subscription)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
+
+                var orderDTOs = _mapper.Map<IEnumerable<AdminOrderDTO>>(orders);
+                return Ok(ApiResponse<IEnumerable<AdminOrderDTO>>.Ok(orderDTOs, "Orders retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve orders", ex.Message));
+            }
+        }
+
+        [HttpGet("posts")]
+        public async Task<IActionResult> GetAllPosts()
+        {
+            try
+            {
+                var posts = await _context.Posts
+                    .Include(p => p.User)
+                    .Include(p => p.PostRecruitments)
+                    .ThenInclude(pr => pr.Recruitment)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+
+                var postDTOs = _mapper.Map<IEnumerable<AdminPostDTO>>(posts);
+                return Ok(ApiResponse<IEnumerable<AdminPostDTO>>.Ok(postDTOs, "Posts retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve posts", ex.Message));
+            }
+        }
+
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Include(c => c.Recruitments)
+                    .ToListAsync();
+
+                var results = categories.Select(c => new {
+                    id = c.Id,
+                    name = c.Name,
+                    count = c.Recruitments.Count
+                });
+
+                return Ok(ApiResponse<object>.Ok(results, "Categories retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve categories", ex.Message));
+            }
+        }
+
+        [HttpGet("jobtypes")]
+        public async Task<IActionResult> GetAllJobTypes()
+        {
+            try
+            {
+                var jobTypes = await _context.JobTypes
+                    .Include(j => j.Recruitments)
+                    .ToListAsync();
+
+                var results = jobTypes.Select(j => new {
+                    id = j.Id,
+                    name = j.Name,
+                    count = j.Recruitments.Count
+                });
+
+                return Ok(ApiResponse<object>.Ok(results, "Job types retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve job types", ex.Message));
+            }
+        }
+
+        [HttpGet("reports")]
+        public async Task<IActionResult> GetAllReports()
+        {
+            try
+            {
+                // No reports table yet, returning empty list
+                return Ok(ApiResponse<IEnumerable<object>>.Ok(new List<object>(), "Reports retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve reports", ex.Message));
             }
         }
     }
