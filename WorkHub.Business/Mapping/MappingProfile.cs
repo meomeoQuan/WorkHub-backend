@@ -181,6 +181,8 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.FoundedYear, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.FoundedYear : null))
                 .ForMember(d => d.Industry, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.IndustryFocus : null))
                 .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.GoogleMapsEmbedUrl : null))
+                .ForMember(d => d.TotalJobs, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.TotalJobs ?? 0 : 0))
+                .ForMember(d => d.TotalPosts, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.TotalPosts ?? 0 : 0))
                 // Collections
                 .ForMember(d => d.Experiences, o => o.MapFrom(s => s.UserExperiences))
                 .ForMember(d => d.Educations, o => o.MapFrom(s => s.UserEducations))
@@ -206,6 +208,9 @@ namespace WorkHub.Business.Mapping
                  .ForMember(d => d.IndustryFocus, o => o.MapFrom(s => s.Industry))
                  .ForMember(d => d.Description, o => o.MapFrom(s => s.Description))
                  .ForMember(d => d.GoogleMapsEmbedUrl, o => o.MapFrom(s => s.GoogleMapsEmbedUrl))
+                 .ForMember(d => d.TotalJobs, o => o.MapFrom(s => s.TotalJobs))
+                 .ForMember(d => d.TotalPosts, o => o.MapFrom(s => s.TotalPosts))
+                 .ForMember(d => d.Rating, o => o.MapFrom(s => s.Rating))
                  .ForMember(d => d.Skills, o => o.MapFrom(s => string.Join(",", s.Skills)));
 
 

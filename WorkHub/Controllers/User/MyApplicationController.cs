@@ -13,7 +13,7 @@ using WorkHub.Utility;
 using WorkHub.Business.Service.IService;
 using System.IO;
 
-namespace WorkHub.Controllers.User
+namespace WorkHub.Controllers.Users
 {
     [Route("api/[controller]")]
     [ApiController]
