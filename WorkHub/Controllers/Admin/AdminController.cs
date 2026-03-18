@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkHub.DataAccess.Data;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.DTOs.ModelDTOs;
+using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 using AutoMapper;
@@ -348,6 +349,76 @@ namespace WorkHub.Controllers.Admin
             catch (Exception ex)
             {
                 return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve job types", ex.Message));
+            }
+        }
+
+        [HttpPost("categories")]
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest(ApiResponse<object>.BadRequest("Name is required"));
+                var category = new Category { Name = dto.Name };
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(new { id = category.Id, name = category.Name, count = 0 }, "Category created successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to create category", ex.Message));
+            }
+        }
+
+        [HttpPut("categories/{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest(ApiResponse<object>.BadRequest("Name is required"));
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null) return NotFound(ApiResponse<object>.NotFound("Category not found"));
+                category.Name = dto.Name;
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(new { id = category.Id, name = category.Name }, "Category updated successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to update category", ex.Message));
+            }
+        }
+
+        [HttpPost("jobtypes")]
+        public async Task<IActionResult> CreateJobType([FromBody] JobTypeDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest(ApiResponse<object>.BadRequest("Name is required"));
+                var jobType = new JobType { Name = dto.Name };
+                _context.JobTypes.Add(jobType);
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(new { id = jobType.Id, name = jobType.Name, count = 0 }, "JobType created successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to create job type", ex.Message));
+            }
+        }
+
+        [HttpPut("jobtypes/{id}")]
+        public async Task<IActionResult> UpdateJobType(int id, [FromBody] JobTypeDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.Name)) return BadRequest(ApiResponse<object>.BadRequest("Name is required"));
+                var jobType = await _context.JobTypes.FindAsync(id);
+                if (jobType == null) return NotFound(ApiResponse<object>.NotFound("JobType not found"));
+                jobType.Name = dto.Name;
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(new { id = jobType.Id, name = jobType.Name }, "JobType updated successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to update job type", ex.Message));
             }
         }
 
