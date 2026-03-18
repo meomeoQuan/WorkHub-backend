@@ -219,7 +219,7 @@ namespace WorkHub.Controllers.Admin
         }
 
         [HttpGet("stats")]
-        public async Task<IActionResult> GetDashboardStats([FromQuery] int days = 7)
+        public async Task<IActionResult> GetDashboardStats([FromQuery] string timeRange = "7d")
         {
             try
             {
@@ -228,24 +228,64 @@ namespace WorkHub.Controllers.Admin
                 var totalRevenue = await _context.Orders.Where(o => o.Status == SD.OrderStatus_Paid).SumAsync(o => o.Amount);
                 var premiumUsers = await _context.Users.CountAsync(u => u.Subscription != null && u.Subscription.Plan != "free");
 
-                // Daily revenue for last X days ending at the most recent order date
                 var maxOrderDateDb = await _context.Orders.AnyAsync() 
                     ? await _context.Orders.MaxAsync(o => o.CreatedAt) 
                     : DateTime.UtcNow;
                 var today = maxOrderDateDb.Date;
-                var lastXDays = Enumerable.Range(0, days).Select(i => today.AddDays(-i)).Reverse().ToList();
-                
-                var dailyRevenue = await _context.Orders
-                    .Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= today.AddDays(-(days - 1)))
-                    .GroupBy(o => o.CreatedAt.Date)
-                    .Select(g => new { Day = g.Key, Revenue = g.Sum(o => o.Amount) })
-                    .ToListAsync();
+                var chartData = new List<DailyRevenueDTO>();
 
-                var chartData = lastXDays.Select(day => new DailyRevenueDTO
+                if (timeRange == "12m")
                 {
-                    Day = days > 7 ? day.ToString("dd/MM") : day.ToString("ddd"), // T2, T3...
-                    Revenue = dailyRevenue.FirstOrDefault(d => d.Day == day)?.Revenue ?? 0
-                }).ToList();
+                    var last12Months = Enumerable.Range(0, 12).Select(i => new DateTime(today.Year, today.Month, 1).AddMonths(-i)).Reverse().ToList();
+                    var minDate = last12Months.First();
+                    
+                    var monthlyRevenue = await _context.Orders
+                        .Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= minDate)
+                        .GroupBy(o => new { o.CreatedAt.Year, o.CreatedAt.Month })
+                        .Select(g => new { Year = g.Key.Year, Month = g.Key.Month, Revenue = g.Sum(o => o.Amount) })
+                        .ToListAsync();
+
+                    chartData = last12Months.Select(m => new DailyRevenueDTO
+                    {
+                        Day = m.ToString("MM/yyyy"),
+                        Revenue = monthlyRevenue.FirstOrDefault(d => d.Year == m.Year && d.Month == m.Month)?.Revenue ?? 0
+                    }).ToList();
+                }
+                else if (timeRange == "5y")
+                {
+                    var last5Years = Enumerable.Range(0, 5).Select(i => today.Year - i).Reverse().ToList();
+                    var minYear = last5Years.First();
+
+                    var yearlyRevenue = await _context.Orders
+                        .Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt.Year >= minYear)
+                        .GroupBy(o => o.CreatedAt.Year)
+                        .Select(g => new { Year = g.Key, Revenue = g.Sum(o => o.Amount) })
+                        .ToListAsync();
+
+                    chartData = last5Years.Select(y => new DailyRevenueDTO
+                    {
+                        Day = y.ToString(),
+                        Revenue = yearlyRevenue.FirstOrDefault(d => d.Year == y)?.Revenue ?? 0
+                    }).ToList();
+                }
+                else
+                {
+                    // Default to days (7d or 30d)
+                    int days = timeRange == "30d" ? 30 : 7;
+                    var lastXDays = Enumerable.Range(0, days).Select(i => today.AddDays(-i)).Reverse().ToList();
+                    
+                    var dailyRevenue = await _context.Orders
+                        .Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= today.AddDays(-(days - 1)))
+                        .GroupBy(o => o.CreatedAt.Date)
+                        .Select(g => new { Day = g.Key, Revenue = g.Sum(o => o.Amount) })
+                        .ToListAsync();
+
+                    chartData = lastXDays.Select(day => new DailyRevenueDTO
+                    {
+                        Day = days > 7 ? day.ToString("dd/MM") : day.ToString("ddd"),
+                        Revenue = dailyRevenue.FirstOrDefault(d => d.Day == day)?.Revenue ?? 0
+                    }).ToList();
+                }
 
                 // Dynamic Growth Metrics (Last 30 days)
                 var thirtyDaysAgo = DateTime.UtcNow.Date.AddDays(-30);
