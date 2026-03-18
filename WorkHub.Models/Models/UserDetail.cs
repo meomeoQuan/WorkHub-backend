@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkHub.Models.Models;
 
@@ -40,8 +41,16 @@ public partial class UserDetail
     public int? FoundedYear { get; set; }
 
     public string? Description { get; set; }
+
+    [NotMapped]
     public int? TotalJobs { get; set; }
+
+    [NotMapped]
     public int? TotalPosts { get; set; }
+
+    [NotMapped]
+    public string? School { get; set; }
+    
     public string? GoogleMapsEmbedUrl { get; set; }
     public virtual User User { get; set; } = null!;
 }

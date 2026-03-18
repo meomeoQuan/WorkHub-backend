@@ -25,11 +25,11 @@ namespace WorkHub.Business.Mapping
             // 🔥 THIS IS WHAT YOU MISSED
             CreateMap<Recruitment, RecruitmentOverviewInfoDTO>()
                 .ForMember(d => d.UserId, o => o.MapFrom(s => s.UserId))
-                .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail.Rating))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Rating : 0))
                 .ForMember(d => d.JobType, o => o.MapFrom(s => s.JobType.Name))
                 .ForMember(d => d.description, o => o.MapFrom(s => s.PostRecruitments.FirstOrDefault() != null ? s.PostRecruitments.FirstOrDefault().Post.Content : null))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
-                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
                 .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
                 .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
@@ -43,16 +43,16 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Schedule, o => o.MapFrom(s => s.WorkTime))
                 .ForMember(d => d.Status, o => o.MapFrom(s => s.Status == "Active"))
                 .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
-                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail.AvatarUrl))
+                .ForMember(d => d.Avatar, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Requirements, o => o.MapFrom(s => s.Requirements))
                 .ForMember(d => d.Benefits, o => o.MapFrom(s => s.Benefits))
                 .ForMember(d => d.Category, o => o.MapFrom(s => s.Category.Name))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.City != null ? s.City.Name : s.Location))
-                .ForMember(d => d.CompanyBio, o => o.MapFrom(s => s.User.UserDetail.Bio))
-                .ForMember(d => d.CompanyDescription, o => o.MapFrom(s => s.User.UserDetail.Description))
-                .ForMember(d => d.CompanyLocation, o => o.MapFrom(s => s.User.UserDetail.Location))
-                .ForMember(d => d.CompanyRating, o => o.MapFrom(s => s.User.UserDetail.Rating))
-                .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail.IndustryFocus))
+                .ForMember(d => d.CompanyBio, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Bio : null))
+                .ForMember(d => d.CompanyDescription, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Description : null))
+                .ForMember(d => d.CompanyLocation, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Location : null))
+                .ForMember(d => d.CompanyRating, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.Rating : 0))
+                .ForMember(d => d.CompanyIndustry, o => o.MapFrom(s => s.User.UserDetail != null ? s.User.UserDetail.IndustryFocus : null))
                 .ForMember(d => d.MinSalary, o => o.MapFrom(s => s.MinSalary))
                 .ForMember(d => d.MaxSalary, o => o.MapFrom(s => s.MaxSalary))
                 .ForMember(d => d.SalaryCurrency, o => o.MapFrom(s => s.SalaryCurrency))
@@ -92,7 +92,14 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Phone, o => o.MapFrom(s => s.Phone))
                 .ForMember(d => d.PaymentPlan, o => o.MapFrom(s => s.Subscription != null ? s.Subscription.Plan : "free"))
-                .ForMember(d => d.IsVerified, o => o.MapFrom(s => s.IsVerified ?? false));
+                .ForMember(d => d.IsVerified, o => o.MapFrom(s => s.IsVerified ?? false))
+                .ForMember(d => d.TotalJobs, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.TotalJobs : 0))
+                .ForMember(d => d.TotalPosts, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.TotalPosts : 0))
+                .ForMember(d => d.Bio, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Bio : ""))
+                .ForMember(d => d.School, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.School : ""))
+                .ForMember(d => d.Location, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Location : ""))
+                .ForMember(d => d.Rating, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Rating : 0))
+                .ForMember(d => d.Revenue, o => o.MapFrom(s => s.Orders.Where(ord => ord.Status == "Completed").Sum(ord => ord.Amount)));
 
             //=================== Home MAPPING =================
 
@@ -278,6 +285,19 @@ namespace WorkHub.Business.Mapping
             CreateMap<UpdateScheduleDTO, UserSchedule>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<UserSchedule, ScheduleViewDTO>();
+
+            //=================== Admin Dashboard MAPPING =================
+            CreateMap<Order, AdminOrderDTO>()
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.Plan, o => o.MapFrom(s => s.User.Subscription != null ? s.User.Subscription.Plan : "free"))
+                .ForMember(d => d.Date, o => o.MapFrom(s => s.CreatedAt));
+
+            CreateMap<Post, AdminPostDTO>()
+                .ForMember(d => d.UserName, o => o.MapFrom(s => s.User.FullName))
+                .ForMember(d => d.Title, o => o.MapFrom(s => s.Content.Length > 50 ? s.Content.Substring(0, 47) + "..." : s.Content))
+                .ForMember(d => d.Category, o => o.MapFrom(s => s.PostRecruitments.Any() ? s.PostRecruitments.First().Recruitment.Category.Name : "General"))
+                .ForMember(d => d.Status, o => o.MapFrom(s => "Published")) // Defaulting for now
+                .ForMember(d => d.Date, o => o.MapFrom(s => s.CreatedAt ?? DateTime.UtcNow));
         }
     }
 }
