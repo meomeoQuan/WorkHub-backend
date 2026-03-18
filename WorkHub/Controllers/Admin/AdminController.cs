@@ -219,30 +219,46 @@ namespace WorkHub.Controllers.Admin
         }
 
         [HttpGet("stats")]
-        public async Task<IActionResult> GetDashboardStats()
+        public async Task<IActionResult> GetDashboardStats([FromQuery] int days = 7)
         {
             try
             {
                 var totalUsers = await _context.Users.CountAsync();
                 var totalJobs = await _context.Recruitments.CountAsync();
-                var totalRevenue = await _context.Orders.Where(o => o.Status == "Completed").SumAsync(o => o.Amount);
+                var totalRevenue = await _context.Orders.Where(o => o.Status == SD.OrderStatus_Paid).SumAsync(o => o.Amount);
                 var premiumUsers = await _context.Users.CountAsync(u => u.Subscription != null && u.Subscription.Plan != "free");
 
-                // Daily revenue for last 7 days
-                var today = DateTime.UtcNow.Date;
-                var last7Days = Enumerable.Range(0, 7).Select(i => today.AddDays(-i)).Reverse().ToList();
+                // Daily revenue for last X days ending at the most recent order date
+                var maxOrderDateDb = await _context.Orders.AnyAsync() 
+                    ? await _context.Orders.MaxAsync(o => o.CreatedAt) 
+                    : DateTime.UtcNow;
+                var today = maxOrderDateDb.Date;
+                var lastXDays = Enumerable.Range(0, days).Select(i => today.AddDays(-i)).Reverse().ToList();
                 
                 var dailyRevenue = await _context.Orders
-                    .Where(o => o.Status == "Completed" && o.CreatedAt >= today.AddDays(-6))
+                    .Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= today.AddDays(-(days - 1)))
                     .GroupBy(o => o.CreatedAt.Date)
                     .Select(g => new { Day = g.Key, Revenue = g.Sum(o => o.Amount) })
                     .ToListAsync();
 
-                var chartData = last7Days.Select(day => new DailyRevenueDTO
+                var chartData = lastXDays.Select(day => new DailyRevenueDTO
                 {
-                    Day = day.ToString("ddd"), // T2, T3...
+                    Day = days > 7 ? day.ToString("dd/MM") : day.ToString("ddd"), // T2, T3...
                     Revenue = dailyRevenue.FirstOrDefault(d => d.Day == day)?.Revenue ?? 0
                 }).ToList();
+
+                // Dynamic Growth Metrics (Last 30 days)
+                var thirtyDaysAgo = DateTime.UtcNow.Date.AddDays(-30);
+                var recentUsers = await _context.Users.CountAsync(u => u.CreatedAt >= thirtyDaysAgo);
+                var recentJobs = await _context.Recruitments.CountAsync(r => r.CreatedAt >= thirtyDaysAgo);
+
+                var last30DaysRevenue = await _context.Orders.Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= thirtyDaysAgo).SumAsync(o => o.Amount);
+                var prev30DaysRevenue = await _context.Orders.Where(o => o.Status == SD.OrderStatus_Paid && o.CreatedAt >= thirtyDaysAgo.AddDays(-30) && o.CreatedAt < thirtyDaysAgo).SumAsync(o => o.Amount);
+                var revenueGrowth = prev30DaysRevenue == 0 ? (last30DaysRevenue > 0 ? 100 : 0) : (int)((last30DaysRevenue - prev30DaysRevenue) / prev30DaysRevenue * 100);
+
+                var recentPremium = await _context.Users.CountAsync(u => u.Subscription != null && u.Subscription.Plan != "free" && u.Subscription.StartAt >= thirtyDaysAgo);
+                var prevPremium = await _context.Users.CountAsync(u => u.Subscription != null && u.Subscription.Plan != "free" && u.Subscription.StartAt >= thirtyDaysAgo.AddDays(-30) && u.Subscription.StartAt < thirtyDaysAgo);
+                var premiumGrowth = prevPremium == 0 ? (recentPremium > 0 ? 100 : 0) : (int)((double)(recentPremium - prevPremium) / prevPremium * 100);
 
                 var stats = new DashboardStatsDTO
                 {
@@ -251,10 +267,10 @@ namespace WorkHub.Controllers.Admin
                     TotalJobs = totalJobs,
                     TotalPremiumUsers = premiumUsers,
                     RevenueChartData = chartData,
-                    RevenueGrowthPercentage = 23, // Mocked for now
-                    UserGrowthCount = 145,
-                    JobGrowthCount = 12,
-                    PremiumGrowthPercentage = 17
+                    RevenueGrowthPercentage = revenueGrowth,
+                    UserGrowthCount = recentUsers,
+                    JobGrowthCount = recentJobs,
+                    PremiumGrowthPercentage = premiumGrowth
                 };
 
                 return Ok(ApiResponse<DashboardStatsDTO>.Ok(stats, "Stats retrieved successfully"));
