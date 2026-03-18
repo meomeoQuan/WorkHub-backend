@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkHub.Models.Models;
 
@@ -61,4 +62,12 @@ public partial class User
     public string? RefreshTokenHash { get; set; }
     public DateTime? RefreshTokenExpiry { get; set; }
     public string Status { get; set; } = "active";
+
+    public int ReportCount { get; set; } = 0;
+
+    [InverseProperty("Reporter")]
+    public virtual ICollection<Report> ReportsGiven { get; set; } = new List<Report>();
+
+    [InverseProperty("ReportedUser")]
+    public virtual ICollection<Report> ReportsReceived { get; set; } = new List<Report>();
 }

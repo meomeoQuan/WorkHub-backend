@@ -48,7 +48,7 @@ public partial class WorkHubDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<City> Cities { get; set; }
 
-
+    public virtual DbSet<Report> Reports { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
