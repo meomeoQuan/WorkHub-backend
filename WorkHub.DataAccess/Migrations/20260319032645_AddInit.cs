@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -70,7 +70,9 @@ namespace WorkHub.DataAccess.Migrations
                     TokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())"),
                     RefreshTokenHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "active"),
+                    ReportCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -170,6 +172,36 @@ namespace WorkHub.DataAccess.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reports",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ReporterId = table.Column<int>(type: "int", nullable: false),
+                    ReportedUserId = table.Column<int>(type: "int", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reports", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reports_Users_ReportedUserId",
+                        column: x => x.ReportedUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Reports_Users_ReporterId",
+                        column: x => x.ReporterId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -608,6 +640,16 @@ namespace WorkHub.DataAccess.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Reports_ReportedUserId",
+                table: "Reports",
+                column: "ReportedUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reports_ReporterId",
+                table: "Reports",
+                column: "ReporterId");
+
+            migrationBuilder.CreateIndex(
                 name: "UQ__UserDeta__1788CC4D395EC6B9",
                 table: "UserDetail",
                 column: "UserId",
@@ -663,6 +705,9 @@ namespace WorkHub.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "PostRecruitment");
+
+            migrationBuilder.DropTable(
+                name: "Reports");
 
             migrationBuilder.DropTable(
                 name: "UserDetail");

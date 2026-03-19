@@ -12,8 +12,8 @@ using WorkHub.DataAccess.Data;
 namespace WorkHub.DataAccess.Migrations
 {
     [DbContext(typeof(WorkHubDbContext))]
-    [Migration("20260316155802_AddUserStatus")]
-    partial class AddUserStatus
+    [Migration("20260319042157_AddNotificationSystem")]
+    partial class AddNotificationSystem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -500,6 +500,36 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("JobTypes");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("(sysdatetime())");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notification", (string)null);
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -683,6 +713,44 @@ namespace WorkHub.DataAccess.Migrations
                     b.ToTable("Recruitment", (string)null);
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportedUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReporterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedUserId");
+
+                    b.HasIndex("ReporterId");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -735,6 +803,9 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Property<string>("RefreshTokenHash")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportCount")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Role")
                         .ValueGeneratedOnAdd()
@@ -931,6 +1002,29 @@ namespace WorkHub.DataAccess.Migrations
                     b.HasIndex("FollowingId");
 
                     b.ToTable("UserFollow", (string)null);
+                });
+
+            modelBuilder.Entity("WorkHub.Models.Models.UserNotification", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("NotificationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId", "NotificationId");
+
+                    b.HasIndex("NotificationId");
+
+                    b.ToTable("UserNotification", (string)null);
                 });
 
             modelBuilder.Entity("WorkHub.Models.Models.UserSchedule", b =>
@@ -1165,6 +1259,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.Report", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.User", "ReportedUser")
+                        .WithMany("ReportsReceived")
+                        .HasForeignKey("ReportedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.User", "Reporter")
+                        .WithMany("ReportsGiven")
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ReportedUser");
+
+                    b.Navigation("Reporter");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.UserDetail", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.User", "User")
@@ -1219,6 +1332,25 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("Following");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.UserNotification", b =>
+                {
+                    b.HasOne("WorkHub.Models.Models.Notification", "Notification")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("NotificationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkHub.Models.Models.User", "User")
+                        .WithMany("UserNotifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.UserSchedule", b =>
                 {
                     b.HasOne("WorkHub.Models.Models.User", "User")
@@ -1259,6 +1391,11 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("Recruitments");
                 });
 
+            modelBuilder.Entity("WorkHub.Models.Models.Notification", b =>
+                {
+                    b.Navigation("UserNotifications");
+                });
+
             modelBuilder.Entity("WorkHub.Models.Models.Post", b =>
                 {
                     b.Navigation("Comments");
@@ -1291,6 +1428,10 @@ namespace WorkHub.DataAccess.Migrations
 
                     b.Navigation("Recruitments");
 
+                    b.Navigation("ReportsGiven");
+
+                    b.Navigation("ReportsReceived");
+
                     b.Navigation("Subscription")
                         .IsRequired();
 
@@ -1303,6 +1444,8 @@ namespace WorkHub.DataAccess.Migrations
                     b.Navigation("UserFollowFollowers");
 
                     b.Navigation("UserFollowFollowings");
+
+                    b.Navigation("UserNotifications");
 
                     b.Navigation("UserSchedules");
                 });

@@ -48,7 +48,10 @@ public partial class WorkHubDbContext : DbContext
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<City> Cities { get; set; }
 
-
+    public virtual DbSet<Report> Reports { get; set; }
+    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<UserNotification> UserNotifications { get; set; }
+    public virtual DbSet<ReportCategory> ReportCategories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -446,6 +449,45 @@ public partial class WorkHubDbContext : DbContext
             );
         });
 
+        modelBuilder.Entity<ReportCategory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("ReportCategories");
+            entity.HasData(
+                new ReportCategory { Id = 1, Name = "Spam" },
+                new ReportCategory { Id = 2, Name = "Harassment", Description = "Quấy rối" },
+                new ReportCategory { Id = 3, Name = "Fake account", Description = "Tài khoản giả mạo" },
+                new ReportCategory { Id = 4, Name = "Scam", Description = "Lừa đảo" },
+                new ReportCategory { Id = 5, Name = "Other", Description = "Khác" }
+            );
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("Notification");
+            entity.Property(e => e.Title).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Message).IsRequired();
+            entity.Property(e => e.Type).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetime())");
+        });
+
+        modelBuilder.Entity<UserNotification>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.NotificationId });
+            entity.ToTable("UserNotification");
+            entity.Property(e => e.IsRead).HasDefaultValue(false);
+
+            entity.HasOne(d => d.Notification)
+                .WithMany(p => p.UserNotifications)
+                .HasForeignKey(d => d.NotificationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.User)
+                .WithMany(p => p.UserNotifications)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }

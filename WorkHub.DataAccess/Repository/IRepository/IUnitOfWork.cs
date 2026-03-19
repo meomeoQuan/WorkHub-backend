@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +38,8 @@ namespace WorkHub.DataAccess.Repository.IRepository
 
         public IRepository<Application> ApplicationRepository { get; }
         public ICityRepository CityRepo { get; }
+        public IRepository<Notification> NotificationRepository { get; }
+        public IRepository<UserNotification> UserNotificationRepository { get; }
 
         Task SaveAsync();
     }

@@ -194,7 +194,7 @@ namespace WorkHub.Controllers.Admin
                     return BadRequest(ApiResponse<object>.BadRequest("Email already exists"));
                 }
 
-                var user = new User
+                var user = new WorkHub.Models.Models.User
                 {
                     FullName = dto.FullName,
                     Email = dto.Email,
@@ -483,12 +483,65 @@ namespace WorkHub.Controllers.Admin
         {
             try
             {
-                // No reports table yet, returning empty list
-                return Ok(ApiResponse<IEnumerable<object>>.Ok(new List<object>(), "Reports retrieved successfully"));
+                var reports = await _context.Reports
+                    .Include(r => r.Reporter)
+                    .Include(r => r.ReportedUser)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .ToListAsync();
+
+                var results = reports.Select(r => new {
+                    id = r.Id,
+                    userName = r.Reporter?.FullName, // Mapping to existing UI fields
+                    userEmail = r.Reporter?.Email,
+                    reportedUserId = r.ReportedUserId,
+                    reportedUserName = r.ReportedUser?.FullName,
+                    reportedUserEmail = r.ReportedUser?.Email,
+                    subject = "Report: " + r.ReportedUser?.FullName, 
+                    category = r.Reason,
+                    description = r.Description,
+                    priority = r.Reason.ToLower().Contains("harassment") || r.Reason.ToLower().Contains("scam") ? "High" : "Medium",
+                    status = r.Status,
+                    date = r.CreatedAt
+                });
+
+                return Ok(ApiResponse<object>.Ok(results, "Reports retrieved successfully"));
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ApiResponse<object>.Error(500, "Failed to retrieve reports", ex.Message));
+            }
+        }
+
+        public class ResolveReportDTO { public string Action { get; set; } }
+
+        [HttpPost("reports/{id}/resolve")]
+        public async Task<IActionResult> ResolveReport(int id, [FromBody] ResolveReportDTO dto)
+        {
+            try
+            {
+                var report = await _context.Reports.Include(r => r.ReportedUser).FirstOrDefaultAsync(r => r.Id == id);
+                if (report == null) return NotFound(ApiResponse<object>.NotFound("Report not found"));
+
+                if (dto.Action == "ban") 
+                {
+                    report.ReportedUser.Status = SD.UserStatus_Suspended;
+                    report.Status = "Resolved";
+                } 
+                else if (dto.Action == "dismiss") 
+                {
+                    report.Status = "Dismissed";
+                }
+                else 
+                {
+                    report.Status = "Reviewed";
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(new { status = report.Status }, "Report resolved successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to resolve report", ex.Message));
             }
         }
     }
