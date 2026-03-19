@@ -70,4 +70,6 @@ public partial class User
 
     [InverseProperty("ReportedUser")]
     public virtual ICollection<Report> ReportsReceived { get; set; } = new List<Report>();
+
+    public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 }

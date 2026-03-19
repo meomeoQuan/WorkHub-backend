@@ -131,6 +131,7 @@ builder.Services.AddHealthChecks()
     builder.Services.AddScoped<IGoogleAuthService,GoogleAuthService>();
     builder.Services.AddScoped<IEmailService, EmailService>();
     builder.Services.AddScoped<IMediaService, MediaService>();
+    builder.Services.AddScoped<INotificationService, NotificationService>();
     builder.Services.Configure<CloudinaryOptions>(builder.Configuration.GetSection("Cloudinary"));
 
 

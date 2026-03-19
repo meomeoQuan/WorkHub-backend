@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +34,8 @@ namespace WorkHub.DataAccess.Repository
             UserEducationRepository = new Repository<UserEducation>(_db);
             UserScheduleRepository = new Repository<UserSchedule>(_db);
             ApplicationRepository = new Repository<Application>(_db);
+            NotificationRepository = new Repository<Notification>(_db);
+            UserNotificationRepository = new Repository<UserNotification>(_db);
         }
 
         public IRecruitmentInfoRepo RecruitmentInfoRepo { get; private set; }
@@ -63,6 +65,8 @@ namespace WorkHub.DataAccess.Repository
         public IRepository<UserEducation> UserEducationRepository { get; private set; }
         public IRepository<UserSchedule> UserScheduleRepository { get; private set; }
         public IRepository<Application> ApplicationRepository { get; private set; }
+        public IRepository<Notification> NotificationRepository { get; private set; }
+        public IRepository<UserNotification> UserNotificationRepository { get; private set; }
 
         public async Task SaveAsync()
         {

@@ -1,0 +1,162 @@
+﻿Build started...
+Build succeeded.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (202ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (198ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (190ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (213ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (185ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      SELECT [MigrationId], [ProductVersion]
+      FROM [__EFMigrationsHistory]
+      ORDER BY [MigrationId];
+info: Microsoft.EntityFrameworkCore.Migrations[20402]
+      Applying migration '20260319032645_AddInit'.
+Applying migration '20260319032645_AddInit'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (204ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Categories] (
+          [Id] int NOT NULL IDENTITY,
+          [Name] nvarchar(max) NOT NULL,
+          CONSTRAINT [PK_Categories] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (193ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Cities] (
+          [Id] int NOT NULL IDENTITY,
+          [Name] nvarchar(100) NOT NULL,
+          CONSTRAINT [PK_Cities] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (188ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [JobTypes] (
+          [Id] int NOT NULL IDENTITY,
+          [Name] nvarchar(max) NOT NULL,
+          CONSTRAINT [PK_JobTypes] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (728ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Users] (
+          [Id] int NOT NULL IDENTITY,
+          [Email] nvarchar(255) NOT NULL,
+          [FullName] nvarchar(max) NOT NULL,
+          [Phone] nvarchar(50) NULL,
+          [PasswordHash] nvarchar(255) NULL,
+          [Role] int NULL DEFAULT 1,
+          [IsVerified] bit NULL DEFAULT CAST(0 AS bit),
+          [Provider] nvarchar(100) NULL,
+          [ProviderId] nvarchar(255) NULL,
+          [EmailVerificationToken] nvarchar(255) NULL,
+          [TokenExpiry] datetime2 NULL,
+          [CreatedAt] datetime2 NULL DEFAULT ((sysdatetime())),
+          [RefreshTokenHash] nvarchar(max) NULL,
+          [RefreshTokenExpiry] datetime2 NULL,
+          [Status] nvarchar(50) NOT NULL DEFAULT N'active',
+          [ReportCount] int NOT NULL,
+          CONSTRAINT [PK__Users__3214EC0775A0391A] PRIMARY KEY ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (195ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Orders] (
+          [Id] int NOT NULL IDENTITY,
+          [UserId] int NOT NULL,
+          [OrderCode] bigint NOT NULL,
+          [Amount] bigint NOT NULL,
+          [Status] nvarchar(50) NOT NULL DEFAULT N'Pending',
+          [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+          [PaidAt] datetime2 NULL,
+          CONSTRAINT [PK_Orders] PRIMARY KEY ([Id]),
+          CONSTRAINT [FK_Orders_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id])
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (197ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Post] (
+          [Id] int NOT NULL IDENTITY,
+          [UserId] int NOT NULL,
+          [Content] nvarchar(max) NULL,
+          [PostImageUrl] nvarchar(max) NULL,
+          [CreatedAt] datetime2 NULL DEFAULT ((sysdatetime())),
+          CONSTRAINT [PK__Post__3214EC07971C2B27] PRIMARY KEY ([Id]),
+          CONSTRAINT [FK__Post__UserId__4222D4EF] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+      );
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (712ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Recruitment] (
+          [Id] int NOT NULL IDENTITY,
+          [UserId] int NOT NULL,
+          [JobName] nvarchar(255) NULL,
+          [CategoryId] int NOT NULL,
+          [JobTypeId] int NOT NULL,
+          [CityId] int NULL,
+          [Location] nvarchar(255) NULL,
+          [Salary] nvarchar(100) NULL,
+          [MinSalary] decimal(18,2) NOT NULL,
+          [MaxSalary] decimal(18,2) NULL,
+          [SalaryCurrency] nvarchar(20) NULL,
+          [SalaryCycle] nvarchar(50) NULL,
+          [Status] nvarchar(50) NULL,
+          [Requirements] nvarchar(max) NULL,
+          [Benefits] nvarchar(max) NULL,
+          [WorkTime] nvarchar(255) NULL,
+          [CreatedAt] datetime2 NULL DEFAULT ((sysdatetime())),
+          CONSTRAINT [PK__Recruitm__3214EC079D1054A4] PRIMARY KEY ([Id]),
+          CONSTRAINT [FK_Recruitment_Categories_CategoryId] FOREIGN KEY ([CategoryId]) REFERENCES [Categories] ([Id]) ON DELETE CASCADE,
+          CONSTRAINT [FK_Recruitment_Cities_CityId] FOREIGN KEY ([CityId]) REFERENCES [Cities] ([Id]),
+          CONSTRAINT [FK_Recruitment_JobTypes_JobTypeId] FOREIGN KEY ([JobTypeId]) REFERENCES [JobTypes] ([Id]) ON DELETE CASCADE,
+          CONSTRAINT [FK_Recruitment_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([Id])
+      );
+fail: Microsoft.EntityFrameworkCore.Database.Command[20102]
+      Failed executing DbCommand (254ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+      CREATE TABLE [Reports] (
+          [Id] int NOT NULL IDENTITY,
+          [ReporterId] int NOT NULL,
+          [ReportedUserId] int NOT NULL,
+          [Reason] nvarchar(max) NOT NULL,
+          [Description] nvarchar(max) NOT NULL,
+          [CreatedAt] datetime2 NOT NULL,
+          [Status] nvarchar(max) NOT NULL,
+          CONSTRAINT [PK_Reports] PRIMARY KEY ([Id]),
+          CONSTRAINT [FK_Reports_Users_ReportedUserId] FOREIGN KEY ([ReportedUserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
+          CONSTRAINT [FK_Reports_Users_ReporterId] FOREIGN KEY ([ReporterId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+      );
+Failed executing DbCommand (254ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+CREATE TABLE [Reports] (
+    [Id] int NOT NULL IDENTITY,
+    [ReporterId] int NOT NULL,
+    [ReportedUserId] int NOT NULL,
+    [Reason] nvarchar(max) NOT NULL,
+    [Description] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    [Status] nvarchar(max) NOT NULL,
+    CONSTRAINT [PK_Reports] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Reports_Users_ReportedUserId] FOREIGN KEY ([ReportedUserId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Reports_Users_ReporterId] FOREIGN KEY ([ReporterId]) REFERENCES [Users] ([Id]) ON DELETE CASCADE
+);
+Microsoft.Data.SqlClient.SqlException (0x80131904): Introducing FOREIGN KEY constraint 'FK_Reports_Users_ReporterId' on table 'Reports' may cause cycles or multiple cascade paths. Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
+Could not create constraint or index. See previous errors.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.RunExecuteNonQueryTds(String methodName, Boolean isAsync, Int32 timeout, Boolean asyncWrite)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalExecuteNonQuery(TaskCompletionSource`1 completion, Boolean sendToPipe, Int32 timeout, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String methodName)
+   at Microsoft.Data.SqlClient.SqlCommand.ExecuteNonQuery()
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQuery(RelationalCommandParameterObject parameterObject)
+   at Microsoft.EntityFrameworkCore.Migrations.MigrationCommand.ExecuteNonQuery(IRelationalConnection connection, IReadOnlyDictionary`2 parameterValues)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.MigrationCommandExecutor.ExecuteNonQuery(IEnumerable`1 migrationCommands, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Migrations.Internal.Migrator.Migrate(String targetMigration)
+   at Microsoft.EntityFrameworkCore.Design.Internal.MigrationsOperations.UpdateDatabase(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabaseImpl(String targetMigration, String connectionString, String contextType)
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.UpdateDatabase.<>c__DisplayClass0_0.<.ctor>b__0()
+   at Microsoft.EntityFrameworkCore.Design.OperationExecutor.OperationBase.Execute(Action action)
+ClientConnectionId:4b832ae5-5eab-4fbc-8f46-c9db5160cd14
+Error Number:1785,State:0,Class:16
+Introducing FOREIGN KEY constraint 'FK_Reports_Users_ReporterId' on table 'Reports' may cause cycles or multiple cascade paths. Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
+Could not create constraint or index. See previous errors.
