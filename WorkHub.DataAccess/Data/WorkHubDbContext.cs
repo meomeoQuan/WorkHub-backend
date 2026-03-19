@@ -51,6 +51,7 @@ public partial class WorkHubDbContext : DbContext
     public virtual DbSet<Report> Reports { get; set; }
     public virtual DbSet<Notification> Notifications { get; set; }
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
+    public virtual DbSet<ReportCategory> ReportCategories { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -445,6 +446,19 @@ public partial class WorkHubDbContext : DbContext
                 new City { Id = 62, Name = "Vinh Phuc" },
                 new City { Id = 63, Name = "Yen Bai" },
                 new City { Id = 64, Name = "Ho Chi Minh City" }
+            );
+        });
+
+        modelBuilder.Entity<ReportCategory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("ReportCategories");
+            entity.HasData(
+                new ReportCategory { Id = 1, Name = "Spam" },
+                new ReportCategory { Id = 2, Name = "Harassment", Description = "Quấy rối" },
+                new ReportCategory { Id = 3, Name = "Fake account", Description = "Tài khoản giả mạo" },
+                new ReportCategory { Id = 4, Name = "Scam", Description = "Lừa đảo" },
+                new ReportCategory { Id = 5, Name = "Other", Description = "Khác" }
             );
         });
 
