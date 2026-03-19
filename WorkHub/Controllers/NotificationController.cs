@@ -57,5 +57,31 @@ namespace WorkHub.Controllers
             await _notificationService.MarkAsReadAsync(userId, notificationId);
             return Ok(new { success = true });
         }
+
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var count = await _notificationService.GetUnreadCountAsync(userId);
+            return Ok(new { success = true, data = count });
+        }
+
+        [HttpPut("read-all")]
+        public async Task<IActionResult> MarkAllAsRead()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            await _notificationService.MarkAllAsReadAsync(userId);
+            return Ok(new { success = true });
+        }
     }
 }
