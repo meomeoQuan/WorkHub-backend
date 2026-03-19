@@ -8,6 +8,7 @@ using WorkHub.DataAccess.Data;
 using WorkHub.Models.DTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
+using WorkHub.Business.Service.IService;
 
 namespace WorkHub.Controllers.User
 {
@@ -16,10 +17,12 @@ namespace WorkHub.Controllers.User
     public class ReportController : ControllerBase
     {
         private readonly WorkHubDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public ReportController(WorkHubDbContext context)
+        public ReportController(WorkHubDbContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         public class ReportCreateDTO
@@ -94,6 +97,23 @@ namespace WorkHub.Controllers.User
                 }
 
                 await _context.SaveChangesAsync();
+
+                // 5. Send Notifications
+                // To reporter
+                await _notificationService.CreateNotificationAsync(
+                    "Report Submitted",
+                    $"Your report against {reportedUser.FullName} for '{dto.Reason}' has been received and is being reviewed.",
+                    "report",
+                    new System.Collections.Generic.List<int> { dto.ReporterId }
+                );
+
+                // To reported user (Warning)
+                await _notificationService.CreateNotificationAsync(
+                    "Account Warning",
+                    $"Your account has been reported for '{dto.Reason}'. Please adhere to our community guidelines to avoid further actions.",
+                    "warning",
+                    new System.Collections.Generic.List<int> { dto.ReportedUserId }
+                );
 
                 return Ok(ApiResponse<object>.Ok(new { reportId = report.Id }, "Report submitted successfully."));
             }
