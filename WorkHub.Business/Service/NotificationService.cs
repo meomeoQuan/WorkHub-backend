@@ -61,9 +61,29 @@ namespace WorkHub.Business.Service
             {
                 userNotif.IsRead = true;
                 userNotif.ReadAt = DateTime.UtcNow;
-                // Just saving is enough if entity is tracked, but some repos require Update()
-                _unitOfWork.SaveAsync().Wait();
+                await _unitOfWork.SaveAsync();
             }
+        }
+
+        public async Task<int> GetUnreadCountAsync(int userId)
+        {
+            var unread = await _unitOfWork.UserNotificationRepository.GetAllAsync(
+                filter: un => un.UserId == userId && !un.IsRead);
+            return unread.Count();
+        }
+
+        public async Task MarkAllAsReadAsync(int userId)
+        {
+            var unreadNotifs = await _unitOfWork.UserNotificationRepository.GetAllAsync(
+                filter: un => un.UserId == userId && !un.IsRead);
+
+            foreach (var notif in unreadNotifs)
+            {
+                notif.IsRead = true;
+                notif.ReadAt = DateTime.UtcNow;
+            }
+
+            await _unitOfWork.SaveAsync();
         }
     }
 }

@@ -10,5 +10,7 @@ namespace WorkHub.Business.Service.IService
         Task CreateNotificationAsync(string title, string message, string type, List<int> userIds);
         Task<IEnumerable<UserNotification>> GetUserNotificationsAsync(int userId);
         Task MarkAsReadAsync(int userId, Guid notificationId);
+        Task<int> GetUnreadCountAsync(int userId);
+        Task MarkAllAsReadAsync(int userId);
     }
 }
