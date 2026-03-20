@@ -90,7 +90,9 @@ builder.Services.AddCors(options =>
               {
                   var uri = new Uri(origin);
                   return uri.Host == "localhost"
-                      || uri.Host.EndsWith(".vercel.app");
+                        || uri.Host == "workhub.com.vn"     // ← add this
+                        || uri.Host == "www.workhub.com.vn" // ← and this
+                        || uri.Host.EndsWith(".vercel.app");
               })
               .AllowAnyHeader()
               .AllowAnyMethod()
