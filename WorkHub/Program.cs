@@ -177,7 +177,19 @@ var app = builder.Build();
 
     // Health endpoint (ALB)
     app.MapHealthChecks("/health");
-
     app.MapControllers();
 
     app.Run();
+
+
+
+//https://workhub-backend-m47s.onrender.com/health
+//If it returns Healthy → DB is connected ✅
+//If it returns Unhealthy → connection string still wrong ❌
+
+
+//However, there are 3 big risks if you don't have /health:
+
+//"False Positives": Your app might show as "Live" on Render because the web server started, even if it's crashing internally because it can't connect to the database.
+//Deployment Downtime: Render uses health checks to decide when to switch traffic from the "Old" version to the "New" version. Without a check, it might switch too early and show users a 500 error page.
+//Harder Debugging: When you see a 500 error (like the one you just had with the connection string), you have to check logs to find out why. With /health, you can instantly see Database: Unhealthy and know exactly where the problem is.
