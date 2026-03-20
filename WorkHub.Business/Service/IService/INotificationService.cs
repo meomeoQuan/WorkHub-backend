@@ -12,5 +12,6 @@ namespace WorkHub.Business.Service.IService
         Task MarkAsReadAsync(int userId, Guid notificationId);
         Task<int> GetUnreadCountAsync(int userId);
         Task MarkAllAsReadAsync(int userId);
+        Task DeleteNotificationAsync(int userId, Guid notificationId);
     }
 }

@@ -85,5 +85,17 @@ namespace WorkHub.Business.Service
 
             await _unitOfWork.SaveAsync();
         }
+        
+        public async Task DeleteNotificationAsync(int userId, Guid notificationId)
+        {
+            var userNotif = await _unitOfWork.UserNotificationRepository.GetAsync(
+                filter: un => un.UserId == userId && un.NotificationId == notificationId);
+            
+            if (userNotif != null)
+            {
+                _unitOfWork.UserNotificationRepository.Remove(userNotif);
+                await _unitOfWork.SaveAsync();
+            }
+        }
     }
 }
