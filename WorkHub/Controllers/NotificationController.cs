@@ -83,5 +83,18 @@ namespace WorkHub.Controllers
             await _notificationService.MarkAllAsReadAsync(userId);
             return Ok(new { success = true });
         }
+        
+        [HttpDelete("{notificationId}")]
+        public async Task<IActionResult> DeleteNotification(Guid notificationId)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId))
+            {
+                return Unauthorized();
+            }
+            
+            await _notificationService.DeleteNotificationAsync(userId, notificationId);
+            return Ok(new { success = true });
+        }
     }
 }
