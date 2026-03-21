@@ -19,12 +19,14 @@ namespace WorkHub.Controllers.Users
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ApplicationDetailController(IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService)
+        public ApplicationDetailController(IUnitOfWork unitOfWork, IMapper mapper, IEmailService emailService, IWebHostEnvironment webHostEnvironment)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _emailService = emailService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet("{id}")]
@@ -74,7 +76,10 @@ namespace WorkHub.Controllers.Users
             {
                 var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
-                var application = await _unitOfWork.ApplicationRepository.GetAsync(a => a.Id == updateDTO.ApplicationId);
+                var application = await _unitOfWork.ApplicationRepository.GetAsync(
+                    a => a.Id == updateDTO.ApplicationId,
+                    includeProperties: "User,Recruitment,Recruitment.User"
+                );
 
                 if (application == null)
                 {
@@ -104,6 +109,53 @@ namespace WorkHub.Controllers.Users
                 application.Status = updateDTO.Status;
                 //_unitOfWork.ApplicationRepository.Update(application);
                 await _unitOfWork.SaveAsync();
+
+                // Send Status Email
+                try 
+                {
+                    string templateName = string.Empty;
+                    string subject = string.Empty;
+
+                    if (updateDTO.Status == ApplicationStatus.Reviewing) 
+                    {
+                        templateName = "ApplicationReviewing.html";
+                        subject = $"WorkHub: Your Application is Under Review";
+                    } 
+                    else if (updateDTO.Status == ApplicationStatus.Accepted) 
+                    {
+                        templateName = "ApplicationAccepted.html";
+                        subject = $"WorkHub: Application Accepted! 🎉";
+                    } 
+                    else if (updateDTO.Status == ApplicationStatus.Rejected) 
+                    {
+                        templateName = "ApplicationRejected.html";
+                        subject = $"WorkHub: Update on your Application";
+                    }
+
+                    if (!string.IsNullOrEmpty(templateName)) 
+                    {
+                        var path = Path.Combine(_webHostEnvironment.ContentRootPath, "Templates", templateName);
+                        if (System.IO.File.Exists(path)) 
+                        {
+                            var body = await System.IO.File.ReadAllTextAsync(path);
+                            body = body.Replace("{{CANDIDATE_NAME}}", application.User?.FullName ?? application.User?.Email ?? "Applicant");
+                            body = body.Replace("{{JOB_TITLE}}", application.Recruitment?.JobName ?? "the position");
+                            body = body.Replace("{{COMPANY_NAME}}", application.Recruitment?.User?.FullName ?? "the company");
+
+                            await _emailService.SendEmailAsync(new WorkHub.Models.DTOs.AuthDTOs.EmailRequestDTO
+                            {
+                                Body = body,
+                                To = application.User?.Email,
+                                Subject = subject,
+                                IsHtml = true
+                            });
+                        }
+                    }
+                } 
+                catch (Exception emailEx) 
+                {
+                    Console.WriteLine($"[ApplicationDetailController] Error sending status email: {emailEx.Message}");
+                }
 
                 return Ok(ApiResponse<object>.Ok(null, "Application status updated successfully"));
             }
