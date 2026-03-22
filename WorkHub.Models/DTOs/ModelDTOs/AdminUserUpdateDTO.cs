@@ -30,5 +30,6 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? CompanySize { get; set; }
         public int? FoundedYear { get; set; }
         public string? GoogleMapsEmbedUrl { get; set; }
+        public bool? IsVerified { get; set; }
     }
 }
