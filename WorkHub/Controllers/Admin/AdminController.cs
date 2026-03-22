@@ -443,6 +443,29 @@ namespace WorkHub.Controllers.Admin
             }
         }
 
+        [HttpDelete("categories/{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                var category = await _context.Categories.Include(c => c.Recruitments).FirstOrDefaultAsync(c => c.Id == id);
+                if (category == null) return NotFound(ApiResponse<object>.NotFound("Category not found"));
+                
+                if (category.Recruitments != null && category.Recruitments.Any())
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Cannot delete category because it has associated posts/jobs"));
+                }
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(null, "Category deleted successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to delete category", ex.Message));
+            }
+        }
+
         [HttpPost("jobtypes")]
         public async Task<IActionResult> CreateJobType([FromBody] JobTypeDTO dto)
         {
@@ -475,6 +498,29 @@ namespace WorkHub.Controllers.Admin
             catch (Exception ex)
             {
                 return StatusCode(500, ApiResponse<object>.Error(500, "Failed to update job type", ex.Message));
+            }
+        }
+
+        [HttpDelete("jobtypes/{id}")]
+        public async Task<IActionResult> DeleteJobType(int id)
+        {
+            try
+            {
+                var jobType = await _context.JobTypes.Include(j => j.Recruitments).FirstOrDefaultAsync(j => j.Id == id);
+                if (jobType == null) return NotFound(ApiResponse<object>.NotFound("JobType not found"));
+                
+                if (jobType.Recruitments != null && jobType.Recruitments.Any())
+                {
+                    return BadRequest(ApiResponse<object>.BadRequest("Cannot delete job type because it has associated posts/jobs"));
+                }
+
+                _context.JobTypes.Remove(jobType);
+                await _context.SaveChangesAsync();
+                return Ok(ApiResponse<object>.Ok(null, "JobType deleted successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to delete job type", ex.Message));
             }
         }
 
