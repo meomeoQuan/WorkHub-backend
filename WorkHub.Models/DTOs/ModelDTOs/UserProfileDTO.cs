@@ -14,6 +14,8 @@ namespace WorkHub.Models.DTOs.ModelDTOs
         public string? Location { get; set; }
         public int Role { get; set; }
         public string? Provider { get; set; }
+        public string PaymentPlan { get; set; } = "free";
+        public bool IsVerified { get; set; }
         public double Rating { get; set; }
         public int TotalJobs { get; set; }
         public int TotalPosts { get; set; }

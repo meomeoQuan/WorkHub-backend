@@ -8,6 +8,8 @@ using WorkHub.Models.DTOs.ModelDTOs.JobDTOs;
 using WorkHub.Models.Models;
 using WorkHub.Utility;
 using AutoMapper;
+using WorkHub.Business.Service.IService;
+using WorkHub.Models.DTOs.AuthDTOs;
 
 namespace WorkHub.Controllers.Admin
 {
@@ -18,11 +20,13 @@ namespace WorkHub.Controllers.Admin
     {
         private readonly WorkHubDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
-        public AdminController(WorkHubDbContext context, IMapper mapper)
+        public AdminController(WorkHubDbContext context, IMapper mapper, IEmailService emailService)
         {
             _context = context;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         [HttpGet("users")]
@@ -134,6 +138,7 @@ namespace WorkHub.Controllers.Admin
 
                 var user = await _context.Users
                     .Include(u => u.UserDetail)
+                    .Include(u => u.Subscription)
                     .FirstOrDefaultAsync(u => u.Id == id);
 
                 if (user == null)
@@ -166,6 +171,29 @@ namespace WorkHub.Controllers.Admin
                 if (dto.TotalJobs.HasValue) user.UserDetail.TotalJobs = dto.TotalJobs.Value;
                 if (dto.TotalPosts.HasValue) user.UserDetail.TotalPosts = dto.TotalPosts.Value;
                 if (dto.Rating.HasValue) user.UserDetail.Rating = dto.Rating.Value;
+
+                // Update verification status
+                if (dto.IsVerified.HasValue) user.IsVerified = dto.IsVerified.Value;
+
+                // Update payment plan
+                if (!string.IsNullOrEmpty(dto.PaymentPlan))
+                {
+                    if (user.Subscription == null)
+                    {
+                        user.Subscription = new UserSubscription 
+                        { 
+                            UserId = user.Id, 
+                            Plan = dto.PaymentPlan, 
+                            StartAt = DateTime.UtcNow, 
+                            EndAt = DateTime.UtcNow.AddYears(1), 
+                            IsActive = true 
+                        };
+                    }
+                    else
+                    {
+                        user.Subscription.Plan = dto.PaymentPlan;
+                    }
+                }
 
                 await _context.SaveChangesAsync();
                 
@@ -590,5 +618,36 @@ namespace WorkHub.Controllers.Admin
                 return StatusCode(500, ApiResponse<object>.Error(500, "Failed to resolve report", ex.Message));
             }
         }
+        // ─── Send Email to User ───────────────────────────────────────
+        [HttpPost("send-email")]
+        public async Task<IActionResult> SendEmailToUser([FromBody] AdminSendEmailDTO dto)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(dto.To) || string.IsNullOrWhiteSpace(dto.Subject) || string.IsNullOrWhiteSpace(dto.Body))
+                    return BadRequest(ApiResponse<object>.Error(400, "Recipient, subject and message are required"));
+
+                await _emailService.SendEmailAsync(new EmailRequestDTO
+                {
+                    To = dto.To,
+                    Subject = dto.Subject,
+                    Body = dto.Body,
+                    IsHtml = true
+                });
+
+                return Ok(ApiResponse<object>.Ok(null, "Email sent successfully"));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<object>.Error(500, "Failed to send email", ex.Message));
+            }
+        }
+    }
+
+    public class AdminSendEmailDTO
+    {
+        public string To { get; set; } = default!;
+        public string Subject { get; set; } = default!;
+        public string Body { get; set; } = default!;
     }
 }

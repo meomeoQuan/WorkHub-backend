@@ -174,6 +174,8 @@ namespace WorkHub.Business.Mapping
                 .ForMember(d => d.Phone, o => o.MapFrom(s => s.Phone))
                 .ForMember(d => d.Role, o => o.MapFrom(s => s.Role))
                 .ForMember(d => d.Provider, o => o.MapFrom(s => s.Provider))
+                .ForMember(d => d.PaymentPlan, o => o.MapFrom(s => s.Subscription != null ? s.Subscription.Plan : "free"))
+                .ForMember(d => d.IsVerified, o => o.MapFrom(s => s.IsVerified ?? false))
                 // Map from UserDetail
                 .ForMember(d => d.AvatarUrl, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.AvatarUrl : null))
                 .ForMember(d => d.Location, o => o.MapFrom(s => s.UserDetail != null ? s.UserDetail.Location : null))
